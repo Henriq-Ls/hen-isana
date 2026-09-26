@@ -1,0 +1,209 @@
+# HEN-ISANA — PROPOSTA DE ALTERAÇÃO DO CONTRATO PARA O PILOTO
+
+Status: proposta técnica aguardando revisão e autorização explícita
+Data: 2026-09-26
+Escopo: somente `componente_de_expressao` e `relacionado_no_tema`
+
+Este documento não altera o contrato executável, o schema físico, qualquer
+banco, nenhuma proposta legada e nenhum registro. Ele registra a alteração
+mínima a ser implementada somente após autorização.
+
+
+## 1. LIMITES INEGOCIÁVEIS
+
+Esta proposta:
+
+- não abre nova fase;
+- não migra os 70 registros;
+- não altera Professor, ProfessorLlama ou legado;
+- não converte `resposta_padrao` em fato ou conhecimento canônico;
+- não chama `registrar`, `autorizar` ou `aplicar` durante a repetição do piloto;
+- não escreve nos seis bancos canônicos;
+- não generaliza relações para tipos ainda não autorizados.
+
+A autorização desta proposta é autorização para alterar o contrato e seus
+adaptadores de validação/persistência em código. Ela não autoriza a aplicação
+física de nenhuma proposta legada.
+
+
+## 2. REVISÃO DO ESTADO ATUAL
+
+O contrato já possui:
+
+- `ObjetoCadastro.relacoes`;
+- `RelacaoCadastro.destino_tipo`, `destino_chave` e `ordem`;
+- objeto `relacao_semantica` com campos de origem, destino e direção;
+- direção física `simetrica` na tabela `relacoes_semanticas`;
+- tabela física `expressao_componentes` com `ordem` e componente `lexema`.
+
+As lacunas revisadas são:
+
+1. a validação rejeita relações embutidas cuja origem seja `expressao`;
+2. a persistência não encaminha uma relação de expressão para
+   `expressao_componentes`;
+3. a validação e o schema físico de `relacoes_semanticas` não aceitam
+   `expressao` como endpoint;
+4. a persistência não deduplica as duas orientações de uma relação simétrica.
+
+
+## 3. PONTO A — `componente_de_expressao`
+
+### 3.1 Representação lógica proposta
+
+Usar a relação embutida já existente no objeto `expressao`. Não criar um novo
+tipo geral de objeto e não usar `relacao_semantica` para esta relação.
+
+Forma mínima:
+
+```json
+{
+  "tipo": "expressao",
+  "relacoes": [
+    {
+      "tipo": "componente_de_expressao",
+      "origem_objeto_id": "expressao-bom-dia",
+      "destino_tipo": "lexema",
+      "destino_chave": "bom",
+      "ordem": 1,
+      "estado": "proposta"
+    }
+  ]
+}
+```
+
+### 3.2 Regras de validação
+
+Uma relação com `tipo = componente_de_expressao` será válida somente quando:
+
+- a origem for um objeto `expressao`;
+- o destino for um objeto `lexema`;
+- `ordem` for inteiro positivo;
+- a relação não estiver fora do objeto de origem;
+- a evidência referenciada, se houver, existir no pacote.
+
+Nenhum outro tipo de origem ou destino será liberado por esta alteração.
+
+### 3.3 Regra conservadora para ordem
+
+O legado não informa ordem. Portanto:
+
+- a ordem só poderá ser proposta quando a forma normalizada da expressão
+  contiver exatamente uma ocorrência não ambígua da forma do lexema;
+- a posição lexical determinística será registrada como derivada, não como
+  valor proveniente do legado;
+- se houver zero ocorrências, múltiplas ocorrências ou tokenização ambígua, a
+  proposta permanecerá pendente;
+- nenhuma ordem será preenchida silenciosamente com `1`.
+
+Para o caso-piloto `bom dia` → `bom`, a posição candidata é `1`, sujeita à
+revisão humana no pacote. Isso não transforma a linha legada em evidência de
+ordem.
+
+### 3.4 Persistência futura, somente após autorização
+
+O adaptador de persistência encaminhará a relação para:
+
+```text
+expressao_componentes(
+    expressao_id,
+    ordem,
+    tipo_componente = 'lexema',
+    lexema_id,
+    opcional = 0,
+    restricao = NULL
+)
+```
+
+A chave primária existente `(expressao_id, ordem)` continuará impedindo
+duplicidade. O adaptador não criará componentes `literal` ou `variavel` nesta
+alteração.
+
+
+## 4. PONTO B — `relacionado_no_tema`
+
+### 4.1 Representação lógica proposta
+
+Usar um objeto `relacao_semantica` com dois endpoints `expressao` e direção
+explicitamente simétrica:
+
+```json
+{
+  "tipo": "relacao_semantica",
+  "chave": "relacionado_no_tema:ola:ola pessoal",
+  "campos": [
+    {"nome": "tipo_relacao", "valor": "relacionado_no_tema"},
+    {"nome": "origem_tipo", "valor": "expressao"},
+    {"nome": "origem_chave", "valor": "ola"},
+    {"nome": "destino_tipo", "valor": "expressao"},
+    {"nome": "destino_chave", "valor": "ola pessoal"},
+    {"nome": "direcao", "valor": "simetrica"}
+  ]
+}
+```
+
+### 4.2 Regras de validação
+
+Para `tipo_relacao = relacionado_no_tema`:
+
+- origem e destino devem ser `expressao`;
+- `direcao` deve ser exatamente `simetrica`;
+- a relação deve aparecer uma única vez no pacote;
+- uma linha reversa não será gerada artificialmente;
+- uma proposta com direção `direta` será rejeitada ou permanecerá inválida,
+  nunca reinterpretada automaticamente.
+
+Esta alteração não libera `expressao` como endpoint para outros tipos de
+relação semântica.
+
+### 4.3 Persistência e idempotência
+
+O schema físico de `relacoes_semanticas` será ajustado somente no `CHECK` dos
+tipos de endpoint para incluir `expressao`. A tabela continuará sendo usada
+para a relação temática; não será criada tabela nova.
+
+Para `direcao = simetrica`, a busca de reaplicação verificará as duas
+orientações do par. Assim, `ola`–`ola pessoal` e `ola pessoal`–`ola` serão a
+mesma relação física, com uma única linha e uma única proveniência lógica.
+
+
+## 5. IMPLEMENTAÇÃO CONDICIONADA À AUTORIZAÇÃO
+
+Somente após autorização explícita serão alterados:
+
+- validações específicas em `core/contratos.py`,
+  `bancos/api_conhecimento.py` e `bancos/ingestao_json.py`;
+- adaptação transacional em `bancos/persistencia_conhecimento.py`;
+- `aprendizado/bancos/linguagem_schema.sql`, somente nos checks necessários;
+- testes unitários e documentação do contrato;
+- o gerador temporário do piloto, fora do repositório, para emitir as duas
+  novas formas contratuais.
+
+Não será alterado o banco canônico. O destino da repetição será uma cópia
+temporária ou um banco temporário criado com o schema revisado.
+
+
+## 6. REVISÃO E CRITÉRIOS DE ACEITAÇÃO
+
+Antes de qualquer persistência física, a implementação autorizada deverá:
+
+1. aceitar a relação `bom dia` → `bom` no formato embutido;
+2. manter a relação pendente se a ordem não puder ser determinada de modo
+   único;
+3. aceitar `olá` ↔ `olá pessoal` como uma relação simétrica única;
+4. rejeitar combinações fora dos dois pontos desta proposta;
+5. validar os dois formatos com `IngestaoJSON.dry_run()`;
+6. provar que a repetição idêntica produz o mesmo JSON;
+7. provar que a orientação reversa simétrica não duplica o destino temporário;
+8. manter `resposta_padrao` somente como evidência/ledger;
+9. confirmar que `registrar`, `autorizar` e `aplicar` não foram chamados;
+10. confirmar hashes e integridade dos seis bancos canônicos inalterados.
+
+Depois dessa validação, o piloto repetido continuará limitado aos seis casos
+originais. Nenhum dos 70 registros será processado.
+
+
+## 7. DECISÃO SOLICITADA
+
+Autorizar ou rejeitar esta proposta como está. Qualquer alteração na regra de
+ordem, na simetria ou no conjunto de tipos permitidos deve ocorrer nesta etapa,
+antes de qualquer edição funcional.

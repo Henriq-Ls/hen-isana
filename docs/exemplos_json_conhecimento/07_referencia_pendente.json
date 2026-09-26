@@ -1,0 +1,38 @@
+{
+  "proposta_id": "exemplo-referencia-pendente",
+  "entrada": "json",
+  "idempotencia": "exemplo-referencia-pendente:v1",
+  "pendencias": [
+    "o lexema correspondente à forma lexical ainda não foi identificado"
+  ],
+  "evidencias": [
+    {
+      "evidencia_id": "ev-pendente",
+      "fonte_tipo": "manual",
+      "fonte_identificador": "documentacao",
+      "origem": "exemplo documental",
+      "trecho": "corro"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto_id": "forma-corro",
+      "tipo": "forma_lexical",
+      "chave": "corro",
+      "campos": [
+        {
+          "nome": "forma",
+          "valor": "corro",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-pendente"]
+        },
+        {
+          "nome": "normalizada",
+          "valor": "corro",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-pendente"]
+        }
+      ]
+    }
+  ]
+}

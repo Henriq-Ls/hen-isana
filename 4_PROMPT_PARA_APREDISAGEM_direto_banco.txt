@@ -1,0 +1,102 @@
+```text
+# CURADORIA INCREMENTAL DO HEN-ISANA
+
+Você está trabalhando no projeto HEN-ISANA. Faça curadoria incremental de conhecimento sobre o tema abaixo, protegendo os dados e preservando o estado para que outra execução Replit possa continuar.
+
+## ÚNICO CAMPO DA EXECUÇÃO
+
+TEMA: vocabulário básico
+
+Não peça uma lista de palavras, expressões ou exemplos. Descubra os conceitos a partir do tema, do conhecimento interno da IA e do banco canônico do projeto.
+
+## 1. CONTINUIDADE ENTRE EXECUÇÕES
+
+1. Localize a raiz do projeto, leia `@hen-isana/docs/_DOC_PROJETO.txt` e confirme no código qual é o banco canônico de conhecimento e quais interfaces públicas devem ser usadas.
+2. Localize o JSON de controle. Se ele existir, preserve o tema, o cursor, os contadores e a fronteira de pesquisa; não reinicie o progresso ao receber este prompt novamente. Se ele não existir, crie-o atomicamente antes de iniciar a curadoria, com o tema desta execução, o idioma, a fase inicial, cursor inicial, contadores zerados, fronteira inicial vazia e estado de execução em andamento. A ausência do JSON de controle não é motivo para interromper a curadoria.
+3. Antes de gravar, compare os candidatos com o banco canônico mais recente. O banco persistente é a fonte principal para decidir o que já foi cadastrado; o JSON orienta a retomada.
+4. Todas as execuções devem usar o mesmo projeto e o banco de dados canônico atualizado pela execução anterior. Se o banco canônico estiver ausente, ilegível, inconsistente ou for uma cópia diferente sem uma forma segura de conciliá-la, não crie, recrie, substitua nem migre para outro banco: pare e informe o que precisa ser atualizado. A ausência do JSON de controle deve ser resolvida criando o arquivo de controle inicial descrito no item 2; isso não autoriza criar outro banco nem alegar continuidade de um estado que não existia.
+5. Se o tema do campo não corresponder ao tema já registrado em outro controle, não reaproveite o cursor anterior. Preserve os dados existentes, crie ou use automaticamente um JSON de controle separado para este tema e continue sem misturar candidatos, contadores, cursores ou fronteiras entre temas. Não peça orientação ao usuário para separar temas.
+
+## 2. SEGURANÇA E LIMITES DO PROJETO
+
+- Não altere código do projeto, esquema de banco, menus, `core/`, `protocolo/` ou `aprendizado/gerado/`. Não apague, recrie ou substitua bancos.
+- Não execute `main.py`, fluxo interativo, loop completo de aprendizagem em cascata ou modo professor. Não use a cascata automática para cadastrar conceitos.
+- Use as interfaces públicas atuais do projeto para ler e gravar. Não use SQL, gravação direta em SQLite ou edição binária para inserir ou alterar dados.
+- Antes da primeira gravação desta execução, crie um backup SQLite consistente pelo mecanismo suportado pelo projeto ou pela API padrão de backup do SQLite. Verifique que o backup foi concluído e informe o caminho ou resultado verificável. Não diga que há backup sem evidência.
+- Para cada gravação, use a permissão específica exigida pelo protocolo do projeto. Consulte o código para usar as ações, alvos e parâmetros exatos; não invente permissões. Se uma permissão necessária não existir ou for negada, pare antes de contorná-la.
+- Não gere nem altere código. Não peça, exiba ou grave senhas, tokens ou chaves de API.
+- Não consulte a internet, a Wikipédia, APIs, serviços externos ou qualquer fonte fora do projeto. Use o conhecimento interno da IA, o banco canônico e o estado do JSON de controle. Registre a origem verdadeira de cada evidência; quando o conteúdo vier do conhecimento interno da IA, use essa origem sem inventar citações, URLs ou confirmações externas.
+
+## 3. DESCOBERTA PROGRESSIVA DO TEMA
+
+Não trate o tema como uma lista fechada nem encerre a pesquisa depois de cadastrar apenas as expressões mais óbvias. Mantenha uma fronteira dinâmica de candidatos e amplie-a progressivamente:
+
+1. Descubra conceitos, expressões e variantes que pertençam diretamente ao tema.
+2. Para cada expressão composta cadastrada ou candidata, examine seus componentes palavra por palavra. Consulte o banco para cada componente; cadastre os componentes que sejam palavras ou conceitos válidos, registrando seu significado próprio e seu uso no contexto do tema.
+3. Repita a análise para novos conceitos compostos encontrados. Explore também variantes de uso, sentidos contextuais e relações relevantes identificados pelo conhecimento interno da IA e pelo banco canônico.
+4. Para um componente que tenha mais de um sentido, cadastre somente o sentido pertinente ao tema; inclua outros sentidos apenas quando também forem úteis e sustentados pelo conhecimento interno da IA e pelo contexto registrado no banco.
+5. Preserve a expressão completa e seus componentes como entradas distintas quando forem unidades úteis distintas. Uma expressão não substitui suas palavras componentes, e os componentes não substituem a expressão.
+6. Não quebre palavras em letras, sílabas ou fragmentos sem significado lexical. Para flexões da mesma palavra, siga a normalização e as convenções do banco: registre a forma canônica e preserve as formas e usos relevantes nos campos existentes, sem criar duplicatas apenas por flexão.
+7. Não introduza candidatos sem relação demonstrável com o tema. Ao ampliar a pesquisa, siga o vínculo com o conceito de origem e registre esse contexto.
+
+A descoberta deve ser guiada pelo tema, pelo conhecimento interno da IA e pelo banco canônico, sem uma lista fixa de palavras embutida neste prompt. Não declare o tema concluído apenas porque uma análise inicial não encontrou novas expressões: percorra também a fronteira de componentes e os candidatos pendentes no controle.
+
+## 4. DEDUPLICAÇÃO E QUALIDADE DOS REGISTROS
+
+Antes de cada gravação:
+
+1. Consulte o banco pela interface pública para verificar o termo normalizado e os contextos existentes.
+2. Evite duplicatas exatas e duplicatas semânticas no mesmo idioma e contexto. Variações de escrita ou de flexão não justificam, por si só, uma nova ficha.
+3. Preserve entradas legítimas com sentidos ou contextos realmente distintos quando o modelo do banco permitir diferenciá-los.
+4. Para uma expressão e uma palavra componente, verifique cada uma separadamente. Não descarte uma palavra componente só porque a expressão completa já existe.
+5. Não sobrescreva silenciosamente uma ficha existente. Se encontrar um problema numa ficha, siga uma operação de atualização existente e autorizada; caso contrário, registre a limitação e não altere o dado.
+
+Preencha os campos existentes que forem aplicáveis, como tipo, significado, contexto de uso, resposta padrão, relacionados e exemplo de uso. Use conteúdo claro e específico. O exemplo deve demonstrar o sentido registrado, não contradizê-lo. Armazene a origem real e o estado permitido pelo projeto; quando a origem for o conhecimento interno da IA, registre essa origem sem inventar fonte externa, citação ou URL.
+
+## 5. RELAÇÕES
+
+O texto no campo `relacionados` não cria, por si só, uma relação no banco de grafo.
+
+Quando dois conceitos já estiverem cadastrados e houver uma relação semântica útil, use a interface pública `RelacoesDB` e a permissão própria para criar a relação. Confirme que ela foi persistida pela interface disponível. Não crie relações vagas nem duplicadas. Se uma relação não for pertinente, deixe o grafo sem essa relação e informe isso no resumo.
+
+## 6. LOTES E EXECUÇÃO CONTÍNUA
+
+- Grave no máximo cinco **novos conceitos** por lote.
+- Verifique duplicatas antes de gravar. Duplicatas e itens descartados não contam como novos conceitos, mas atualize seu estado no controle para que não sejam reprocessados repetidamente.
+- Após cada novo conceito gravado, releia-o pela interface pública, confira os campos e atualize o JSON de controle de forma atômica. Não espere o final do lote para salvar o progresso.
+- Ao chegar a cinco novos conceitos, marque o lote como concluído e comece o próximo automaticamente, sem pedir aprovação ao usuário entre lotes.
+- Não encerre deliberadamente após um lote, uma resposta ou uma quantidade arbitrária de conceitos. Continue com os candidatos pendentes e amplie a fronteira conforme a seção de descoberta.
+- Não faça alegações sobre fontes externas, créditos ou consultas que não foram realizadas. Continue enquanto houver candidatos válidos identificáveis pelo conhecimento interno da IA e pelo banco canônico.
+- Se falhar uma permissão ou ocorrer uma falha persistente do projeto, salve o estado mais recente, registre o motivo verificável e pare sem repetir operações indefinidamente.
+- Se não houver novos candidatos numa etapa, passe à próxima etapa de descoberta antes de considerar a fronteira esgotada. Só declare que não há mais candidatos quando os candidatos pendentes tiverem sido analisados pelo conhecimento interno da IA e pelo banco canônico, sem novas entradas válidas. Não afirme que todas as palavras existentes no mundo foram cobertas.
+
+## 7. JSON DE CONTROLE E RETOMADA
+
+Preserve o JSON de controle existente e atualize-o atomicamente após cada gravação verificada. Se ele não existir, crie-o atomicamente antes da curadoria e continue a execução; não espere o usuário fornecer esse arquivo. O controle inicial deve manter, no mínimo:
+
+- tema e idioma;
+- fase de expansão;
+- cursor que permita retomar a partir do último candidato processado;
+- progresso: gravados, duplicatas, ignorados e lotes concluídos;
+- fronteira ou candidatos pendentes, com vínculo ao conceito de origem e estado;
+- último conceito gravado;
+- próximo ponto de pesquisa;
+- estado da execução;
+- motivo de parada, se a execução for interrompida.
+
+Use estados que diferenciem claramente execução em andamento, lote concluído, pausa por falha, espera por arquivos atualizados e conclusão da fronteira atual. “Lote concluído” não significa “tema concluído”. Não apague contadores ou candidatos pendentes ao retomar.
+
+## 8. RESUMO FINAL
+
+Só apresente o resumo quando houver uma condição observável para encerrar a execução. Informe:
+
+- tema e idioma;
+- conceitos novos gravados nesta execução e total acumulado;
+- duplicatas e itens ignorados;
+- lotes concluídos;
+- próximo ponto e candidatos pendentes;
+- estado final e motivo verificável da parada;
+- resultado verificável do backup e das validações.
+
+Se a execução tiver parado por limite de sessão ou falha persistente do projeto, diga isso claramente e deixe o controle pronto para a próxima Replit. Não diga que o tema ou o trabalho inteiro está concluído se ainda houver fronteira pendente.
+```

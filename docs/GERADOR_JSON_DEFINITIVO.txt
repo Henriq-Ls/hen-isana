@@ -1,0 +1,151 @@
+# HEN-ISANA — GERADOR DEFINITIVO DE JSON DE CONHECIMENTO
+
+Status: primeira etapa da Fase 3.7 implementada e validada
+Data: 2026-09-26
+Escopo: geração e validação de propostas JSON; sem aplicação, migração ou
+desligamento do legado.
+
+## 1. ARQUITETURA
+
+O gerador está em `aplicacao/gerador_json.py`. Ele recebe uma descrição
+estruturada, normaliza as coleções declarativas, chama
+`aplicacao.contrato_entrada.contrato_de_dict()` e produz JSON canônico
+compatível com o `ContratoCadastro` real.
+
+```text
+descrição estruturada
+        ↓
+GeradorJSONConhecimento
+        ↓
+JSON canônico
+        ↓
+ContratoCadastro / IngestaoJSON.dry_run()
+        ↓
+revisão e autorização em etapa posterior
+        ↓
+aplicação transacional existente, fora desta etapa
+```
+
+O gerador não conhece tabela, coluna, cursor, conexão ou schema físico. Não abre
+SQLite e não chama Professor, ProfessorLlama, internet, Ollama, OpenRouter ou
+qualquer API externa.
+
+## 2. FORMATO DE ENTRADA E SAÍDA
+
+A entrada é um `Mapping` com o formato aceito pelo contrato real:
+
+- `proposta_id`, `entrada` e `idempotencia` são obrigatórios;
+- `objetos`, `evidencias`, `pendencias`, `incertezas`, `estado` e
+  `ambiguidades` são opcionais;
+- objetos, campos, relações e evidências usam somente as posições lógicas
+  previstas por `ContratoCadastro`.
+
+As principais operações são:
+
+- `GeradorJSONConhecimento.gerar(descricao)` — devolve relatório com status,
+  JSON canônico e motivos;
+- `gerar_json(descricao)` — devolve uma string ou rejeita a entrada;
+- `gerar_arquivo(descricao, caminho)` — grava somente um arquivo `.json`;
+- `gerar_lote(descricoes, diretorio)` — grava arquivos individuais em um
+  diretório, sem chamar ingestão;
+- `validar_no_fluxo_real(descricao, ingestao)` — usa
+  `IngestaoJSON.dry_run()` injetado para verificar pendências, conflitos e
+  duplicidades sem aplicação.
+
+O relatório usa os estados `aceito`, `pendente`, `conflito` e `rejeitado`, com
+motivos textuais e duplicidades quando a ingestão real é usada.
+
+## 3. NORMALIZAÇÃO CANÔNICA
+
+- objetos são ordenados por identidade lógica;
+- campos são ordenados por nome;
+- evidências são ordenadas por `evidencia_id`;
+- relações são ordenadas por suas referências lógicas;
+- listas declarativas de textos e evidências são ordenadas;
+- chaves JSON são serializadas com `sort_keys=True`;
+- a saída usa UTF-8, `ensure_ascii=False` e separadores determinísticos;
+- a entrada original não é mutada.
+
+Assim, repetir a mesma descrição ou alterar a ordem de coleções sem alterar seu
+significado produz exatamente a mesma string JSON.
+
+## 4. SEGURANÇA
+
+Antes de produzir a saída, o gerador chama a fronteira real
+`contrato_de_dict()`. Portanto, ele rejeita:
+
+- chaves desconhecidas;
+- IDs repetidos e estruturas incompatíveis;
+- referências físicas a tabela, coluna, cursor ou conexão;
+- SQL e comandos de banco;
+- `eval`, `exec`, `compile`, `__import__`, `open`, `subprocess` e imports;
+- estruturas que tentem transformar dados em instruções executáveis.
+
+O gerador não preenche campos ausentes, não inventa referências e não altera
+`inferida` para `confirmada`. Pendências, incertezas, ambiguidades, evidências,
+proveniência e conflitos permanecem explícitos.
+
+## 5. LOTES E LIMITES
+
+Um lote recebe um mapa de nomes de arquivo para descrições e escreve apenas
+arquivos JSON dentro do diretório indicado. Nomes com caminho relativo,
+separadores ou caracteres fora da política são rejeitados. A geração de lote
+não registra, autoriza ou aplica nenhuma proposta.
+
+Para a preparação em escala, `aplicacao/lotes_json.py` fornece
+`LotesJSONConhecimento`. Ele separa os lotes por fonte, assunto, identificador e
+versão, produz `manifesto.json` determinístico com hashes e contagens e grava
+por diretório temporário com renomeação atômica. A mesma versão com os mesmos
+bytes é idempotente; conteúdo diferente nunca sobrescreve uma versão existente.
+O inventário de fontes e o layout completo estão em
+`docs/LOTES_JSON_FASE_3_7.txt`.
+
+Conflitos e duplicidades que dependem do conteúdo já existente só podem ser
+classificados quando o chamador injeta `IngestaoJSON` e chama
+`validar_no_fluxo_real()`. A geração isolada não acessa banco e só consegue
+classificar pendências e ambiguidades presentes na própria descrição.
+
+## 6. VALIDAÇÃO EXECUTADA
+
+O teste específico está em `testes/test_gerador_json.py`. Ele cobre cadastro
+simples, múltiplos sentidos, relações, evidências, proveniência, incerteza,
+pendência, referências desconhecidas, conflito, duplicidade, idempotência,
+entrada incompleta, campos físicos proibidos, SQL, código executável, ordem
+variável, geração repetida, arquivo individual, lote seguro e preservação do
+banco no `dry_run`.
+
+Resultados da implementação original e da revalidação da cópia transferida:
+
+- testes específicos: 18 aprovados;
+- testes direcionados das Fases 3.1–3.6 mais o gerador definitivo e a
+  ferramenta de teste do gerador: 130 aprovados;
+- decomposição dos 130 testes: 98 das Fases 3.1–3.6, 18 do gerador definitivo
+  e 14 da ferramenta de teste;
+- `compileall`: aprovado;
+- `integrity_check`: `ok` em todos os seis bancos do checkout;
+- `foreign_key_check`: zero violações em todos os seis bancos;
+- hashes dos seis bancos: inalterados antes/depois da validação nesta cópia
+  transferida.
+
+Os testes de lotes em `testes/test_lotes_json_fase_3_7.py` executaram 9 casos
+aprovados, cobrindo inventário de fontes, determinismo, manifesto, contagens,
+idempotência, conflito de sobrescrita, rejeição segura, `dry_run`, hash
+divergente e os sete exemplos documentais. Os testes usam diretórios
+temporários; nenhum lote foi criado no repositório.
+
+## 7. FORA DESTA ETAPA
+
+Esta implementação não:
+
+- gera conhecimento em massa;
+- aplica arquivos JSON automaticamente;
+- migra dados;
+- altera schema ou bancos;
+- desliga o legado;
+- altera Professor ou ProfessorLlama;
+- adiciona dependências externas;
+- marca a Fase 3.7 inteira como concluída.
+
+O próximo passo da Fase 3.7, fora desta execução, é a etapa autorizada que o
+planejamento definir para integração controlada posterior. Geração massiva,
+aplicação, migração e desligamento permanecem fora do escopo atual.

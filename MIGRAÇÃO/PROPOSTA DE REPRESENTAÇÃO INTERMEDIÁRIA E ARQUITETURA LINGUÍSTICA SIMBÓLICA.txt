@@ -1,0 +1,3056 @@
+HEN-ISANA
+PLANO CONSOLIDADO DE MIGRAÇÃO E NOVA ARQUITETURA LINGUÍSTICA
+================================================================
+
+Documento consolidado de análise, decisões e plano de engenharia
+Data da consolidação: 2026-09-25
+Status: proposta para revisão e aprovação
+
+Este documento consolida:
+
+* o mapa do pipeline atual;
+* a análise da representação intermediária;
+* a separação entre linguagem, semântica, conhecimento e contexto;
+* a proposta inicial de bancos e tabelas;
+* a estratégia de migração;
+* a ordem de implementação;
+* os testes e critérios de conclusão;
+* os riscos e pontos que ainda dependem de aprovação.
+
+Os dois documentos anteriores da pasta foram substituídos por este documento
+único. A consolidação é documental. Nenhum código, banco, schema físico, teste
+ou configuração foi alterado como parte desta etapa.
+
+
+1. DECISÕES CENTRAIS
+--------------------
+
+1.1. O código atual é legado
+
+O sistema atual será usado como referência, baseline de comportamento, fonte de
+dados e coleção de testes. Ele não deve definir sozinho a arquitetura nova.
+
+Não vamos simplesmente transformar a tabela atual de conhecimento em outra
+tabela com mais colunas. O modelo novo precisa distinguir explicitamente:
+
+* forma lexical;
+* lema;
+* lexema;
+* flexão;
+* classe gramatical;
+* sentido;
+* conceito;
+* expressão;
+* entidade;
+* evento;
+* estado;
+* propriedade;
+* predicado;
+* argumento;
+* relação semântica;
+* proposição;
+* polaridade;
+* modalidade;
+* escopo;
+* contexto;
+* evidência;
+* fato;
+* inferência;
+* intenção;
+* planejamento;
+* geração de resposta.
+
+1.2. O primeiro núcleo será simbólico
+
+A arquitetura inicial será baseada em regras explícitas, estruturas
+intermediárias e conhecimento persistente em SQLite.
+
+O núcleo inicial não dependerá de:
+
+* redes neurais;
+* embeddings;
+* LLM;
+* modelos estatísticos;
+* busca aproximada como substituta da análise linguística.
+
+Essas tecnologias podem ser avaliadas no futuro como apoio, mas não devem
+definir a representação intermediária.
+
+1.3. A frase não será tratada como uma ficha
+
+O objetivo é sair de:
+
+    "encontrei uma ficha correspondente"
+
+para:
+
+    "analisei a frase, identifiquei suas unidades, construí uma estrutura
+     sintática e semântica, representei as proposições e só depois decidi
+     como responder."
+
+Uma frase nova deve poder ser analisada mesmo quando a frase inteira não está
+cadastrada no banco.
+
+1.4. O banco novo será separado
+
+A recomendação é criar futuramente somente um novo banco para o núcleo
+linguístico:
+
+    aprendizado/bancos/linguagem.db
+
+Esse banco concentrará o conhecimento linguístico, semântico e factual
+estruturado.
+
+Não será criado um banco separado para cada camada. Léxico, sentidos,
+conceitos, proposições, fatos, relações e evidências precisam de relações
+fortes e devem permanecer no mesmo banco canônico.
+
+1.5. O legado será preservado
+
+Os bancos atuais não serão apagados durante a implementação ou migração.
+
+Os dados conhecidos atualmente serão preservados:
+
+    conhecimento.db: 37 conhecimentos
+    evidencias_conhecimento: 217 evidências
+    relacoes.db: 66 relações
+    fatos_conhecimento: 0 fatos
+
+Os dados antigos só deixarão de ser usados como fonte principal depois de:
+
+* o novo núcleo existir;
+* os testes passarem;
+* a migração ser revisada;
+* a comparação antigo/novo ser concluída;
+* o rollback continuar disponível.
+
+
+2. ESTADO ATUAL DO PROJETO
+--------------------------
+
+2.1. Bancos existentes
+
+Foram encontrados os seguintes arquivos:
+
+    hen-isana/aprendizado/bancos/conhecimento.db
+    hen-isana/aprendizado/bancos/indice_codigo.db
+    hen-isana/aprendizado/bancos/log_mudancas.db
+    hen-isana/aprendizado/bancos/relacoes.db
+    hen-isana/data/diagnostico.db
+
+O arquivo `propostas_aprendizagem.py` não possui um banco separado. A tabela
+`propostas_aprendizagem` é criada na conexão do `conhecimento.db`.
+
+2.2. Papel dos bancos atuais
+
+`conhecimento.db`
+
+Banco legado que mistura:
+
+* termos;
+* expressões;
+* categorias;
+* significados;
+* contexto de uso;
+* respostas padrão;
+* exemplos;
+* fatos;
+* evidências;
+* propostas de aprendizagem.
+
+Não é adequado como modelo canônico da arquitetura nova.
+
+`relacoes.db`
+
+Banco legado com relações entre IDs de termos. Não informa de forma suficiente
+o tipo semântico, direção, participantes, evidência, estado ou validade da
+relação.
+
+`indice_codigo.db`
+
+Índice operacional dos arquivos, classes e funções de código gerado. Não é
+conhecimento linguístico.
+
+`log_mudancas.db`
+
+Histórico operacional de alterações de código. Não é conhecimento linguístico.
+
+`diagnostico.db`
+
+Registro operacional de erros e bloqueios. Não é conhecimento linguístico e
+deve permanecer separado.
+
+2.3. Pipeline atual em uma linha
+
+    entrada no terminal
+      -> normalização superficial
+      -> resolução contextual limitada
+      -> comandos e intenções heurísticas
+      -> tokenização por palavras/expressões conhecidas
+      -> busca textual no SQLite
+      -> seleção heurística de fichas, fatos e relações
+      -> composição de resposta
+      -> contexto em memória
+
+O pipeline atual não produz uma representação sintática ou semântica geral.
+
+
+3. MAPA DETALHADO DO PIPELINE ATUAL
+-----------------------------------
+
+3.1. Entrada
+
+O fluxo começa normalmente em:
+
+    hen-isana/main.py
+      -> aplicacao.terminal.executar_terminal()
+        -> aplicacao.conversa.sessao.executar_conversa_pessoal()
+          -> aplicacao.fluxo.processar_frase()
+
+O modo conversa cria uma instância de:
+
+    core.contexto_conversa.ContextoConversa
+
+Essa instância permanece viva durante os turnos da sessão.
+
+3.2. Orquestrador atual
+
+O principal orquestrador é:
+
+    aplicacao.fluxo.processar_frase()
+
+Ele concentra responsabilidades que deverão ser separadas no futuro:
+
+* comandos;
+* normalização;
+* contexto;
+* intenções;
+* tokenização;
+* busca;
+* aprendizagem;
+* fatos;
+* relações;
+* seleção de sentido;
+* composição de resposta.
+
+3.3. Ordem efetiva atual
+
+Em termos simplificados, `processar_frase()` faz:
+
+1. verifica comandos de propostas;
+2. normaliza a frase;
+3. tenta resolver pronomes com o contexto;
+4. trata comandos explícitos de aprendizagem;
+5. trata intenções sociais;
+6. trata ferramentas como hora, data, clima, URL e definição;
+7. trata apresentação de nome e respostas pendentes;
+8. tenta resolver desambiguação pendente;
+9. busca uma resposta contextual;
+10. se estiver em aprendizagem, tenta aprender;
+11. registra o turno.
+
+3.4. Normalização atual
+
+`core.normalizador.normalizar_frase()`:
+
+* aplica `casefold`;
+* remove espaços externos;
+* comprime espaços;
+* expande abreviações registradas;
+* preserva pontuação.
+
+Também existem normalizações para:
+
+* chave de busca;
+* forma estrita;
+* comparação de intenção.
+
+Essa etapa não identifica sujeito, verbo, tempo, negação ou semântica.
+
+3.5. Tokenização atual
+
+A função atual:
+
+    aplicacao.fluxo.tokenizar()
+
+usa palavras extraídas por expressão regular e depois tenta preservar
+expressões compostas conhecidas, da maior para a menor.
+
+Exemplo:
+
+    tokenizar("tudo bem hoje", ["tudo bem"])
+      -> ["tudo bem", "hoje"]
+
+Ela não produz:
+
+* lema;
+* análise morfológica;
+* classe gramatical;
+* sujeito;
+* predicado;
+* dependências;
+* papéis semânticos;
+* proposição;
+* polaridade.
+
+3.6. Busca atual
+
+A busca pública passa por:
+
+    ferramentas.busca.buscar_conhecimento()
+      -> ConhecimentoDB.buscar_termo()
+
+O índice principal é:
+
+    conhecimento.termo_chave
+
+O banco continua sendo consultado principalmente por correspondência textual
+de termos ou expressões.
+
+3.7. Roteamento atual
+
+`core.roteador.rotear()` reconhece categorias como:
+
+    SAUDACAO
+    PERGUNTA
+    ORDEM
+    INFORMACAO
+    DESCONHECIDO
+
+E destinos como:
+
+    INTERACAO
+    CONHECIMENTO
+    APRENDIZAGEM
+
+A decisão usa padrões, pontuação, prefixos e expressões conhecidas.
+
+O roteador não é um parser geral e não representa estruturalmente:
+
+* afirmação;
+* negação;
+* hipótese;
+* causa;
+* consequência;
+* sujeito e predicado;
+* proposições encaixadas.
+
+3.8. Contexto atual
+
+`core.contexto_conversa.ContextoConversa` mantém estado em memória:
+
+* últimos turnos;
+* última frase normalizada;
+* entidades ou menções ativas;
+* tópico;
+* desambiguação pendente;
+* correção pendente;
+* pergunta pendente;
+* nome do interlocutor;
+* contador de turno.
+
+Esse contexto não é persistido no SQLite atual.
+
+3.9. Composição atual
+
+O compositor está em:
+
+    core/composicao_resposta.py
+
+Ele recebe dados já selecionados e monta uma resposta textual.
+
+Ele não constrói:
+
+* árvore sintática;
+* grafo semântico;
+* proposição;
+* relação lógica;
+* escopo de negação.
+
+No modelo novo, ele deverá receber uma estrutura semântica pronta e não
+reinterpretar a frase original.
+
+
+4. RESULTADO DOS EXEMPLOS ATUAIS
+--------------------------------
+
+Os três exemplos foram executados em cópias temporárias dos bancos, sem alterar
+os bancos originais.
+
+4.1. "Hoje o vento está muito forte."
+
+Resultado atual:
+
+    normalização:
+        hoje o vento está muito forte.
+
+    tokens:
+        hoje
+        o
+        vento
+        está
+        muito
+        forte
+
+    rota:
+        desconhecido
+
+    tokens encontrados no banco:
+        nenhum
+
+    grupos de sentido:
+        nenhum
+
+    resposta:
+        desconhecimento
+
+O sistema não identifica `vento` como entidade/sujeito, `forte` como
+propriedade, `muito` como grau ou `hoje` como referência temporal.
+
+4.2. "O cachorro está dormindo."
+
+Resultado atual:
+
+    normalização:
+        o cachorro está dormindo.
+
+    tokens:
+        o
+        cachorro
+        está
+        dormindo
+
+    rota:
+        desconhecido
+
+    tokens encontrados no banco:
+        nenhum
+
+    grupos de sentido:
+        nenhum
+
+    resposta:
+        desconhecimento
+
+O sistema não constrói a relação:
+
+    DORMIR(cachorro)
+
+4.3. "O cachorro não está dormindo."
+
+Resultado atual:
+
+    normalização:
+        o cachorro não está dormindo.
+
+    tokens:
+        o
+        cachorro
+        não
+        está
+        dormindo
+
+    rota:
+        desconhecido
+
+    tokens encontrados no banco:
+        nenhum
+
+    grupos de sentido:
+        nenhum
+
+    resposta:
+        desconhecimento
+
+Não existe tratamento lógico específico para `não`.
+
+O sistema não representa:
+
+    NÃO(DORMIR(cachorro))
+
+Nem diferencia estruturalmente a frase positiva da frase negativa.
+
+4.4. Combinações novas
+
+Quando duas expressões conhecidas aparecem juntas, o sistema pode reconhecer
+cada unidade, mas não necessariamente compor a frase inteira.
+
+Exemplo:
+
+    "oi pessoal e boa noite"
+
+Pode ser tokenizado como:
+
+    ["oi pessoal", "e", "boa noite"]
+
+Mas isso não produz uma estrutura composta nem duas proposições relacionadas.
+
+Conclusão:
+
+    reconhecer unidades existentes != compreender uma combinação nova
+
+
+5. REPRESENTAÇÃO INTERMEDIÁRIA ALVO
+------------------------------------
+
+5.1. Estrutura geral
+
+A frase deverá ser representada como um conjunto de camadas:
+
+    Enunciado
+      ├── texto original
+      ├── texto normalizado
+      ├── tokens e spans
+      ├── formas lexicais
+      ├── análises morfológicas
+      ├── estruturas sintáticas candidatas
+      ├── grafo semântico
+      ├── proposições
+      ├── contexto e referências
+      ├── intenção
+      └── incertezas/proveniência
+
+Não haverá um único objeto plano que misture toda a informação.
+
+5.2. Enunciado
+
+Deve preservar:
+
+* texto original;
+* texto normalizado;
+* idioma;
+* variante;
+* posição;
+* pontuação;
+* turnos;
+* intenção provisória;
+* análises alternativas;
+* estado de processamento.
+
+5.3. Token
+
+Deve preservar:
+
+* texto;
+* posição inicial;
+* posição final;
+* pontuação;
+* forma normalizada;
+* possíveis expressões;
+* origem da segmentação.
+
+5.4. Forma lexical
+
+É a ocorrência concreta, como:
+
+    cães
+    cachorro
+    dormindo
+    dormiu
+
+Não é automaticamente o lema, o sentido ou o conceito.
+
+5.5. Lema
+
+É a forma de referência usada para agrupar flexões:
+
+    cães       -> cão
+    cachorros  -> cachorro
+    dormindo   -> dormir
+    dormiu     -> dormir
+
+`termo_chave` do banco antigo não deve ser tratado como lema.
+
+5.6. Lexema
+
+É a unidade lexical abstrata que reúne:
+
+* lema;
+* comportamento gramatical;
+* possibilidades de flexão;
+* comportamento sintático;
+* ligação com um ou mais sentidos.
+
+Uma palavra polissêmica pode ser representada como:
+
+    forma "banco"
+      -> lexema candidato
+      -> sentido financeiro
+      -> sentido assento
+      -> sentido margem de rio
+
+O modelo deve permitir manter essas alternativas.
+
+5.7. Sentido
+
+É uma interpretação específica de um lexema em um contexto.
+
+Um sentido pode possuir:
+
+* definição;
+* contexto de uso;
+* classe gramatical;
+* domínio;
+* exemplos;
+* relações;
+* evidências;
+* origem;
+* estado de confirmação.
+
+5.8. Conceito
+
+É uma unidade semântica independente da forma linguística.
+
+Exemplo:
+
+    "cachorro"
+    "cão"
+    "cães"
+
+podem se ligar a um conceito geral CANINO, sem que forma, lema, sentido e
+conceito sejam a mesma coisa.
+
+5.9. Entidade
+
+Uma entidade é algo referido no discurso:
+
+* pessoa;
+* animal;
+* objeto;
+* lugar;
+* fenômeno;
+* entidade abstrata;
+* entidade discursiva temporária.
+
+`"o cachorro"` pode criar uma entidade discursiva sem criar automaticamente
+uma entidade persistente.
+
+5.10. Evento, estado e propriedade
+
+Exemplos:
+
+    DORMIR(cachorro)
+    FORTE(vento)
+    CANSADO(cachorro)
+    ABRIR(João, porta)
+
+O modelo deve permitir representar eventos, estados e propriedades sem
+reduzir tudo a uma string.
+
+5.11. Predicado e argumentos
+
+Um predicado descreve uma propriedade, evento ou estado.
+
+Argumentos recebem papéis:
+
+* agente;
+* sujeito;
+* tema;
+* paciente;
+* instrumento;
+* destino;
+* origem;
+* beneficiário;
+* conteúdo;
+* causa.
+
+5.12. Proposição
+
+Uma proposição é conteúdo estruturado que pode ser:
+
+* afirmado;
+* negado;
+* perguntado;
+* hipotético;
+* provável;
+* desejado;
+* citado;
+* condicionado.
+
+Uma proposição não é automaticamente um fato confirmado.
+
+5.13. Polaridade e escopo
+
+Para:
+
+    O cachorro não está dormindo.
+
+O modelo deve produzir algo equivalente a:
+
+    NÃO
+      └── DORMIR(cachorro)
+
+O escopo deve ser preservado para distinguir:
+
+    Não acho que o cachorro esteja dormindo.
+
+de:
+
+    Acho que o cachorro não está dormindo.
+
+5.14. Modalidade
+
+Para:
+
+    O cachorro provavelmente está dormindo.
+
+O conteúdo é:
+
+    DORMIR(cachorro)
+
+Com modalidade:
+
+    PROVAVELMENTE(conteúdo)
+
+Isso não deve ser persistido automaticamente como fato confirmado.
+
+5.15. Relações entre proposições
+
+Para:
+
+    O cachorro está dormindo porque está cansado.
+
+Devem existir:
+
+    P1 = DORMIR(cachorro)
+    P2 = CANSADO(cachorro)
+    CAUSA(P2, P1)
+
+Para:
+
+    O cachorro que estava dormindo acordou.
+
+Devem existir:
+
+    P1 = ACORDAR(cachorro)
+    P2 = DORMIR(cachorro)
+    P2 restringe a referência de "o cachorro"
+
+
+6. CAMADAS DA NOVA ARQUITETURA
+--------------------------------
+
+6.1. Entrada e normalização
+
+Entrada:
+
+* texto bruto;
+* metadados;
+* horário;
+* origem.
+
+Saída:
+
+* texto original;
+* texto normalizado;
+* spans;
+* pontuação;
+* segmentação preliminar.
+
+Não deve:
+
+* escolher sentido;
+* declarar verdade;
+* criar conhecimento;
+* resolver toda a frase.
+
+6.2. Análise lexical
+
+Entrada:
+
+* texto normalizado;
+* pontuação;
+* léxico;
+* expressões candidatas.
+
+Saída:
+
+* tokens;
+* formas;
+* expressões candidatas;
+* palavras desconhecidas;
+* hipóteses de segmentação.
+
+Não deve:
+
+* escolher definitivamente o sentido;
+* decidir função sintática;
+* transformar toda sequência conhecida em expressão fixa.
+
+6.3. Morfologia
+
+Entrada:
+
+* tokens;
+* formas;
+* regras morfológicas.
+
+Saída:
+
+* lemas;
+* lexemas;
+* classe gramatical;
+* gênero;
+* número;
+* pessoa;
+* tempo;
+* modo;
+* aspecto;
+* voz;
+* grau;
+* formas nominais;
+* alternativas.
+
+Não deve:
+
+* decidir sozinha o sentido;
+* escolher o sujeito;
+* criar fatos.
+
+6.4. Sintaxe
+
+Entrada:
+
+* tokens;
+* morfologia;
+* pontuação;
+* gramática.
+
+Saída:
+
+* constituintes;
+* dependências;
+* funções sintáticas;
+* predicados;
+* argumentos;
+* estruturas candidatas.
+
+Não deve:
+
+* declarar fatos do mundo;
+* gravar conhecimento;
+* esconder ambiguidades.
+
+6.5. Semântica
+
+Entrada:
+
+* sintaxe;
+* morfologia;
+* sentidos;
+* contexto.
+
+Saída:
+
+* entidades;
+* conceitos;
+* eventos;
+* estados;
+* propriedades;
+* papéis semânticos;
+* relações;
+* grafo semântico.
+
+Não deve:
+
+* transformar toda frase em fato;
+* eliminar incertezas sem justificativa.
+
+6.6. Proposições
+
+Entrada:
+
+* grafo semântico;
+* sintaxe;
+* polaridade;
+* modalidade;
+* contexto.
+
+Saída:
+
+* proposições;
+* operadores;
+* escopos;
+* proposições encaixadas;
+* relações entre proposições.
+
+Não deve:
+
+* confundir afirmação com confirmação factual;
+* misturar conversa com mundo persistente.
+
+6.7. Contexto
+
+Entrada:
+
+* turnos;
+* entidades;
+* proposições;
+* referências;
+* tempo;
+* pendências.
+
+Saída:
+
+* saliência;
+* coreferência;
+* tópico;
+* deíxis;
+* esclarecimentos necessários.
+
+Não deve:
+
+* transformar contexto automaticamente em conhecimento persistente.
+
+6.8. Conhecimento
+
+Entrada:
+
+* consultas estruturadas;
+* formas;
+* sentidos;
+* conceitos;
+* proposições;
+* evidências.
+
+Saída:
+
+* candidatos;
+* fatos;
+* relações;
+* fontes;
+* evidências;
+* estados.
+
+Não deve:
+
+* funcionar como parser;
+* usar uma ficha como conceito automaticamente.
+
+6.9. Inferência
+
+Entrada:
+
+* proposições;
+* fatos confirmados;
+* relações;
+* regras;
+* contexto.
+
+Saída:
+
+* conclusões;
+* explicações;
+* premissas;
+* conflitos;
+* proveniência.
+
+Não deve:
+
+* inventar premissas;
+* transformar hipótese em fato;
+* esconder contradições.
+
+6.10. Intenção
+
+Entrada:
+
+* estrutura da frase;
+* proposições;
+* contexto.
+
+Saída:
+
+* ato de fala;
+* objetivo;
+* parâmetros;
+* necessidade de esclarecimento.
+
+Não deve:
+
+* ser apenas uma lista de regex;
+* executar diretamente uma ação.
+
+6.11. Planejamento
+
+Entrada:
+
+* intenção;
+* conhecimento;
+* proposições;
+* permissões.
+
+Saída:
+
+* plano de resposta;
+* plano de ação;
+* pedido de esclarecimento;
+* evidências a apresentar.
+
+6.12. Geração
+
+Entrada:
+
+* plano;
+* resultado;
+* evidências;
+* incertezas.
+
+Saída:
+
+* resposta textual;
+* esclarecimento;
+* explicação.
+
+O gerador não deve interpretar novamente a frase original.
+
+
+7. ORGANIZAÇÃO DE BANCOS E TABELAS
+-----------------------------------
+
+7.1. Quantidade recomendada para a primeira versão
+
+Quando a implementação for aprovada, a recomendação é:
+
+    1 novo banco:
+        aprendizado/bancos/linguagem.db
+
+    14 tabelas iniciais:
+        aproximadamente 125 colunas no total
+
+O número é uma proposta de schema inicial para revisão. Não é autorização para
+criar o banco antes da aprovação do desenho físico completo.
+
+7.2. Tabelas iniciais propostas
+
+    lexemas                  7 colunas
+    formas_lexicais          8 colunas
+    analises_morfologicas   11 colunas
+    sentidos                 9 colunas
+    conceitos                8 colunas
+    sentidos_conceitos       6 colunas
+    expressoes               8 colunas
+    expressao_componentes    7 colunas
+    proposicoes             12 colunas
+    proposicao_argumentos    9 colunas
+    fatos                    10 colunas
+    relacoes_semanticas     11 colunas
+    fontes                   8 colunas
+    evidencias              11 colunas
+
+    total                   125 colunas
+
+7.3. Função de cada tabela
+
+`lexemas`
+
+Unidades lexicais abstratas, como DORMIR, CACHORRO e BANCO.
+
+`formas_lexicais`
+
+Formas concretas como dormindo, dormiu, cães e cachorra.
+
+`analises_morfologicas`
+
+Características da forma em uma análise: classe, gênero, número, pessoa,
+tempo, modo, aspecto, voz, grau e confiança.
+
+`sentidos`
+
+Interpretações específicas de lexemas em contextos.
+
+`conceitos`
+
+Unidades semânticas independentes de uma única palavra.
+
+`sentidos_conceitos`
+
+Associação entre sentido e conceito, incluindo tipo da ligação, confiança e
+estado.
+
+`expressoes`
+
+Expressões fixas ou semi-fixas, com grau de fixidez.
+
+`expressao_componentes`
+
+Componentes, ordem, literalidade, opcionalidade e restrições.
+
+`proposicoes`
+
+Conteúdo estruturado, polaridade, modalidade, tempo, escopo e estado.
+
+`proposicao_argumentos`
+
+Ligação de argumentos e papéis semânticos a uma proposição.
+
+`fatos`
+
+Proposições que receberam tratamento factual, com estado, validade e origem.
+
+`relacoes_semanticas`
+
+Relações tipadas entre conceitos, sentidos, entidades, proposições ou fatos.
+
+`fontes`
+
+Fontes de informação e sua confiabilidade.
+
+`evidencias`
+
+Trechos, explicações, estados e vínculos de proveniência.
+
+7.4. Tabelas posteriores
+
+Quando a inferência persistente e o fluxo novo de aprendizagem forem
+estabilizados, podem ser adicionadas:
+
+    regras_inferencia
+    regra_premissas
+    regra_conclusoes
+    propostas_aprendizagem
+
+Estimativa posterior:
+
+    18 tabelas
+    aproximadamente 160 colunas
+
+Essas tabelas não precisam existir para o primeiro parser funcional.
+
+7.5. O que não deve ser persistido inicialmente
+
+Não colocar no SQLite permanente:
+
+* tokens de cada frase comum;
+* árvore sintática temporária;
+* hipóteses descartadas;
+* contexto de sessão;
+* entidades temporárias;
+* intenção transitória;
+* plano de resposta;
+* todas as análises intermediárias de cada turno.
+
+Esses objetos ficam em memória. A persistência de análises e snapshots poderá
+ser decidida posteriormente.
+
+7.6. Bancos durante a transição
+
+Durante a migração, existirão temporariamente:
+
+    conhecimento.db       legado
+    relacoes.db           legado
+    linguagem.db          novo
+    indice_codigo.db      operacional
+    log_mudancas.db       operacional
+    diagnostico.db        operacional
+
+Total durante a transição:
+
+    6 arquivos de banco
+
+Depois de validar o novo núcleo, a operação normal recomendada terá:
+
+    linguagem.db
+    indice_codigo.db
+    log_mudancas.db
+    diagnostico.db
+
+Total:
+
+    4 bancos ativos
+
+`conhecimento.db` e `relacoes.db` ficarão arquivados, sem serem a fonte
+principal.
+
+Se a geração de código for retirada no futuro, `indice_codigo.db` e
+`log_mudancas.db` também poderão ser aposentados. Isso não deve ser feito
+agora.
+
+
+8. RELACIONAMENTOS DO MODELO NOVO
+---------------------------------
+
+Diagrama conceitual:
+
+    lexemas
+      ├── formas_lexicais
+      │     └── analises_morfologicas
+      └── sentidos
+              └── sentidos_conceitos
+                        └── conceitos
+
+    expressoes
+      ├── expressao_componentes
+      └── sentidos_conceitos/sentidos
+
+    proposicoes
+      ├── proposicao_argumentos
+      ├── fatos
+      └── relacoes_semanticas
+
+    relacoes_semanticas
+      └── conceitos, sentidos, proposicoes, fatos ou entidades
+
+    fontes
+      └── evidencias
+             └── lexemas, sentidos, conceitos, proposicoes, fatos e relações
+
+8.1. Por que lexemas e formas são diferentes
+
+`dormir` e `dormindo` não são o mesmo registro linguístico.
+
+    lexema:
+        dormir
+
+    forma:
+        dormindo
+
+A forma preserva o texto e os traços da ocorrência. O lexema agrupa formas
+relacionadas.
+
+8.2. Por que sentidos e conceitos são diferentes
+
+Um lexema pode ter vários sentidos. Um conceito pode ser expresso por vários
+lexemas.
+
+    "cão"
+    "cachorro"
+    "canino"
+
+podem participar de sentidos relacionados ao conceito CANINO, sem serem o
+mesmo lexema ou a mesma forma.
+
+8.3. Por que existe `sentidos_conceitos`
+
+Porque a associação não precisa ser sempre um-para-um.
+
+Um sentido pode se relacionar com vários conceitos, e um conceito pode ser
+expresso por vários sentidos. A tabela de associação permite guardar:
+
+* tipo de ligação;
+* confiança;
+* estado;
+* evidência futura.
+
+8.4. Palavra polissêmica
+
+    forma "banco"
+      -> lexema BANCO
+      -> sentido BANCO_FINANCEIRO
+      -> sentido BANCO_ASSENTO
+      -> sentido BANCO_MARGEM
+
+O parser pode manter hipóteses até que contexto e sintaxe desambiguem.
+
+8.5. Flexão ligada ao lema
+
+    forma "cães"
+      -> forma_lexical
+      -> lexema "cão"
+      -> análise:
+           classe substantivo
+           número plural
+
+    forma "dormiu"
+      -> forma_lexical
+      -> lexema "dormir"
+      -> análise:
+           pessoa terceira
+           número singular
+           tempo passado
+           modo indicativo
+
+8.6. Expressão
+
+`bom dia` pode ser expressão fixa/conversacional.
+
+`cachorro grande` tende a ser combinação produtiva:
+
+    cachorro + modificador grande
+
+`dar uma olhada` pode ser expressão semi-fixa, com componentes e variações.
+
+`o cachorro está dormindo` é normalmente uma frase produtiva, não um item
+lexical.
+
+8.7. Proposição e argumentos
+
+    proposição:
+        predicado: DORMIR
+        argumento:
+            papel: sujeito/agente
+            alvo: entidade cachorro
+
+Os argumentos podem apontar para conceitos, entidades, eventos, proposições
+ou outros elementos estruturados.
+
+8.8. Fato e proposição
+
+Uma proposição é conteúdo interpretado.
+
+Um fato é uma proposição aceita com estado, fonte, validade e proveniência.
+
+    "O cachorro provavelmente está dormindo."
+
+gera uma proposição provável, mas não necessariamente um fato confirmado.
+
+8.9. Relação semântica
+
+Uma relação deve ter:
+
+* tipo;
+* origem;
+* destino ou argumentos;
+* direção;
+* estado;
+* contexto;
+* fonte;
+* confiança.
+
+O campo legado `relacionados` não substitui essa estrutura.
+
+8.10. Evidências e fontes
+
+Uma fonte identifica de onde veio uma informação.
+
+Uma evidência liga uma fonte e um trecho/justificativa ao registro que está
+sendo sustentado.
+
+A mesma proposição pode possuir várias evidências de origens diferentes.
+
+
+9. CONTEXTO E MEMÓRIA
+----------------------
+
+9.1. Dados somente da sessão
+
+Devem permanecer em memória:
+
+* turnos recentes;
+* entidades discursivas;
+* saliência;
+* pronomes;
+* deícticos;
+* tópico;
+* perguntas pendentes;
+* hipóteses de coreferência;
+* análises ainda não confirmadas;
+* plano de resposta.
+
+9.2. Dados que podem ser persistidos
+
+Depois de uma política de confirmação:
+
+* formas;
+* lemas;
+* sentidos;
+* conceitos;
+* regras gramaticais;
+* relações;
+* fatos;
+* fontes;
+* evidências;
+* entidades persistentes;
+* regras de inferência.
+
+9.3. Exemplo de referência
+
+    O cachorro entrou na sala.
+    Ele está dormindo.
+
+O contexto pode ligar `ele` à entidade discursiva cachorro.
+
+Isso não deve criar automaticamente:
+
+    fato persistente: algum cachorro global está dormindo
+
+A resolução de referência e a persistência factual são decisões diferentes.
+
+
+10. PLANO DE MIGRAÇÃO DO LEGADO
+-------------------------------
+
+10.1. Registros atuais
+
+Preservar:
+
+    37 conhecimentos
+    217 evidências
+    66 relações
+    0 fatos atuais
+
+10.2. Princípio
+
+A migração será classificação com revisão, não conversão automática perfeita.
+
+10.3. Sequência
+
+1. manter os bancos antigos intactos;
+2. criar cópias de trabalho somente quando a implementação for autorizada;
+3. registrar IDs legados;
+4. importar dados para uma área de staging;
+5. classificar termos;
+6. criar candidatos a formas, lemas, sentidos e conceitos;
+7. preservar campos não mapeados como dados legados;
+8. classificar relações;
+9. revisar ambiguidades;
+10. aprovar registros;
+11. comparar resultados;
+12. somente então usar `linguagem.db` como fonte principal.
+
+10.4. Campos antigos
+
+`termo`
+
+Pode ser forma, lema, expressão, conceito, assunto de aprendizagem ou termo
+de exemplo. Não tem destino único automático.
+
+`termo_original`
+
+Deve ser preservado como forma textual de origem.
+
+`termo_chave`
+
+Deve continuar como chave legada de busca. Não é lema.
+
+`tipo`
+
+É pista de classificação, não modelo completo de classe gramatical.
+
+`significado`
+
+Pode ser definição de sentido, descrição de conceito, explicação ou resposta
+didática. Requer classificação.
+
+`contexto_uso`
+
+Pode virar evidência de uso, restrição de sentido, domínio ou anotação
+pragmática.
+
+`resposta_padrao`
+
+É política ou saída conversacional. Não deve virar automaticamente sentido ou
+fato.
+
+`relacionados`
+
+É associação legada sem direção e sem tipo confiável. Deve virar item de
+revisão.
+
+`exemplo_uso`
+
+Deve ser preservado como exemplo/evidência. Não é automaticamente fato.
+
+10.5. Evidências
+
+As 217 evidências devem manter:
+
+* ID legado;
+* registro de origem;
+* campo original;
+* valor original;
+* origem;
+* estado;
+* data;
+* candidato novo;
+* grau de certeza;
+* revisão necessária.
+
+10.6. Relações
+
+As 66 relações devem inicialmente ser tratadas como:
+
+    relação legada não classificada
+
+Depois devem receber, quando possível:
+
+* tipo;
+* direção;
+* participantes;
+* fonte;
+* estado;
+* evidência;
+* validade.
+
+10.7. O que não pode ser inferido com segurança
+
+Os dados antigos provavelmente não são suficientes para migrar
+automaticamente:
+
+* lemas;
+* homônimos;
+* todos os traços flexionais;
+* sentido exato;
+* conceito independente;
+* papéis semânticos;
+* escopo de negação;
+* entidade persistente;
+* validade temporal;
+* natureza factual de exemplos;
+* tipo de relação;
+* origem real da afirmação.
+
+Esses campos devem permanecer desconhecidos, candidatos ou pendentes de
+revisão. Não devem ser preenchidos silenciosamente.
+
+
+11. CONTRATOS E OBJETOS PYTHON
+------------------------------
+
+Os nomes abaixo são propostas de contrato, não nomes obrigatórios de
+implementação.
+
+11.1. Enunciado
+
+Finalidade:
+
+* representar uma entrada completa;
+* preservar texto;
+* reunir análises.
+
+Campos conceituais:
+
+* texto original;
+* texto normalizado;
+* tokens;
+* análises;
+* intenção;
+* contexto;
+* alternativas;
+* confiança;
+* origem.
+
+Temporário:
+
+* sim.
+
+Persistência futura:
+
+* somente como histórico/snapshot, se necessário.
+
+11.2. Token
+
+Campos:
+
+* texto;
+* início;
+* fim;
+* forma normalizada;
+* pontuação;
+* candidatos lexicais;
+* expressão candidata.
+
+Temporário:
+
+* sim.
+
+11.3. Análise morfológica
+
+Campos:
+
+* forma;
+* lexema;
+* classe;
+* gênero;
+* número;
+* pessoa;
+* tempo;
+* modo;
+* aspecto;
+* voz;
+* grau;
+* confiança;
+* regra usada.
+
+Temporário:
+
+* normalmente sim;
+* somente análises aprovadas podem alimentar o conhecimento persistente.
+
+11.4. Estrutura sintática
+
+Campos:
+
+* nós;
+* constituintes;
+* dependências;
+* funções;
+* cabeça;
+* alternativas;
+* custo;
+* justificativa.
+
+Temporário:
+
+* sim, inicialmente.
+
+11.5. Entidade discursiva
+
+Campos:
+
+* ID de sessão;
+* menções;
+* conceito candidato;
+* saliência;
+* gênero/número;
+* origem;
+* hipóteses de coreferência.
+
+Temporário:
+
+* sim, salvo decisão posterior de persistência.
+
+11.6. Predicado
+
+Campos:
+
+* conceito/sentido;
+* tipo;
+* forma verbal;
+* tempo;
+* aspecto;
+* modalidade;
+* participantes;
+* origem textual.
+
+11.7. Argumento
+
+Campos:
+
+* papel;
+* alvo;
+* ordem;
+* função sintática;
+* evidência;
+* confiança.
+
+11.8. Proposição
+
+Campos:
+
+* predicado;
+* argumentos;
+* polaridade;
+* modalidade;
+* escopo;
+* tempo;
+* fonte;
+* estado;
+* proposições encaixadas;
+* relações.
+
+11.9. Hipótese de análise
+
+Campos:
+
+* análise candidata;
+* confiança;
+* evidências;
+* alternativas;
+* motivo;
+* status.
+
+Temporária:
+
+* sim.
+
+11.10. Intenção
+
+Campos:
+
+* tipo de ato de fala;
+* objetivo;
+* parâmetros;
+* proposição relacionada;
+* confiança;
+* necessidade de esclarecimento.
+
+Temporária:
+
+* sim, enquanto não houver registro de diálogo.
+
+11.11. Contratos entre camadas
+
+Cada camada deve receber uma estrutura definida e devolver uma estrutura
+definida.
+
+Nenhuma camada deve depender de acessar diretamente o banco de outra camada.
+
+Exemplo:
+
+    normalizador(texto)
+      -> TextoNormalizado
+
+    analisador_lexical(TextoNormalizado)
+      -> ResultadoLexical
+
+    analisador_morfologico(ResultadoLexical)
+      -> ResultadoMorfologico
+
+    parser(ResultadoMorfologico)
+      -> EstruturaSintatica
+
+    interpretador_semantico(EstruturaSintatica, contexto, conhecimento)
+      -> GrafoSemantico
+
+    proposicionador(GrafoSemantico)
+      -> Proposicoes
+
+    planejador(Proposicoes, intencao, conhecimento)
+      -> Plano
+
+    gerador(Plano)
+      -> Resposta
+
+
+12. FASES DE IMPLEMENTAÇÃO FUTURA
+----------------------------------
+
+As fases abaixo são o plano de engenharia para depois da aprovação documental.
+Nenhuma fase está sendo executada por este documento.
+
+12.1. Fase 0 — Base e segurança
+
+Objetivo:
+
+* preservar o legado;
+* comparar comportamento antigo e novo;
+* garantir rollback.
+
+Arquivos/módulos envolvidos:
+
+* configuração de testes;
+* scripts de cópia/execução isolada;
+* documentação de operação.
+
+Novos módulos:
+
+* somente ferramentas de isolamento, se necessário.
+
+Módulos existentes modificados:
+
+* preferencialmente nenhum no início.
+
+Bancos:
+
+* todos os atuais permanecem intactos;
+* cópias de desenvolvimento e teste serão usadas.
+
+Tabelas:
+
+* nenhuma nova tabela de produção.
+
+Dependências:
+
+* definição de branch/checkpoint;
+* cópia verificável dos bancos.
+
+Entradas:
+
+* código atual;
+* bancos atuais;
+* suíte atual.
+
+Saídas:
+
+* baseline versionado;
+* cópias de teste;
+* comando reprodutível da suíte.
+
+Testes:
+
+* execução da suíte antiga;
+* verificação de contagens;
+* verificação de que conversa não escreve conteúdo.
+
+Conclusão:
+
+* cópia dos bancos conferida;
+* baseline registrado;
+* rollback testado;
+* nenhum banco original alterado.
+
+Riscos:
+
+* backup incompleto;
+* teste usando banco original;
+* diferença de ambiente.
+
+Rollback:
+
+* restaurar checkpoint/branch;
+* descartar cópia de desenvolvimento.
+
+12.2. Fase 1 — Modelo de dados novo
+
+Objetivo:
+
+* revisar e aprovar o desenho físico de `linguagem.db`;
+* ainda sem migrar dados antigos.
+
+Novos módulos:
+
+* módulo de conexão do banco novo;
+* inicializador de schema, somente após aprovação.
+
+Módulos existentes modificados:
+
+* nenhum módulo legado deve ser substituído ainda.
+
+Bancos:
+
+* novo `linguagem.db` somente após aprovação;
+* bancos antigos somente leitura.
+
+Tabelas:
+
+* as 14 tabelas iniciais aprovadas;
+* as quatro tabelas posteriores ficam fora desta fase.
+
+Dependências:
+
+* representação intermediária aprovada;
+* DDL revisado;
+* política de IDs e proveniência definida.
+
+Entradas:
+
+* este documento;
+* desenho físico completo;
+* decisões do usuário.
+
+Saídas:
+
+* schema aprovado;
+* banco novo criado vazio;
+* constraints e índices verificados.
+
+Testes:
+
+* criação limpa;
+* inserção mínima;
+* chaves estrangeiras;
+* constraints;
+* rollback de transação.
+
+Conclusão:
+
+* todas as tabelas aprovadas;
+* todas as relações testadas;
+* nenhum dado legado migrado.
+
+Riscos:
+
+* schema prematuro;
+* cardinalidades incorretas;
+* confusão entre conceito e sentido.
+
+Rollback:
+
+* apagar apenas o banco novo de desenvolvimento;
+* manter bancos antigos intactos.
+
+12.3. Fase 2 — Objetos e contratos Python
+
+Objetivo:
+
+* criar estruturas intermediárias em memória;
+* conectar contratos entre camadas.
+
+Novos módulos:
+
+* modelos de enunciado;
+* token;
+* morfologia;
+* sintaxe;
+* semântica;
+* proposição;
+* intenção;
+* contexto.
+
+Módulos modificados:
+
+* `core/contratos.py`, se necessário;
+* nenhum fluxo legado deve ser removido ainda.
+
+Bancos:
+
+* nenhum dado deve ser persistido automaticamente.
+
+Entradas:
+
+* texto normalizado;
+* resultados de camadas anteriores.
+
+Saídas:
+
+* objetos validados;
+* serialização de diagnóstico opcional.
+
+Testes:
+
+* criação válida;
+* rejeição de estado impossível;
+* preservação de spans;
+* polaridade;
+* escopo;
+* alternativas.
+
+Conclusão:
+
+* objetos não dependem de SQLite;
+* contratos são testáveis isoladamente.
+
+Riscos:
+
+* objetos planos demais;
+* mistura de sintaxe e semântica;
+* campos obrigatórios prematuros.
+
+Rollback:
+
+* remover somente os módulos novos;
+* manter fluxo antigo.
+
+12.4. Fase 3 — Léxico e morfologia
+
+Objetivo:
+
+* reconhecer palavras e formas em frases novas;
+* separar forma, lema, lexema e análise.
+
+Novos módulos:
+
+* analisador lexical;
+* analisador morfológico;
+* regras iniciais de flexão;
+* registro de expressões.
+
+Módulos reaproveitáveis:
+
+* `core/normalizador.py`;
+* partes de `core/linguagem.py`;
+* tokenização legada como compatibilidade.
+
+Bancos:
+
+* consulta ao novo banco, quando disponível;
+* leitura legada somente por adaptador.
+
+Primeiro subconjunto:
+
+* substantivos;
+* artigos;
+* pronomes básicos;
+* verbos frequentes;
+* adjetivos;
+* advérbios;
+* singular/plural;
+* masculino/feminino quando aplicável;
+* presente/passado/futuro básicos;
+* infinitivo/gerúndio;
+* palavras funcionais;
+* expressões fixas selecionadas.
+
+Testes:
+
+* cães/cão;
+* cachorra/cachorro;
+* dormindo/dormir;
+* dormiu/dormir;
+* formas desconhecidas;
+* colisões de acento;
+* expressões multipalavra.
+
+Conclusão:
+
+* palavras conhecidas podem aparecer em frases novas;
+* palavras desconhecidas não descartam o restante da frase;
+* análises alternativas são preservadas.
+
+Riscos:
+
+* cobertura morfológica insuficiente;
+* falsos lemas;
+* classe gramatical ambígua.
+
+Rollback:
+
+* usar adaptador lexical antigo;
+* manter o parser novo em modo sombra.
+
+12.5. Fase 4 — Gramática e parser
+
+Objetivo:
+
+* construir parser simbólico inicial.
+
+Formalismo inicial recomendado:
+
+* regras de constituintes explícitas;
+* features morfossintáticas;
+* unificação limitada;
+* dependências derivadas;
+* possibilidade de mais de uma análise.
+
+Subconjunto inicial:
+
+* declarativas;
+* interrogativas;
+* negativas;
+* sujeito/predicado;
+* verbos transitivos;
+* verbos intransitivos;
+* adjetivos;
+* advérbios;
+* complementos;
+* coordenação;
+* subordinação simples;
+* relativas simples;
+* `estar + gerúndio`.
+
+Entradas:
+
+* análises morfológicas.
+
+Saídas:
+
+* constituintes;
+* dependências;
+* funções;
+* alternativas;
+* desconhecidos localizados.
+
+Testes:
+
+* O cachorro está dormindo.
+* João abriu a porta.
+* João abriu a porta com a chave.
+* coordenação;
+* relativa;
+* palavra desconhecida;
+* concordância.
+
+Conclusão:
+
+* frases novas geram estrutura;
+* combinações não cadastradas não dependem de ficha inteira;
+* ambiguidades não são descartadas silenciosamente.
+
+Riscos:
+
+* parser superdimensionado;
+* regras conflitantes;
+* escopo incorreto.
+
+Rollback:
+
+* execução em paralelo/sombra;
+* roteamento antigo continua disponível.
+
+12.6. Fase 5 — Representação semântica
+
+Objetivo:
+
+* converter sintaxe em conceitos, entidades, eventos, estados, argumentos,
+  relações e proposições.
+
+Entradas:
+
+* estruturas sintáticas;
+* sentidos;
+* contexto.
+
+Saídas:
+
+* grafo semântico;
+* proposições;
+* papéis semânticos;
+* polaridade;
+* modalidade;
+* escopo.
+
+Casos obrigatórios:
+
+    O cachorro está dormindo.
+    O cachorro não está dormindo.
+    O cachorro provavelmente está dormindo.
+    O cachorro está dormindo porque está cansado.
+    O cachorro que estava dormindo acordou.
+    Hoje o vento está muito forte.
+
+Conclusão:
+
+* a frase positiva e a negativa possuem representações distintas;
+* probabilidade não vira fato;
+* duas proposições são preservadas;
+* relações causais e relativas são representadas.
+
+Riscos:
+
+* confundir conceito e entidade;
+* perder escopo;
+* transformar afirmação em fato.
+
+Rollback:
+
+* geração de resposta antiga continua disponível;
+* sem escrita factual automática.
+
+12.7. Fase 6 — Contexto e referência
+
+Objetivo:
+
+* resolver pronomes, deícticos, entidades discursivas e tópico.
+
+Entradas:
+
+* histórico;
+* proposições;
+* entidades.
+
+Saídas:
+
+* referências;
+* saliência;
+* hipóteses de coreferência;
+* pendências.
+
+Testes:
+
+    O cachorro entrou na sala.
+    Ele está dormindo.
+
+E também casos com dois candidatos.
+
+Conclusão:
+
+* referências resolvidas permanecem no contexto;
+* contexto não vira fato permanente sem confirmação.
+
+Riscos:
+
+* resolução errada;
+* memória excessiva;
+* vazamento entre sessões.
+
+Rollback:
+
+* manter `ContextoConversa` legado;
+* desligar somente o resolvedor novo.
+
+12.8. Fase 7 — Conhecimento e inferência
+
+Objetivo:
+
+* substituir gradualmente a consulta direta por API estruturada.
+
+Operações:
+
+* consultar formas;
+* consultar lemas;
+* consultar sentidos;
+* consultar conceitos;
+* consultar expressões;
+* consultar relações;
+* consultar fatos;
+* consultar evidências;
+* registrar conhecimento aprovado;
+* verificar conflitos;
+* registrar proveniência.
+
+Primeira inferência:
+
+* regras explícitas;
+* premissas identificadas;
+* conclusões com proveniência;
+* ausência de prova não equivale automaticamente a falso.
+
+Conclusão:
+
+* inferência pode ser explicada;
+* conclusões não são gravadas sem origem;
+* legado é consultado por adaptador, não diretamente pelo parser.
+
+Riscos:
+
+* conclusões falsas;
+* ciclos;
+* ausência de proveniência.
+
+Rollback:
+
+* usar somente consultas legadas;
+* impedir escrita de conclusões novas.
+
+12.9. Fase 8 — Migração do legado
+
+Objetivo:
+
+* classificar e importar os dados preservados.
+
+Entradas:
+
+* 37 conhecimentos;
+* 217 evidências;
+* 66 relações;
+* zero fatos atuais.
+
+Saídas:
+
+* staging;
+* candidatos;
+* registros aprovados;
+* pendências de revisão;
+* relatório de migração.
+
+Conclusão:
+
+* nenhuma origem perdida;
+* ambiguidades marcadas;
+* contagens conferidas;
+* banco antigo preservado.
+
+Riscos:
+
+* falsa equivalência entre termo e conceito;
+* perda de relação;
+* importação de exemplos como fatos.
+
+Rollback:
+
+* descartar staging;
+* manter banco novo vazio;
+* continuar usando legado.
+
+12.10. Fase 9 — Integração gradual
+
+Objetivo:
+
+* substituir o fluxo atual por etapas, sem reescrita total.
+
+Estratégia:
+
+1. modo sombra: parser novo analisa e fluxo antigo responde;
+2. comparação das estruturas;
+3. habilitação por tipo de frase;
+4. fallback explícito para o legado;
+5. desativação gradual das buscas textuais;
+6. remoção somente após métricas.
+
+Pontos de integração:
+
+* entrada;
+* tokenização;
+* análise;
+* conhecimento;
+* intenção;
+* resposta.
+
+Riscos:
+
+* respostas divergentes;
+* duplicação de escrita;
+* dependência circular.
+
+Rollback:
+
+* feature flag;
+* fallback para fluxo antigo;
+* nenhuma alteração destrutiva no banco antigo.
+
+12.11. Fase 10 — Geração de resposta
+
+Objetivo:
+
+* fazer o compositor receber estrutura semântica.
+
+Entradas:
+
+* intenção;
+* plano;
+* proposições;
+* resultado;
+* evidências;
+* incertezas.
+
+Saída:
+
+* resposta coerente com a estrutura;
+* explicação quando houver dúvida;
+* preservação da negação.
+
+Conclusão:
+
+* compositor não consulta o banco por conta própria;
+* compositor não reinterpreta texto.
+
+12.12. Fase 11 — Testes progressivos
+
+Unitários:
+
+* tokenização;
+* normalização;
+* morfologia;
+* features;
+* unificação;
+* gramática;
+* parser;
+* semântica;
+* proposições;
+* negação;
+* modalidade;
+* contexto;
+* referência;
+* inferência.
+
+Integrados:
+
+* entrada até resposta;
+* novo banco;
+* fallback legado;
+* migração;
+* ausência de escrita indevida.
+
+12.13. Fase 12 — Critério de migração
+
+Objetivo:
+
+* decidir objetivamente quando desligar o núcleo antigo.
+
+Critérios:
+
+* testes unitários passando;
+* testes integrados passando;
+* construções iniciais cobertas;
+* negação correta;
+* modalidades preservadas;
+* palavras desconhecidas localizadas;
+* combinações novas reconhecidas;
+* contexto isolado por sessão;
+* ausência de regressões críticas;
+* migração revisada;
+* dados legados preservados;
+* rollback validado.
+
+12.14. Fase 13 — Desligamento controlado
+
+Somente depois de todos os critérios:
+
+1. retirar o fluxo antigo da rota principal;
+2. manter fallback temporário;
+3. arquivar `conhecimento.db`;
+4. arquivar `relacoes.db`;
+5. manter bancos operacionais necessários;
+6. remover código legado somente em etapa separada e autorizada.
+
+
+13. TESTES DE CARACTERIZAÇÃO OBRIGATÓRIOS
+-----------------------------------------
+
+Os testes devem verificar estrutura, não somente texto de resposta.
+
+13.1. Palavra conhecida em frase nova
+
+Entrada:
+
+    O cachorro está dormindo.
+
+Esperado:
+
+* cachorro reconhecido;
+* dormir reconhecido;
+* sujeito;
+* predicado;
+* polaridade positiva;
+* frase inteira não precisa estar cadastrada.
+
+13.2. Palavra desconhecida em estrutura conhecida
+
+Entrada:
+
+    O grifon está dormindo.
+
+Esperado:
+
+* sujeito parcialmente analisado;
+* predicado reconhecido;
+* entidade desconhecida localizada;
+* restante da frase preservado.
+
+13.3. Frase negativa
+
+Entrada:
+
+    O cachorro não está dormindo.
+
+Esperado:
+
+* mesmo predicado base;
+* polaridade negativa;
+* escopo de negação sobre dormir.
+
+13.4. Modalidade
+
+Entrada:
+
+    O cachorro provavelmente está dormindo.
+
+Esperado:
+
+* polaridade positiva;
+* modalidade epistêmica provável;
+* não virar fato confirmado automaticamente.
+
+13.5. Tempo e grau
+
+Entrada:
+
+    Hoje o vento está muito forte.
+
+Esperado:
+
+* vento;
+* propriedade forte;
+* modificador muito;
+* referência temporal hoje.
+
+13.6. Causa
+
+Entrada:
+
+    O cachorro está dormindo porque está cansado.
+
+Esperado:
+
+* duas proposições;
+* mesma entidade;
+* relação CAUSA.
+
+13.7. Relativa
+
+Entrada:
+
+    O cachorro que estava dormindo acordou.
+
+Esperado:
+
+* proposição principal acordar;
+* proposição encaixada dormir;
+* ligação da relativa à entidade cachorro.
+
+13.8. Agente, tema e instrumento
+
+Entradas:
+
+    João abriu a porta.
+    João abriu a porta com a chave.
+
+Esperado:
+
+* agente João;
+* tema porta;
+* instrumento chave na segunda frase.
+
+13.9. Negação de evento
+
+Entrada:
+
+    João não abriu a porta.
+
+Esperado:
+
+* negação com escopo sobre abrir;
+* não confundir com ausência de busca.
+
+13.10. Proposição encaixada
+
+Entrada:
+
+    João disse que Maria abriu a porta.
+
+Esperado:
+
+* evento dizer;
+* fonte João;
+* proposição encaixada;
+* agente Maria;
+* tema porta.
+
+13.11. Flexão
+
+Entradas:
+
+    O cachorro dormiu.
+    Os cachorros dormiram.
+    A cachorra dormirá.
+    Os cães estão dormindo.
+
+Esperado:
+
+* formas ligadas aos lemas;
+* gênero/número/pessoa/tempo/modo/aspecto quando disponíveis.
+
+13.12. Concordância
+
+Entradas:
+
+    Os cachorros estão dormindo.
+    A cachorra está dormindo.
+    Os cachorros está dormindo.
+
+Esperado:
+
+* duas primeiras compatíveis;
+* terceira com conflito registrado;
+* texto original preservado.
+
+13.13. Expressão fixa
+
+Entrada:
+
+    Bom dia.
+
+Esperado:
+
+* expressão convencional;
+* saudação;
+* resposta social possível.
+
+13.14. Combinação produtiva
+
+Entradas:
+
+    cachorro grande
+    cachorro muito grande
+    cachorro cansado
+
+Esperado:
+
+* estrutura sintática produtiva;
+* não exigir cadastro de cada combinação.
+
+13.15. Ambiguidade lexical
+
+Entradas:
+
+    Banco.
+    Eu fui ao banco.
+    Eu coloquei dinheiro no banco.
+    O banco está quebrado.
+
+Esperado:
+
+* sentidos candidatos;
+* seleção contextual quando possível;
+* pergunta de esclarecimento quando necessário.
+
+13.16. Ambiguidade sintática
+
+Entrada:
+
+    Vi o homem com o telescópio.
+
+Esperado:
+
+* análise instrumento;
+* análise companhia/associação;
+* alternativas preservadas.
+
+13.17. Referência contextual
+
+Sequência:
+
+    O cachorro entrou na sala.
+    Ele está dormindo.
+
+Esperado:
+
+* candidato de coreferência;
+* ligação contextual;
+* nenhum fato persistente automático.
+
+13.18. Duas proposições e status
+
+Testar:
+
+* frase afirmada;
+* frase provável;
+* frase perguntada;
+* frase negada;
+* frase hipotética.
+
+Esperado:
+
+* conteúdo preservado;
+* modalidade/polaridade diferentes;
+* estado factual separado.
+
+13.19. Não persistência indevida
+
+No modo conversa:
+
+* frase desconhecida não deve gravar conhecimento;
+* uma menção não deve virar entidade global;
+* uma afirmação não deve virar fato confirmado;
+* hipótese não deve virar regra.
+
+
+14. CRITÉRIOS OBJETIVOS DE CONCLUSÃO
+-------------------------------------
+
+O novo núcleo só poderá substituir o fluxo principal quando:
+
+1. o schema aprovado estiver criado em ambiente isolado;
+2. os bancos legados continuarem intactos;
+3. os objetos intermediários estiverem validados;
+4. o parser reconhecer o subconjunto inicial definido;
+5. palavras conhecidas funcionarem em frases novas;
+6. palavras desconhecidas não destruírem a análise;
+7. a negação tiver polaridade e escopo;
+8. modalidade não for confundida com fato;
+9. duas proposições puderem coexistir;
+10. referências contextuais forem separadas da persistência;
+11. relações semânticas tiverem tipo e participantes;
+12. evidências e fontes forem preservadas;
+13. migração dos dados tiver relatório;
+14. os 37 conhecimentos antigos continuarem recuperáveis;
+15. as 217 evidências continuarem rastreáveis;
+16. as 66 relações continuarem preservadas;
+17. os testes novos e antigos passarem;
+18. o fallback antigo funcionar;
+19. rollback tiver sido executado em teste;
+20. não houver escrita indevida no modo conversa.
+
+
+15. RISCOS DA NOVA ARQUITETURA
+--------------------------------
+
+15.1. Schema prematuro
+
+Risco:
+
+* cristalizar conceitos que ainda não foram discutidos.
+
+Mitigação:
+
+* revisar DDL completo antes de criar o banco;
+* manter o schema como proposta até aprovação.
+
+15.2. Confundir lexema, sentido e conceito
+
+Risco:
+
+* transferir a confusão do banco atual para várias tabelas.
+
+Mitigação:
+
+* testar polissemia;
+* exigir exemplos;
+* manter associações explícitas.
+
+15.3. Excesso de colunas opcionais
+
+Risco:
+
+* tabelas difíceis de validar;
+* dados sem significado claro.
+
+Mitigação:
+
+* separar entidades quando a cardinalidade exigir;
+* usar constraints somente depois das regras definidas;
+* não preencher desconhecido com valores falsos.
+
+15.4. Parser grande demais
+
+Risco:
+
+* tentar cobrir todo o português antes de validar o núcleo.
+
+Mitigação:
+
+* começar com subconjunto pequeno;
+* adicionar construções por testes;
+* preservar fallback.
+
+15.5. Falsa certeza na migração
+
+Risco:
+
+* transformar `tipo` em classe;
+* transformar `termo_chave` em lema;
+* transformar exemplo em fato;
+* transformar `relacionados` em semântica.
+
+Mitigação:
+
+* staging;
+* estados de candidato;
+* revisão humana;
+* origem legada preservada.
+
+15.6. Perda de contexto
+
+Risco:
+
+* transformar referência de sessão em memória permanente.
+
+Mitigação:
+
+* separar objetos de contexto e persistência;
+* exigir confirmação.
+
+15.7. Perda de negação
+
+Risco:
+
+* continuar tratando "não" como token comum.
+
+Mitigação:
+
+* testes de escopo;
+* representação explícita de operadores;
+* comparação positiva/negativa.
+
+15.8. Inferência sem explicação
+
+Risco:
+
+* conclusões sem premissas ou evidências.
+
+Mitigação:
+
+* registrar regra, premissas, conclusão e fonte.
+
+
+16. ESTRATÉGIA DE ROLLBACK
+--------------------------
+
+Durante toda a migração:
+
+* não apagar `conhecimento.db`;
+* não apagar `relacoes.db`;
+* não substituir o fluxo antigo de uma vez;
+* usar bancos de desenvolvimento separados;
+* executar o novo parser em modo sombra;
+* manter fallback;
+* registrar versões;
+* criar checkpoints antes de mudanças.
+
+Rollback por fase:
+
+    Fase 0:
+        restaurar branch/checkpoint e cópia dos bancos.
+
+    Fase 1:
+        descartar somente linguagem.db de desenvolvimento.
+
+    Fase 2:
+        retirar objetos novos sem alterar legado.
+
+    Fases 3-7:
+        desligar parser/API novos e usar adaptadores antigos.
+
+    Fase 8:
+        descartar staging/migração incompleta.
+
+    Fase 9:
+        desativar feature flag do novo fluxo.
+
+    Fase 13:
+        só arquivar legado depois de validação; nunca apagar sem backup.
+
+
+17. ORDEM OPERACIONAL FINAL
+---------------------------
+
+Esta é a sequência planejada para a implementação, depois da aprovação:
+
+PASSO 1
+
+Criar branch/checkpoint de migração e validar cópias dos bancos.
+
+Resultado:
+
+* baseline do sistema atual;
+* contagens documentadas;
+* rollback disponível.
+
+PASSO 2
+
+Revisar e aprovar o schema físico completo das 14 tabelas.
+
+Resultado:
+
+* DDL revisado;
+* colunas, tipos, constraints, índices e cardinalidades aprovados.
+
+PASSO 3
+
+Criar `linguagem.db` vazio em ambiente isolado.
+
+Resultado:
+
+* banco novo sem dados legados;
+* schema validado;
+* bancos antigos intactos.
+
+PASSO 4
+
+Criar os contratos Python da representação intermediária.
+
+Resultado:
+
+* enunciado;
+* tokens;
+* morfologia;
+* sintaxe;
+* semântica;
+* proposições;
+* intenção;
+* contexto.
+
+PASSO 5
+
+Implementar análise lexical e morfológica mínima.
+
+Resultado:
+
+* formas;
+* lemas;
+* flexões;
+* classes;
+* palavras desconhecidas localizadas.
+
+PASSO 6
+
+Implementar parser simbólico do subconjunto inicial.
+
+Resultado:
+
+* declarativas;
+* interrogativas;
+* negativas;
+* sujeito/predicado;
+* complementos;
+* coordenação;
+* subordinação simples;
+* relativas simples;
+* `estar + gerúndio`.
+
+PASSO 7
+
+Implementar conversão sintaxe-semântica.
+
+Resultado:
+
+* conceitos;
+* entidades;
+* eventos;
+* estados;
+* argumentos;
+* papéis;
+* proposições;
+* polaridade;
+* modalidade;
+* escopo.
+
+PASSO 8
+
+Implementar contexto e referência.
+
+Resultado:
+
+* pronomes;
+* saliência;
+* entidades discursivas;
+* deícticos;
+* hipóteses de coreferência.
+
+PASSO 9
+
+Implementar API estruturada do conhecimento.
+
+Resultado:
+
+* consultas por forma;
+* lema;
+* sentido;
+* conceito;
+* relação;
+* fato;
+* evidência.
+
+PASSO 10
+
+Implementar inferência simbólica inicial.
+
+Resultado:
+
+* regras explícitas;
+* premissas;
+* conclusões;
+* explicações;
+* conflitos.
+
+PASSO 11
+
+Executar parser novo em modo sombra contra o fluxo antigo.
+
+Resultado:
+
+* comparação de estruturas;
+* relatório de divergências;
+* nenhuma alteração automática de resposta ou legado.
+
+PASSO 12
+
+Implementar compositor baseado em estrutura.
+
+Resultado:
+
+* resposta recebe plano e dados estruturados;
+* não reinterpreta frase;
+* preserva polaridade e incerteza.
+
+PASSO 13
+
+Executar migração classificada dos 37 conhecimentos, 217 evidências e 66
+relações.
+
+Resultado:
+
+* staging;
+* candidatos;
+* aprovados;
+* pendências;
+* relatório de origem.
+
+PASSO 14
+
+Ativar novo fluxo por grupos de construção linguística.
+
+Resultado:
+
+* novo parser para casos aprovados;
+* fallback legado nos demais;
+* métricas de regressão.
+
+PASSO 15
+
+Validar critérios objetivos e rollback.
+
+Resultado:
+
+* suíte completa;
+* migração validada;
+* dados preservados;
+* fallback comprovado.
+
+PASSO 16
+
+Desligar gradualmente `conhecimento.db` e `relacoes.db` como fontes ativas,
+mantendo os arquivos arquivados.
+
+Resultado:
+
+* `linguagem.db` como fonte principal;
+* legado somente para auditoria e rollback.
+
+
+18. APROVAÇÕES AINDA NECESSÁRIAS
+--------------------------------
+
+Antes da criação física do banco, é necessário aprovar:
+
+1. o significado exato de lexema;
+2. a distinção entre homonímia e polissemia;
+3. as classes gramaticais da primeira versão;
+4. o subconjunto inicial da gramática;
+5. a política de desconhecimento;
+6. a política de persistência de fatos;
+7. a política de entidades entre sessões;
+8. a política de ambiguidades;
+9. os tipos de relações prioritários;
+10. o schema físico completo das 14 tabelas;
+11. os tipos SQLite e constraints;
+12. a política de proveniência;
+13. o momento de incluir regras persistentes;
+14. o momento de incluir propostas de aprendizagem no banco novo;
+15. os critérios para arquivar o legado.
+
+Perguntas que precisam ser respondidas:
+
+* Ausência de prova significa desconhecido ou falso?
+* A Isana deve perguntar diante de ambiguidade ou manter hipóteses?
+* Entidades devem sobreviver entre sessões?
+* Quais fatos podem ser persistidos automaticamente?
+* Quais relações são prioritárias?
+* Qual cobertura de português será a primeira meta?
+* O primeiro objetivo é analisar, responder ou inferir?
+* Qual nível de explicação o usuário deseja receber?
+
+
+19. DECISÃO FINAL DESTA ETAPA
+-----------------------------
+
+O projeto está dividido em duas realidades:
+
+    sistema atual:
+        reconhecimento textual de termos/expressões,
+        busca de fichas,
+        heurísticas,
+        contexto curto,
+        composição de respostas.
+
+    sistema futuro:
+        análise lexical,
+        morfologia,
+        sintaxe,
+        semântica,
+        proposições,
+        polaridade,
+        modalidade,
+        contexto,
+        conhecimento estruturado,
+        inferência,
+        intenção,
+        planejamento,
+        geração.
+
+A direção física recomendada é:
+
+    um novo linguagem.db
+      -> 14 tabelas / aproximadamente 125 colunas inicialmente
+      -> aproximadamente 18 tabelas / 160 colunas quando regras persistentes
+         e propostas de aprendizagem forem incorporadas
+
+Durante a transição:
+
+* `conhecimento.db` será preservado;
+* `relacoes.db` será preservado;
+* `indice_codigo.db` continuará separado;
+* `log_mudancas.db` continuará separado;
+* `diagnostico.db` continuará separado;
+* nenhuma migração será destrutiva;
+* nenhum banco novo será criado antes da aprovação do schema físico.
+
+A ordem correta é:
+
+    documento consolidado
+      -> schema físico completo
+      -> aprovação
+      -> criação de linguagem.db
+      -> contratos Python
+      -> léxico e morfologia
+      -> parser
+      -> semântica
+      -> contexto
+      -> conhecimento e inferência
+      -> testes
+      -> migração
+      -> integração gradual
+      -> desligamento controlado do legado
+
+FIM DO DOCUMENTO

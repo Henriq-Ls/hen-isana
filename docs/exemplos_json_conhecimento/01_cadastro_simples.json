@@ -1,0 +1,37 @@
+{
+  "proposta_id": "exemplo-simples",
+  "entrada": "json",
+  "idempotencia": "exemplo-simples:v1",
+  "evidencias": [
+    {
+      "evidencia_id": "ev-simples",
+      "fonte_tipo": "manual",
+      "fonte_identificador": "documentacao",
+      "origem": "exemplo documental",
+      "trecho": "correr"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto_id": "lexema-correr",
+      "tipo": "lexema",
+      "chave": "correr",
+      "campos": [
+        {
+          "nome": "lema",
+          "valor": "correr",
+          "origem": "usuario",
+          "estado": "fornecida",
+          "evidencia_ids": ["ev-simples"]
+        },
+        {
+          "nome": "categoria_lexical",
+          "valor": "verbo",
+          "origem": "usuario",
+          "estado": "fornecida",
+          "evidencia_ids": ["ev-simples"]
+        }
+      ]
+    }
+  ]
+}

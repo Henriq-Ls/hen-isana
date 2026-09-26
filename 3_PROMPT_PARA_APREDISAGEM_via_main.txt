@@ -1,0 +1,33 @@
+Execute o projeto real com `python3 hen-isana/main.py`.
+
+## Objetivo
+Ensine vocabulário gradualmente à Isana, uma palavra por vez, do mais simples ao mais difícil. Alterne entre assuntos variados. Não deixe a aprendizagem presa a uma única área: concluir um grupo de palavras deve levar a outro assunto diferente.
+
+## Acesso e limites do projeto
+- Não leia nem pesquise código, documentação, testes ou outras pastas. Não faça listagens ou comparações de arquivos.
+- Leia e atualize somente `hen-isana/RESUMO_APRENDIZAGEM_MANUAL.txt`.
+- Não altere código ou configurações, não instale dependências, não rode testes e não acesse o SQLite diretamente nem use SQL.
+- Execute o programa no terminal interativo. Se precisar de PTY, faça uma única tentativa, com temporários somente em `/tmp`. Não procure métodos alternativos. Se não funcionar, relate o bloqueio e pare.
+
+## Início
+1. Leia o arquivo de resumo pelo caminho exato indicado acima. Se não estiver disponível, não procure em outras pastas.
+2. Use o resumo para evitar repetir palavras e acompanhar a dificuldade. **Não trate o assunto ou a “próxima direção” anterior como obrigação.** O assunto atual no resumo já foi visitado; escolha um assunto novo, amplo e não relacionado a ele.
+3. Inicie o programa e escolha 2 no primeiro menu e 1 no segundo.
+
+## Aprendizagem contínua
+- Escolha os assuntos dinamicamente, sem uma lista pré-feita de temas, palavras, frases ou respostas.
+- Cada assunto deve ser uma área ampla e distinta. Trocar para um subtema, uma etapa ou um sinônimo da mesma área não conta como mudar de assunto.
+- Em cada assunto, ensine até 3 palavras novas, aumentando gradualmente a dificuldade. Depois da terceira palavra confirmada, atualize o resumo e **continue no mesmo processo com outro assunto distinto**.
+- Não existe limite total de assuntos ou palavras por execução. Continue enquanto o programa e a execução estiverem disponíveis. Não pare depois de salvar o resumo, completar um assunto ou completar três palavras.
+- Para cada palavra, digite `termo: <palavra>` no prompt principal. Use um único termo por vez. Leia e responda a cada pergunta da aplicação individualmente.
+- Se a aplicação não pedir campos porque a palavra já é conhecida, não a conte como nova; escolha outra palavra e continue.
+- Só marque um cadastro como confirmado quando a aplicação o confirmar. Não aprove conteúdo incerto ou incorreto.
+
+## Resumo como ponto de salvamento
+Após **cada palavra confirmada**, atualize imediatamente o arquivo de resumo antes de continuar. A atualização é um ponto de salvamento, não um motivo para encerrar.
+Mantenha o arquivo curto: nível geral, palavras confirmadas (nomes apenas), assuntos recentes que devem ser evitados e o assunto atual. Não inclua definições, exemplos ou transcrições. Remova instruções antigas que apontem um assunto específico como “próximo”; a próxima escolha deve ser variada e não relacionada aos assuntos recentes.
+
+## Encerramento
+Não digite `sair` ao terminar um assunto ou atualizar o resumo. Pare somente se eu pedir, se a aplicação falhar sem recuperação ou se a execução for interrompida pelo limite da plataforma. Se uma ficha ficar incompleta, não a registre como confirmada. Se a plataforma interromper a execução, o resumo deve preservar todas as palavras confirmadas até aquele momento.
+
+Ao encerrar, informe no chat os assuntos e as palavras realmente confirmadas e o caminho do resumo. Não faça inventário de arquivos nem invente resultados.

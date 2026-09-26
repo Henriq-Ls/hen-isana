@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "package_id": "pacote-exemplo-001",
+  "created_at": "2026-09-25T00:00:00Z",
+  "source": {
+    "type": "manual",
+    "identifier": "operador-local",
+    "origin": "entrada-manual",
+    "confidence": 0.9
+  },
+  "purpose": "proposta_conhecimento",
+  "requested_action": "propose",
+  "records": [
+    {
+      "record_id": "lex-dormir",
+      "unit_type": "lexeme",
+      "data": {
+        "lema": "dormir",
+        "categoria_lexical": "verbo"
+      },
+      "status": "candidate",
+      "evidence_refs": [
+        "ev-1"
+      ]
+    },
+    {
+      "record_id": "con-dormir",
+      "unit_type": "concept",
+      "data": {
+        "chave": "DORMIR",
+        "rotulo": "dormir",
+        "tipo": "evento"
+      },
+      "status": "candidate",
+      "evidence_refs": [
+        "ev-1"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "ev-1",
+      "content": "Dormir é estar em estado de sono.",
+      "origin": "explicacao-manual",
+      "reference": "anotacao-local",
+      "state": "candidate"
+    }
+  ],
+  "relations": [
+    {
+      "relation_id": "rel-1",
+      "source_record_id": "lex-dormir",
+      "target_record_id": "con-dormir",
+      "type": "expresses",
+      "evidence_refs": [
+        "ev-1"
+      ]
+    }
+  ]
+}

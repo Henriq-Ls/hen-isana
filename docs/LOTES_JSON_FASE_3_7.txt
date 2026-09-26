@@ -1,0 +1,127 @@
+# HEN-ISANA — PREPARAÇÃO DE LOTES JSON DA FASE 3.7
+
+Status: preparação implementada e validada; nenhum lote foi aplicado
+Data: 2026-09-26
+Escopo: organização, determinismo, validação e gravação protegida de lotes
+JSON; sem migração, sem aplicação física e sem desligamento do legado.
+
+## 1. FONTES IDENTIFICADAS
+
+A geração em escala não varre o projeto inteiro. O inventário explícito está
+disponível por `inventariar_fontes()` em `aplicacao/lotes_json.py`:
+
+| Fonte | Classificação | Elegível nesta etapa |
+|---|---|---:|
+| `docs/exemplos_json_conhecimento/` | sete pacotes JSON já estruturados no contrato | sim, somente para reempacotamento documental |
+| `docs/exemplos_fase_1_3_json/` | fixtures deliberadamente inválidos | não |
+| `data/linguagem.json` | configuração linguística de runtime | não |
+| `aprendizado/bancos/conhecimento.db` | banco legado | não |
+| `aprendizado/bancos/relacoes.db` | banco legado | não |
+| `aprendizado/bancos/linguagem.db` | destino canônico futuro | não |
+| `backup/snapshots/` | 84 snapshots históricos de código | não |
+
+Código, testes, documentação, fontes externas, `Professor`,
+`ProfessorLlama`, Ollama e OpenRouter também não são convertidos
+automaticamente em conhecimento.
+
+O inventário consulta somente a existência e a quantidade de arquivos
+documentais. Não lê bancos legados, não abre SQLite e não transforma uma fonte
+não elegível em proposta.
+
+## 2. ESTRUTURA FÍSICA DO LOTE
+
+O diretório raiz padrão é `lotes_json/`. Nenhum lote real foi criado no
+repositório durante esta etapa; os testes usam diretórios temporários.
+
+```text
+lotes_json/
+└── <fonte>/
+    └── <assunto>/
+        └── <lote_id>/
+            └── <versao>/
+                ├── manifesto.json
+                └── propostas/
+                    ├── <arquivo-a>.json
+                    └── <arquivo-b>.json
+```
+
+`fonte`, `assunto`, `lote_id` e `versao` são identificadores lógicos seguros,
+sem separadores, caminhos relativos ou caracteres fora da política. A versão
+fica no caminho e no manifesto. Como o contrato de cada proposta é estrito,
+metadados do lote não são inseridos no JSON da proposta.
+
+## 3. MANIFESTO E CONTAGENS
+
+`manifesto.json` é determinístico e não contém data, hora ou estado
+transitório. Ele registra:
+
+- formato e versão do formato do lote;
+- contrato lógico usado (`ContratoCadastro`);
+- fonte, assunto, lote e versão;
+- cada arquivo, sua proposta, idempotência e SHA-256;
+- status, motivos, duplicidades e contagens por arquivo;
+- totais de arquivos, estados, objetos, relações, evidências, pendências,
+  incertezas, ambiguidades e conflitos.
+
+Os estados são os mesmos do gerador: `aceito`, `pendente`, `conflito` e
+`rejeitado`. Propostas pendentes ou em conflito podem ser armazenadas como
+propostas para revisão; propostas rejeitadas impedem a gravação do lote.
+
+## 4. DETERMINISMO, IDEMPOTÊNCIA E SOBRESCRITA
+
+`LotesJSONConhecimento.preparar()`:
+
+1. ordena os nomes de entrada;
+2. reutiliza `GeradorJSONConhecimento`;
+3. deixa `contrato_de_dict()` rejeitar conteúdo incompatível;
+4. opcionalmente chama `IngestaoJSON.dry_run()` por injeção;
+5. produz bytes JSON e manifesto canônicos sem relógio ou aleatoriedade.
+
+`gravar()` usa um diretório temporário e renomeação atômica. Se o destino já
+existe com exatamente os mesmos arquivos e bytes, a operação é idempotente. Se
+qualquer byte for diferente, a operação falha com `FileExistsError`; a mesma
+versão não é sobrescrita silenciosamente. A mudança de conteúdo exige nova
+versão explícita.
+
+## 5. VALIDAÇÃO PELO FLUXO REAL
+
+`validar_lote(caminho, ingestao)` lê o manifesto, confere os hashes e chama
+somente `ingestao.dry_run()` para cada proposta. Ele não chama `registrar`,
+`autorizar`, `aplicar`, migração ou qualquer operação de escrita. Alteração de
+arquivo, arquivo ausente, total divergente ou rejeição pelo contrato deixa o
+relatório inválido.
+
+O módulo não cria uma segunda regra de contrato. Contagens são apenas
+metadados do payload já aceito; regras estruturais e semânticas continuam nas
+fronteiras existentes.
+
+## 6. IMPLEMENTAÇÃO E TESTES
+
+Implementação:
+
+- `aplicacao/lotes_json.py`;
+- `testes/test_lotes_json_fase_3_7.py`;
+- `docs/LOTES_JSON_FASE_3_7.txt`.
+
+Os 9 testes específicos aprovados cobrem:
+
+- inventário e separação de fontes;
+- leitura somente de JSONs diretos;
+- layout e manifesto determinísticos;
+- contagens;
+- repetição idempotente;
+- proteção contra sobrescrita;
+- rejeição segura sem gravação parcial;
+- uso de `IngestaoJSON.dry_run()`;
+- preservação do banco durante validação;
+- detecção de hash alterado;
+- reempacotamento dos sete exemplos documentais.
+
+Ainda fora do escopo:
+
+- criação de lote documental versionado no repositório;
+- aplicação dos JSONs;
+- migração de qualquer banco;
+- transação de produção;
+- alteração de `Professor` ou `ProfessorLlama`;
+- desligamento ou substituição do legado.

@@ -1,0 +1,245 @@
+# docs/_DOC_RESUMO.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  HEN-ISANA — RESUMO DE ESTADO
+  Última atualização: 2026-09-26 (primeira etapa da Fase 3.7)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ESTADO ATUAL
+────────────
+As fases simbólicas legadas 1 a 7 continuam concluídas. A Parte 1 da nova
+fundação foi encerrada com as Fases 1.0, 1.1, 1.2 e 1.3 concluídas. A Parte 2
+— núcleo linguístico simbólico — também foi concluída, com 8 testes específicos
+aprovados. Na Parte 3, as Fases 3.1, 3.2, 3.3, 3.4, 3.5 e 3.6 foram
+implementadas e validadas; o modo sombra e a resposta baseada em estrutura
+permanecem opt-in. A primeira etapa da Fase 3.7, o gerador definitivo de JSON,
+foi implementada e validada. A Fase 3.7 — geração massiva, aplicação, migração
+e desligamento controlado — permanece pendente e sem autorização.
+
+Conceitos, sentidos, fatos, relações e propostas ficam no SQLite; aprendizagem
+não gera código por palavra/categoria. Os contratos imutáveis para interpretação,
+recuperação, resposta e representação intermediária estão definidos em
+`core/contratos.py`, mas ainda não foram ligados ao fluxo atual.
+
+ARQUITETURA FUTURA DE CADASTRO
+──────────────────────────────
+O cadastro da Parte 3 deverá aceitar entrada manual, JSON e assistência de
+IA/professor por meio de um contrato estruturado comum. A API Python valida,
+revisa e controla a persistência em `linguagem.db`; nenhuma IA ou professor
+escreve diretamente no SQLite ou escolhe tabelas físicas.
+
+`professor/professor.py` e `professor/professor_llama.py` serão preservados como
+adaptadores. O professor poderá responder perguntas específicas ou estruturar
+propostas, sempre com fonte, evidência, incerteza e autorização separadas. O
+cadastro manual será orientado pelo estado atual do objeto, não por perguntas
+fixas. JSON será uma proposta validável, nunca código executável.
+
+A Fase 1.2 foi validada com 15 testes isolados aprovados e sem acesso a banco.
+A Fase 1.3 foi validada somente como contrato conceitual: 1 JSON válido foi
+aceito e 9 casos inválidos foram rejeitados, sem importador ou persistência.
+`aprendizado/gerado/` não existe no checkout auditado e não há carregador de
+módulos de categoria no runtime.
+
+`SequenceMatcher` fornece somente aproximações lexicais, não generalização por
+categoria. Snapshots repetidos antigos não são carregados pelo programa.
+
+ÚLTIMA SESSÃO — Sessão 4 (2026-09-23)
+──────────────────────────────────────
+• O menu inicial agora separa `1 - Conversa` de `2 - Aprendizagem`.
+• Dentro de aprendizagem, a fonte é escolhida entre manual, professor, internet
+  e Llama local do Ollama.
+• As quatro fontes usam a mesma cascata; sugestões da internet só entram nela
+  depois da confirmação do usuário.
+• O modo conversa não grava termos desconhecidos, não faz perguntas de aprendizagem
+  e mostra associações somente como pistas de proximidade textual.
+• Perguntas de data, hora, clima e URL continuam sendo tratadas pelas ferramentas
+  autorizadas, sem transformar a conversa em aprendizagem.
+• A frase inteira é analisada antes da tokenização para as intenções operacionais
+  já reconhecidas. Variações como `quero saber quantas horas?` chegam ao relógio
+  sem gerar consultas individuais para cada palavra.
+• A consulta de definição online usa a Wikipédia em português e pede confirmação
+  antes de usar o resumo como significado.
+• O teste de frase informal confirmou que `Fala aí, mano, tudo bem?` não cria
+  registros nem inicia a entrevista de aprendizagem.
+• O roteador agora normaliza acentos e pontuação para reconhecer variações de
+  consulta de hora e data.
+• Prefixos conversacionais como `ola mano` não impedem mais o reconhecimento de
+  uma consulta de hora no final da frase.
+• A aprendizagem pela internet agora informa claramente quando está ativa e
+  quando uma definição externa não foi encontrada, em vez de parecer sempre
+  aprendizagem manual.
+• Cinquenta e nove testes passaram.
+• Abreviações comuns são expandidas antes do roteamento: `qt horas` é tratada
+  como `quantas horas`.
+• Vocativos informais no início da frase, como `mano`, não são apresentados
+  como termos desconhecidos quando há um assunto reconhecível depois deles.
+
+SESSÃO ANTERIOR — Sessão 3 (2026-09-23)
+───────────────────────────────────────
+• O modo professor agora tokeniza o assunto antes de gerar perguntas.
+• O assunto inteiro não é mais enviado ao professor como pergunta.
+• A cascata voltou a analisar respostas, com limite de quatro candidatos por
+  resposta e 64 termos por entrada.
+• Histórico curto e cache persistente reduzem chamadas repetidas sem substituir
+  o conhecimento do SQLite.
+• Respostas com metadados, raciocínio interno ou categorias inválidas continuam
+  sendo rejeitadas com retry controlado.
+• Pontuação final de uma categoria é normalizada antes de salvar.
+• Trinta e cinco testes passaram.
+
+ESTADO POR MÓDULO
+─────────────────
+core/        ✅ interpretação, contratos, núcleo simbólico, perguntas, composição, roteador, validador e controlador  ⚠️ sandbox de recursos ainda limitado
+protocolo/   ✅ regras, bloqueios, permissões e validação AST  ⏳ ampliar política de recursos
+bancos/      ✅ conhecimento, relações, índice e histórico  ✅ SQLite inicializado
+aprendizado/ ✅ bancos SQLite canônicos; código gerado segue protegido
+data/        ✅ diagnóstico e regras fixas                         ✅ persistência local
+ferramentas/ ✅ busca, criação e edição autorizadas  ⚠️ edição substitui arquivo inteiro
+aprendizado/gerado/ ✅ caminho reservado a comportamentos pedidos; ausente no checkout e sem carregador no runtime
+backup/      ✅ snapshot, restauração e diagnóstico  ✅ restauração testada
+aplicacao/   ✅ terminal, sessões separadas e modo sombra opt-in              ⚠️ fluxo compartilhado ainda concentrado em `fluxo.py`
+main.py      ✅ entrada terminal e fachada compatível; menus e coordenação em `aplicacao/`  ✅ gravações exigem autorização explícita
+professor/   ✅ cliente HTTP, retry, contexto, cache, validação e erro de limite controlado  ⚠️ cota gratuita depende do provedor
+ testes/      ✅ 278 testes executados; 275 aprovados e 3 falhas legadas conhecidas
+
+--- Reorganização da aplicação (2026-09-24) ---
+• A sessão de conversa e a sessão do professor foram separadas nos pacotes
+  `aplicacao/conversa/` e `aplicacao/aprendizagem/`.
+• `aplicacao/sessao.py` permanece como fachada de compatibilidade; `terminal.py`
+  coordena o menu e chama as sessões por seus novos caminhos.
+• `aplicacao/fluxo.py` permanece na raiz por ser compartilhado pelos dois modos.
+  A separação interna desse módulo ainda não foi feita.
+• Nesta alteração, 16 testes direcionados passaram; a suíte completa não foi
+  reexecutada.
+
+PENDÊNCIAS GLOBAIS
+──────────────────
+• Executar a Fase 3.7 somente em nova execução explicitamente autorizada;
+  migração e desligamento controlado continuam pendentes.
+• Restringir melhor memória, CPU, processos e acesso do código validado.
+• Implementar edição AST incremental de arquivos gerados.
+• Manter código gerado restrito a comportamentos executáveis solicitados; não
+  criar classes por categoria aprendida.
+• Definir como a Isana aprenderá os conceitos básicos de pergunta, resposta,
+  palavra, frase, símbolo e pontuação.
+• Preservar as permissões nas funções internas e a aprovação explícita das
+  propostas do professor ou da internet.
+• Corrigir ou revisar os registros antigos de `fenômeno`, `geológico` e `processo`.
+• Normalizar saudações com e sem acento, especialmente `ola` e `olá`.
+• Ampliar a interpretação determinística de intenção para frases informais e
+  gírias, tratando a frase completa antes de tentar associar palavras.
+• Avaliar uma busca online mais ampla quando a Wikipédia não tiver uma definição.
+
+--- Fase 3.4 (2026-09-25): inferência simbólica determinística ---
+• O motor `core/inferencia_simbolica.py` opera em memória sobre afirmações e
+  regras explicitamente registradas, sem LLM, embeddings ou probabilidades.
+• Premissas, evidências, regra, estado, incerteza, conflito e proveniência da
+  conclusão são preservados. Conclusões recebem origem `inferencia` e não viram
+  fatos confirmados.
+• Premissas ausentes ou negativas bloqueiam a derivação; incerteza é propagada;
+  cadeias explícitas são permitidas; P e não-P permanecem em conflito sem
+  resolução automática.
+• O schema não possui estrutura suficiente para persistir a cadeia completa.
+  A fase não alterou o schema nem persistiu inferências parciais.
+• 14 testes específicos e 69 testes direcionados passaram; a suíte completa
+  ficou em 249 testes, com 246 aprovados e as mesmas 3 falhas legadas.
+
+--- Fase 3.5 (2026-09-25): modo sombra e integração gradual ---
+• `aplicacao/modo_sombra.py` executa o núcleo simbólico novo de forma
+  observacional e compara sua projeção lexical com a tokenização legada.
+• `ModoSombra` registra entrada, resultados, representações, diferenças, origem,
+  status, idempotência e fallback somente em memória.
+• `processar_frase_em_modo_sombra()` é opt-in e devolve sempre a lista de
+  respostas do legado. O `processar_frase()` padrão não foi alterado.
+• Falha, ausência de suporte, incompletude e ambiguidade mantêm fallback
+  explícito; nenhuma resposta nova é escolhida automaticamente.
+• A comparação de respostas estruturadas foi deixada para a Fase 3.6; schema,
+  bancos, professor e inferências persistidas não foram alterados.
+• 12 testes específicos e 81 testes direcionados passaram. A suíte completa
+  ficou em 261 testes, com 258 aprovados e as mesmas 3 falhas legadas.
+
+--- Fase 3.6 (2026-09-26): resposta baseada em estrutura ---
+• `core/resposta_estruturada.py` recebe um `PlanoResposta` e produz texto apenas
+  a partir da estrutura fornecida, sem reinterpretar a frase original.
+• Intenção, proposições, resultados, evidências, incertezas, conflitos,
+  inferências, proveniência e idempotência são preservados na saída.
+• Conclusões inferidas permanecem identificadas como inferidas; conflitos não
+  são resolvidos automaticamente e informação ausente não é inventada.
+• `aplicacao.resposta_estruturada.gerar_resposta_com_fallback()` usa o novo
+  gerador somente quando possível e registra o motivo do fallback legado em
+  caso de estrutura incompleta ou falha.
+• `processar_frase_com_plano_estruturado()` é opt-in. O fluxo padrão
+  `processar_frase()` e o contrato de `processar_frase_em_modo_sombra()` foram
+  preservados.
+• 17 testes específicos e 98 testes direcionados passaram. A suíte completa
+  ficou em 278 testes, com 275 aprovados e somente as 3 falhas legadas
+  conhecidas: `test_aprende_um_termo_e_depois_responde_sem_repetir_perguntas`,
+  `test_aprendizagem_adaptativa_nao_exige_categoria` e
+  `test_expressoes_de_conversa_sao_aprendidas_como_unidade`.
+• `compileall`, `integrity_check` e `foreign_key_check` foram aprovados; não
+  houve alteração de schema, migração ou persistência de inferências.
+
+--- Sessão 4 (2026-09-23): conversa segura e aprendizagem por fonte ---
+• A conversa passou a ser somente leitura no fluxo do terminal.
+• O primeiro menu agora escolhe conversa ou aprendizagem; o segundo escolhe
+  manual, professor ou internet.
+• A pesquisa online apresenta uma sugestão pública e exige confirmação.
+• Frases desconhecidas não iniciam perguntas nem gravações no modo conversa.
+• A suíte completa confirmou 45 testes.
+
+--- Sessão 5 (2026-09-23): primeira camada de intenção ---
+• O roteador passou a reconhecer a intenção da frase completa antes da busca
+  termo a termo.
+• Consultas de hora e data aceitam variações de acento, pontuação e formulação.
+• O caso observado no log, `quero saber quantas horas?`, consulta o relógio sem
+  criar termos desconhecidos no banco.
+• A suíte completa confirmou 50 testes.
+
+--- Sessão 6 (2026-09-23): seleção semântica do assunto ---
+• `que porcaria` não inicia mais aprendizagem nem consulta o professor ou a
+  internet: a seleção rejeita a frase por não conter assunto claro.
+• Uma pergunta como `o que é biblioteca?` aprende somente `biblioteca`, sem
+  transformar `o que` em termo.
+• A suíte completa confirmou 53 testes.
+
+--- Sessão 7 (2026-09-23): normalização de abreviações e vocativos ---
+• A camada determinística de normalização roda antes do roteamento e da
+  tokenização, sem dependências externas.
+• Abreviações aprovadas ficam em `data/linguagem.json` e são expandidas por
+  `core/normalizador.py`.
+• `mano estou triste` consulta a expressão `estou triste` sem gerar um falso
+  desconhecido para o vocativo.
+• A frase original e a versão normalizada são registradas no log.
+• A suíte completa confirmou 58 testes.
+
+--- Segurança de escrita (2026-09-23) ---
+• A memória oficial, as relações entre termos e os arquivos em `aprendizado/gerado/`
+  exigem uma `Permissao` emitida pelo protocolo antes da escrita.
+• O modo conversa não recebe permissões de escrita.
+• Chamadas internas sem autorização falham com `PermissionError` ou um
+  resultado controlado, sem criar arquivos.
+• A suíte completa confirmou 59 testes.
+
+--- Sessão 3 (2026-09-23): fluxo automático, cache e cascata controlada ---
+• O modo 2 recebe o assunto, tokeniza os termos e envia somente perguntas
+  geradas por `aprender_termo()` ao professor.
+• `?`, `!`, `.` e outros sinais continuam sendo descartados pelo tokenizador;
+  ainda não são conhecimento aprendido.
+• Respostas do professor podem apresentar candidatos novos, mas a seleção está
+  limitada a quatro por resposta e 64 por cadeia, com deduplicação e fila.
+• Histórico curto e cache são persistidos em `AppData/professor/`, sem tokens.
+• Metadados de segurança e raciocínio interno são rejeitados; categoria curta com
+  pontuação final é normalizada.
+• A suíte completa confirmou 35 testes.
+
+--- Sessão 2 (2026-09-22): Correção do professor e aprendizagem em cascata ---
+• O professor passou a descartar respostas sem texto com retry controlado e
+  manter somente o contexto recente no pedido.
+• Toda resposta válida pode apresentar termos novos para a aprendizagem.
+• A sessão para novas chamadas ao receber HTTP 429 do provedor.
+• A suíte passou de vinte para vinte e sete testes confirmados.
+
+--- Sessão 1 (2026-09-22): Implementação terminal completa ---
+• O sistema passou a aprender termos e persistir respostas em SQLite.
+• O fluxo de escrita passou a usar controlador, protocolo, snapshot e validação.
+• O terminal passou a criar módulos de categoria em aprendizado/gerado/.
+• Foram confirmados vinte testes e a inicialização dos cinco bancos.

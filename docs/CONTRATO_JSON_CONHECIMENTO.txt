@@ -1,0 +1,654 @@
+# HEN-ISANA — CONTRATO JSON DE CONHECIMENTO
+
+Status: especificação operacional derivada do código real das Fases 3.1, 3.2 e 3.3
+Data: 2026-09-26
+Escopo: entrada/proposta de conhecimento; não é o schema físico do SQLite
+
+Este documento especifica somente o que o projeto atual aceita por meio de
+`ContratoCadastro`, `CadastroPacotes`, `ConhecimentoAPI` e `IngestaoJSON`.
+O gerador definitivo foi implementado separadamente em
+`aplicacao/gerador_json.py`, usando a fronteira independente
+`aplicacao/contrato_entrada.py`. Este documento continua sendo a especificação
+do contrato; ele não migra dados e não altera o banco.
+
+Os exemplos em `docs/exemplos_json_conhecimento/` são documentação. Eles não
+foram importados nem adicionados a nenhum banco.
+
+
+1. ESTRUTURA DO PACOTE JSON
+===========================
+
+O pacote JSON é um objeto com estas chaves de primeiro nível:
+
+Obrigatórias:
+
+- `proposta_id`: texto não vazio, identidade lógica da proposta.
+- `entrada`: um destes textos: `manual`, `json`, `professor`, `llama`.
+- `idempotencia`: texto não vazio, chave lógica de reaplicação da proposta.
+
+Opcionais:
+
+- `objetos`: lista de objetos de conhecimento. O padrão interno é lista vazia.
+- `evidencias`: lista de evidências. O padrão interno é lista vazia.
+- `pendencias`: lista de textos.
+- `incertezas`: lista de textos.
+- `estado`: um estado aceito pelo contrato de cadastro; o padrão é `proposta`.
+- `ambiguidades`: lista de textos.
+
+Um pacote sem `objetos` precisa declarar pelo menos uma `pendencia`. Um pacote
+sem pendência e sem objeto é rejeitado pelo contrato.
+
+Chaves desconhecidas são rejeitadas. Portanto, o pacote não possui campo livre
+para instruções, credenciais, configuração ou metadados arbitrários.
+
+O JSON pode ser recebido como texto, dicionário estruturado ou
+`ContratoCadastro`. A entrada textual é convertida com `json.loads`; não há
+`eval`, importação, execução ou interpretação de código.
+
+O valor de `entrada` identifica a origem lógica do pacote. O método que recebeu
+o pacote também importa: `receber_professor()` exige `entrada` igual a
+`professor`, e `receber_llama()` exige `entrada` igual a `llama`. A ingestão
+JSON geral não reescreve nem força esse campo para `json`.
+
+
+2. TIPOS DE VALOR JSON
+======================
+
+Campos lógicos (`CampoCadastro.valor`) aceitam somente valores escalares JSON:
+
+- texto;
+- inteiro;
+- número real finito;
+- booleano;
+- `null`.
+
+Listas e objetos são usados somente nas posições estruturais previstas pelo
+contrato: `objetos`, `campos`, `relacoes`, `evidencias` e listas de IDs/textos.
+Uma lista ou objeto não pode ser colocado como valor arbitrário de um campo.
+Na conversão Python, números não finitos como NaN e infinito são rejeitados.
+
+IDs, chaves, nomes, origens e textos de controle exigidos pelo contrato devem
+ser textos não vazios. Confiança é um número entre 0 e 1, inclusive.
+Identidades de objetos e evidências não podem se repetir dentro do pacote.
+
+
+3. OBJETOS ACEITOS
+===================
+
+`objeto.tipo` só pode ser um dos seguintes:
+
+- `lexema`
+- `forma_lexical`
+- `analise_morfologica`
+- `sentido`
+- `conceito`
+- `expressao`
+- `proposicao`
+- `argumento`
+- `fato`
+- `relacao_semantica`
+
+Todo objeto possui:
+
+Obrigatórios:
+
+- `objeto_id`: identidade textual única dentro do pacote.
+- `tipo`: um tipo da lista acima.
+- `chave`: identidade lógica textual do objeto.
+
+Opcionais:
+
+- `campos`: lista de campos lógicos.
+- `relacoes`: lista de relações embutidas.
+- `pendencias`: lista de textos.
+- `incertezas`: lista de textos.
+- `ambiguidades`: lista de textos.
+
+Cada nome de campo permitido depende do tipo do objeto. Campos desconhecidos,
+campos repetidos no mesmo objeto e campos fora do tipo são rejeitados durante
+a validação da proposta.
+
+
+4. CAMPOS POR ENTIDADE
+======================
+
+Os campos abaixo são nomes lógicos do contrato. Eles não são nomes de tabela,
+coluna ou instrução SQL.
+
+4.1 Lexema
+
+Obrigatórios:
+
+- `lema`
+- `categoria_lexical`
+
+Opcional:
+
+- `descricao`
+
+4.2 Forma lexical
+
+Obrigatórios:
+
+- `forma`
+- `normalizada`
+
+Opcional:
+
+- `tipo_forma`
+- `lexema`
+
+Na ingestão, uma forma lexical precisa referenciar um lexema. A referência
+pode apontar para outro objeto do mesmo pacote ou para um registro já existente
+que possa ser resolvido pela fronteira confiável.
+
+4.3 Análise morfológica
+
+Obrigatório:
+
+- `classe_gramatical`
+
+Opcionais:
+
+- `genero`
+- `numero`
+- `pessoa`
+- `tempo`
+- `modo`
+- `aspecto`
+- `voz`
+- `forma_lexical`
+
+Na ingestão, a análise precisa referenciar uma forma lexical.
+
+4.4 Sentido
+
+Obrigatório:
+
+- `definicao`
+
+Opcionais:
+
+- `contexto_uso`
+- `classe_gramatical`
+- `dominio`
+- `lexema`
+
+Na ingestão, um sentido precisa referenciar um lexema.
+
+4.5 Conceito
+
+Obrigatórios:
+
+- `chave`
+- `rotulo`
+- `tipo`
+
+O campo lógico `chave` normalmente repete ou detalha a identidade do objeto.
+Isso não é uma escolha de tabela física.
+
+4.6 Expressão
+
+Obrigatórios:
+
+- `forma`
+- `normalizada`
+- `tipo`
+
+Opcional:
+
+- `fixidez`
+
+4.7 Proposição
+
+Obrigatório na validação estrutural:
+
+- `tipo_predicado`
+
+Opcionais:
+
+- `predicado_sentido`
+- `predicado_conceito`
+- `polaridade`
+- `modalidade`
+- `tempo_referencia`
+- `escopo`
+
+Na aplicação transacional, a proposição precisa resolver pelo menos um
+predicado: `predicado_sentido` ou `predicado_conceito`. Se nenhum dos dois
+for resolvível, a aplicação falha e a transação é revertida.
+
+O mapa lógico atual não aceita um campo `fonte` para proposição. Durante a
+aplicação, a fonte é resolvida pela primeira evidência disponível quando não
+há outro caminho explícito.
+
+4.8 Argumento
+
+Obrigatórios:
+
+- `proposicao`
+- `papel`
+- `alvo_tipo`
+- `alvo_chave`
+
+Opcionais:
+
+- `ordem`
+- `funcao_sintatica`
+
+`ordem` assume 1 quando omitida. O alvo precisa ser resolvível na aplicação.
+
+4.9 Fato
+
+Obrigatórios:
+
+- `proposicao`
+- `fonte`
+
+Opcionais:
+
+- `estado`
+- `validade_inicio`
+- `validade_fim`
+- `confianca`
+- `contexto`
+
+O fato é uma entidade distinta de proposição, hipótese e campo proposto.
+Sua aplicação ainda depende de revisão e autorização da proposta inteira.
+
+4.10 Relação semântica
+
+Obrigatórios:
+
+- `tipo_relacao`
+- `origem_tipo`
+- `origem_chave`
+- `destino_tipo`
+- `destino_chave`
+
+Opcionais:
+
+- `direcao`
+- `contexto`
+
+Na ingestão, a regra geral continua exigindo tipos semânticos:
+`conceito`, `sentido`, `proposicao` ou `fato`. Há somente uma exceção
+autorizada: `tipo_relacao = relacionado_no_tema` exige origem e destino
+`expressao`, além de `direcao = simetrica`. Outros tipos de relação não podem
+usar `expressao` como endpoint.
+
+
+5. METADADOS COMUNS DOS CAMPOS
+==============================
+
+Cada item de `campos` possui:
+
+Obrigatórios:
+
+- `nome`
+- `valor`
+- `origem`
+
+Opcionais:
+
+- `estado`, padrão `proposta`;
+- `confianca`, padrão `0.5`;
+- `evidencia_ids`, padrão lista vazia.
+
+`origem` só pode ser:
+
+- `usuario`
+- `professor`
+- `llama`
+- `internet`
+- `sistema`
+
+`estado` só pode ser:
+
+- `fornecida`
+- `proposta`
+- `inferida`
+- `confirmada`
+- `rejeitada`
+
+Um campo com estado `confirmada` precisa referenciar pelo menos uma evidência.
+Fonte automática (`professor`, `llama` ou `internet`) não pode confirmar a
+própria proposta durante a validação da API.
+
+O gerador futuro não deve usar `inferida` como sinônimo de `confirmada`.
+Uma inferência deve permanecer identificada como inferência até existir
+confirmação explícita e autorização independente.
+
+
+6. EVIDÊNCIAS E PROVENIÊNCIA
+=============================
+
+Cada item de `evidencias` possui:
+
+Obrigatórios:
+
+- `evidencia_id`
+- `fonte_tipo`
+- `fonte_identificador`
+- `origem`
+- `trecho`
+
+Opcionais:
+
+- `referencia`
+- `confianca`, padrão `0.5`;
+- `estado`, padrão `candidato`;
+- `revisao_necessaria`, padrão `true`.
+
+`fonte_tipo` só pode ser:
+
+- `manual`
+- `professor`
+- `llama`
+- `agente`
+- `internet`
+- `legado`
+- `sistema`
+
+`estado` da evidência só pode ser `candidato`, `aprovado`, `recusado` ou
+`revertido`.
+
+Campos e relações podem apontar para evidências por `evidencia_ids`. Cada
+referência precisa existir no pacote. Proveniência não é descartada nem
+substituída por um texto sem origem.
+
+Uma evidência de nível superior que não seja referenciada por campo ou relação
+pode ser aceita como parte do contrato, mas não tem alvo físico para ser
+aplicada como registro de evidência na transação atual.
+
+
+7. RELAÇÕES E REFERÊNCIAS LÓGICAS
+==================================
+
+As referências são textuais e lógicas:
+
+- uma referência pode usar `objeto_id` de outro objeto do mesmo pacote;
+- ou pode usar a `chave` lógica de um registro resolvível já existente;
+- o pacote nunca fornece ID físico, tabela, coluna, cursor ou conexão.
+
+Uma relação embutida possui:
+
+Obrigatórios:
+
+- `tipo`
+- `origem_objeto_id`
+- `destino_tipo`
+- `destino_chave`
+
+Opcionais:
+
+- `ordem`, padrão 1;
+- `estado`, padrão `proposta`;
+- `confianca`, padrão `0.5`;
+- `evidencia_ids`, padrão lista vazia.
+
+Na ingestão, a regra geral da relação embutida exige origem semântica e destino
+`conceito`, `sentido`, `proposicao` ou `fato`. Há somente uma exceção
+autorizada: `tipo = componente_de_expressao` exige origem `expressao`, destino
+`lexema` e `ordem` inteira positiva. Ela é aplicada depois que os objetos foram
+resolvidos, em `expressao_componentes`, como componente do tipo `lexema`.
+
+Para `componente_de_expressao`, a ordem não pode ser inventada. Uma proposta
+somente deve informar ordem quando a forma normalizada da expressão contiver
+exatamente uma ocorrência não ambígua da forma do lexema. Se a ocorrência for
+zero, múltipla ou ambígua, a proposta deve permanecer pendente sem criar a
+relação.
+
+Referências que ainda não podem ser resolvidas não são inventadas. Elas ficam
+como pendência na validação ou causam rejeição na aplicação autorizada, caso
+continuem sem resolução.
+
+
+8. MÚLTIPLOS SENTIDOS
+======================
+
+Múltiplos sentidos são representados por objetos `sentido` distintos, com
+`objeto_id` e `chave` distintos. O contrato não força definições diferentes
+para uma única entrada nem escolhe silenciosamente um sentido.
+
+Cada sentido pode referenciar o mesmo lexema e manter definição, contexto de
+uso, domínio e evidências próprios.
+
+
+9. INCERTEZA, PENDÊNCIA E CONFLITO
+===================================
+
+Incertezas podem aparecer no nível do pacote, do objeto ou do campo. Elas são
+textos declarativos e não são convertidas em confirmação.
+
+Pendências podem aparecer nos mesmos níveis. Uma pendência torna a proposta
+incompleta e impede autorização, embora a proposta possa ser registrada em
+memória para revisão.
+
+Ambiguidades também são preservadas. Uma proposta ambígua não pode ser
+autorizada.
+
+Conflitos com conhecimento existente são detectados atualmente para
+`lexema`, `forma_lexical`, `conceito` e `expressao`, comparando as identidades
+e os campos comparáveis. O conflito é relatado e não sobrescreve o registro
+existente.
+
+Essa detecção não pretende provar que não existe conflito em toda entidade ou
+em todo campo. Ausência de conflito relatado não é prova de equivalência
+semântica.
+
+
+10. ESTADOS DA PROPOSTA
+=======================
+
+O contrato lógico aceita estes estados:
+
+- `proposta`
+- `em_revisao`
+- `autorizada`
+- `recusada`
+- `persistida`
+
+Na API operacional atual, a proposta em memória percorre apenas:
+
+`proposta` -> `em_revisao` -> `autorizada`
+
+Não há, neste conjunto de módulos, uma operação pública completa para marcar
+`recusada` ou `persistida`. O campo `ContratoCadastro.estado` não substitui
+o estado controlado por `PropostaConhecimento` e não autoriza persistência por
+si só.
+
+
+11. VALIDAÇÃO
+==============
+
+A validação ocorre em camadas:
+
+1. `json.loads` rejeita JSON textual inválido.
+2. A fronteira rejeita código, SQL e referências físicas.
+3. `ContratoCadastro.from_dict` rejeita chaves desconhecidas, tipos
+   incompatíveis, IDs repetidos e relações estruturais inválidas.
+4. `ConhecimentoAPI.validar` verifica campos permitidos, campos obrigatórios,
+   evidências, origem automática, pendências, ambiguidades e conflitos.
+5. `IngestaoJSON._validar_referencias` acrescenta as exigências de resolução
+   necessárias para a aplicação transacional.
+6. A aplicação resolve referências e impõe as restrições físicas restantes
+   dentro de uma transação.
+
+`ResultadoValidacao.valido` significa que não foram encontrados erros
+estruturais ou semânticos imediatos. Para autorizar, também é necessário:
+
+- não haver pendências;
+- não haver conflitos;
+- não haver ambiguidade;
+- a proposta continuar válida.
+
+Assim, uma validação pode ser `valido=true` e ainda não ser autorizável.
+
+
+12. DUPLICIDADE E IDEMPOTÊNCIA
+==============================
+
+Na memória da API:
+
+- repetir o mesmo `proposta_id` com contrato idêntico devolve a mesma proposta;
+- reutilizar `proposta_id` para outro contrato é erro;
+- reutilizar a mesma `idempotencia` para outra proposta é erro.
+
+A ingestão relata duplicidades existentes para `lexema`, `forma_lexical`,
+`conceito` e `expressao`. O relatório não sobrescreve nem elimina o registro
+existente.
+
+Na aplicação transacional, registros equivalentes e fontes são reutilizados
+quando a identidade lógica e os campos de deduplicação correspondem. O
+resultado de aplicação informa registros reutilizados. Reaplicar não deve
+criar duplicação física para os casos cobertos pelo aplicador atual.
+
+
+13. AUTORIZAÇÃO
+===============
+
+O fluxo operacional é:
+
+1. ler e validar o pacote;
+2. registrar a proposta em memória;
+3. iniciar revisão com uma identidade de revisor;
+4. autorizar com uma identidade independente;
+5. aplicar somente a proposta autorizada.
+
+Proposta incompleta, ambígua, conflitante ou inválida não pode ser autorizada.
+A identidade que aparece como `fonte_identificador` de uma evidência não pode
+autorizar a própria proposta.
+
+Registrar uma proposta não é aplicar conhecimento. A API de cadastro não
+escreve diretamente no SQLite.
+
+
+14. DRY-RUN, REJEIÇÃO E TRANSAÇÃO
+==================================
+
+`IngestaoJSON.dry_run()` lê e valida, devolve um `RelatorioIngestao`, informa
+duplicidades e não escreve no banco. O relatório marca `dry_run=true` e
+`aplicado=false`.
+
+`registrar()` cria ou reutiliza uma proposta em memória. Ele rejeita erros
+estruturais/semânticos, mas pode registrar uma proposta ainda pendente para
+revisão.
+
+`aplicar()` exige que a proposta esteja autorizada e que uma nova validação
+continue autorizável. Sem autorização, a operação falha com `PermissionError`.
+
+A aplicação física é feita por `aplicar_contrato()` em uma transação única:
+
+- inicia transação;
+- aplica objetos na ordem necessária;
+- resolve relações e evidências;
+- confirma tudo somente ao final;
+- em qualquer exceção, executa rollback completo;
+- fecha a conexão.
+
+Falha ao resolver uma referência, falha de constraint ou qualquer outra
+exceção não deve deixar parte da proposta aplicada.
+
+
+15. CAMPOS E CONTEÚDOS PROIBIDOS
+================================
+
+O pacote não pode conter:
+
+- SQL executável ou instruções SQL;
+- `eval`, `exec`, `compile`, `__import__`, `open`, `os.system`,
+  `subprocess`, imports ou comandos executáveis;
+- nomes ou referências a tabela, coluna, cursor ou conexão;
+- escolha de schema físico;
+- token, senha, credencial ou segredo;
+- comando de persistência, autorização, migração ou rollback;
+- campos desconhecidos fora do contrato;
+- instruções para o programa, para o banco ou para uma ferramenta.
+
+O pacote é dado. Texto dentro de `valor`, `trecho`, `descricao` ou qualquer
+outro campo não é executado.
+
+
+16. O QUE O JSON NÃO PODE FAZER
+================================
+
+O JSON:
+
+- não é código;
+- não contém SQL executável;
+- não escolhe tabela física;
+- não escolhe coluna física;
+- não abre conexão nem cursor;
+- não escreve diretamente no SQLite;
+- não aprova a própria proposta;
+- não transforma hipótese ou inferência em fato automaticamente;
+- não elimina proveniência, evidência, incerteza ou ambiguidade;
+- não sobrescreve silenciosamente conhecimento conflitante;
+- não autoriza aplicação apenas por declarar `estado=autorizada`;
+- não altera schema;
+- não migra dados;
+- não desliga o fluxo legado;
+- não cria entidades fora dos tipos aceitos;
+- não chama Professor, ProfessorLlama, internet ou ferramentas.
+
+A presença de um objeto `fato` no JSON é apenas uma proposta de fato. A
+persistência depende das validações, revisão, autorização e aplicação
+transacional independentes.
+
+
+17. DIVERGÊNCIAS E LIMITES FORMALIZADOS
+========================================
+
+Os pontos abaixo são limites do código atual, não extensões inventadas:
+
+- O contrato aceita `recusada` e `persistida`, mas a API de proposta atual
+  controla operacionalmente somente `proposta`, `em_revisao` e `autorizada`.
+- Os estados e a confiança de campos e evidências são preservados no contrato,
+  mas o aplicador físico grava registros aprovados conforme sua própria
+  transação; ele não implementa uma política geral que persista cada estado
+  lógico do JSON.
+- A validação impede uma fonte automática de confirmar a própria proposta,
+  mas não existe ainda um bloqueio geral que impeça todo campo marcado
+  `inferida` de ser autorizado por um revisor. O gerador futuro deve manter
+  essa distinção explícita e não emitir `confirmada` para uma inferência.
+- Relações, proposições, argumentos e fatos têm resolução adicional na camada
+  transacional. Um pacote pode ser estruturalmente aceito e ainda falhar ao
+  aplicar se uma referência não for resolvida.
+- Não há campo de versão do formato no contrato atual.
+- Não há representação estruturada de uma cadeia de pendências; pendências e
+  ambiguidades são listas de textos.
+- Não há operação pública completa para recusar uma proposta ou para atualizar
+  o estado lógico do contrato depois da aplicação.
+- A detecção de conflito cobre apenas os tipos e comparações implementados pela
+  API; não é um verificador semântico geral.
+
+Essas divergências devem ser resolvidas em uma fase autorizada futura. Esta
+especificação não altera o comportamento para eliminá-las.
+
+
+18. FONTES AUDITADAS
+====================
+
+Estruturas e comportamentos foram conferidos em:
+
+- `core/contratos.py`;
+- `aplicacao/cadastro.py`;
+- `bancos/api_conhecimento.py`;
+- `bancos/ingestao_json.py`;
+- `bancos/persistencia_conhecimento.py`;
+- `testes/test_api_conhecimento_fase_3_1.py`;
+- `testes/test_cadastro_pacotes_fase_3_2.py`;
+- `testes/test_ingestao_json_fase_3_3.py`;
+- `01_PROXIMOS_PASSOS.txt`;
+- `02_IMPLEMENTAR_ AGORA.txt`;
+- `03_ULTIMOS_IMPLEMENTADOS.txt`;
+- `docs/_DOC_PROJETO.txt`;
+- `docs/_DOC_RESUMO.txt`;
+- `aplicacao/_DOC_APLICACAO.txt`.
+
+Nenhum banco foi alterado para produzir esta especificação. A primeira etapa da
+Fase 3.7 — implementação e validação do gerador definitivo — foi concluída
+separadamente e está descrita em `docs/GERADOR_JSON_DEFINITIVO.txt`. A Fase 3.7
+como um todo continua pendente: geração massiva, aplicação automática,
+migração e desligamento do legado não foram executados.

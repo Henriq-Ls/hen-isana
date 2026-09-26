@@ -1,0 +1,300 @@
+# docs/_DOC_PERFORMANCE.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  HEN-ISANA — LOG DE PERFORMANCE E INCIDENTES
+  Última atualização: 2026-09-23 (Sessão 3: assunto tokenizado, cache e cascata controlada)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ESTADO RÁPIDO — Sessão 1 (2026-09-22)
+──────────────────────────────────────
+validador    ✅   processo separado, timeout e captura de falha
+SQLite       ✅   criação automática e índices básicos
+backup       ✅   snapshot e restauração exercitados por teste
+protocolo    ✅   bloqueios registrados em diagnostico.db
+gerado       ⚠️   ainda sem limites completos de recursos do sistema
+professor    ✅   retry, contexto recente, cache, histórico e parada para HTTP 429
+aprendizagem ⚠️   cascata limitada, mas seleção semântica ainda é heurística
+
+ESTADO ATUAL DOS SUBSISTEMAS
+─────────────────────────────
+SUBSISTEMA                  STATUS    DETALHE
+──────────────────────────  ────────  ──────────────────────────────────────
+Validação de código         ✅ OK     subprocesso separado com timeout
+Validação de sintaxe        ✅ OK     ast.parse antes da execução
+Aprendizagem SQLite         ✅ OK     busca, lacunas e persistência testadas
+Expressões compostas        ✅ OK     maior expressão conhecida tem prioridade
+Snapshots                   ✅ OK     estado anterior restaurado em falha
+Diagnóstico                 ✅ OK     bloqueios e falhas são persistidos
+Versionamento Git           ✅ OK     git add e commit testados de verdade
+Sandbox de recursos        ⚠️ RISCO  sem limite completo de memória, CPU ou filhos
+Professor externo          ✅ OK     retry, histórico curto, cache e rejeição de respostas inválidas
+Cadeia de aprendizagem     ⚠️ RISCO  até quatro candidatos por resposta e 64 por entrada
+
+PRÓXIMAS ÁREAS A INVESTIGAR
+────────────────────────────
+ALTA PRIORIDADE:
+  • Aplicar limites de memória, CPU e processos ao validador quando o sistema
+    operacional permitir.
+  • Impedir que código validado use recursos externos além da política definida.
+
+MÉDIA PRIORIDADE:
+  • Validar candidatos em arquivo temporário antes da promoção definitiva.
+  • Evitar regravação integral quando um módulo gerado precisar ser editado.
+  • Avaliar agrupamento de perguntas do professor para reduzir chamadas externas
+    sem deixar de registrar os termos desconhecidos.
+
+INVESTIGAR:
+  • Estratégia de carregamento seguro de classes geradas sem importá-las no
+    processo principal antes da validação.
+
+DECISÕES PENDENTES / EM DEBATE
+───────────────────────────────
+• [INFORMAÇÃO NÃO CONFIRMADA] Definir o conjunto final de recursos que uma
+  classe gerada poderá acessar durante sua evolução.
+• Definir se a edição futura será feita apenas por AST ou por outro mecanismo
+  estrutural equivalente.
+
+REGRAS ESPECÍFICAS DE PERFORMANCE
+───────────────────────────────────
+P-01  Código candidato deve ser executado fora do processo principal e possuir
+      timeout explícito.
+P-02  Um loop infinito deve produzir falha controlada, não travar o terminal.
+P-03  Falhas de validação não devem deixar código parcial em aprendizado/gerado/.
+P-04  Consultas frequentes usam índices SQLite em termo e contexto.
+P-05  O cliente do professor envia somente o contexto recente para não carregar
+      histórico desnecessário em cada chamada.
+P-06  HTTP 429 não deve ser repetido para cada termo restante da mesma sessão.
+P-07  Termos descobertos em uma cadeia devem ser deduplicados antes de nova
+      aprendizagem.
+P-08  O assunto do usuário no modo professor deve ser tokenizado; somente as
+       perguntas geradas por `aprender_termo()` podem ser enviadas ao professor.
+P-09  Candidatos de respostas devem ser limitados por resposta e por cadeia para
+       evitar que palavras auxiliares consumam a cota externa.
+P-10  Respostas válidas repetidas devem usar cache local por modelo, pergunta e
+       versão da política de resposta.
+
+FILOSOFIA TÉCNICA
+────────────────
+Priorizar falha explícita, recuperação automática, isolamento estrutural e
+persistência simples na biblioteca padrão antes de aumentar a autonomia do
+código gerado.
+
+ÍNDICE DE SESSÕES
+─────────────────
+Sessão 1 (2026-09-22): validação isolada, fluxo SQLite e restauração testados.
+Sessão 2 (2026-09-22): professor externo, aprendizagem em cadeia e controle de
+limite de chamadas.
+
+================================================================================
+SESSÃO 3 — FLUXO AUTOMÁTICO, CACHE E CASCATA CONTROLADA (2026-09-23)
+================================================================================
+
+PROBLEMA OBSERVADO
+──────────────────
+No teste local do usuário, o assunto:
+
+    ola mano como vc esta?
+
+foi enviado inteiro ao professor. Isso contrariava a finalidade do modo 2:
+o usuário fornece o assunto uma vez e a Isana deve gerar e fazer as perguntas de
+aprendizagem automaticamente.
+
+CORREÇÃO DO FLUXO
+─────────────────
+O desvio que tratava qualquer frase terminada em `?` como pergunta pronta para o
+professor foi removido do caminho de `processar_frase()`. O fluxo atual é:
+
+    assunto → tokenizar → buscar cada termo → identificar lacunas
+    → perguntas automáticas de tipo, significado, contexto e resposta
+    → professor externo
+
+O sinal `?` continua sendo pontuação estrutural descartada pelo tokenizador. Ele
+não é aprendido e não transforma o assunto inteiro em uma pergunta externa.
+
+CONTROLE DA CASCATA
+───────────────────
+A seleção de candidatos das respostas foi reativada de forma limitada:
+
+• até quatro candidatos por resposta;
+• deduplicação com `termos_em_cadeia`;
+• limite total de 64 termos por entrada;
+• palavras funcionais e metadados comuns são ignorados;
+• candidatos entram em fila e só começam depois do termo atual;
+• respostas de categoria podem gerar um rótulo curto, quando apropriado;
+• a seleção ainda é heurística e não representa compreensão semântica completa.
+
+RESPOSTAS INVÁLIDAS E CATEGORIAS
+────────────────────────────────
+O professor continua rejeitando `User Safety`, `Response Safety`, raciocínio
+interno e categorias longas. Categorias curtas com pontuação final, como:
+
+    Interjeição ou saudação informal.
+
+têm a pontuação final removida antes da validação e do salvamento.
+
+HISTÓRICO E CACHE
+─────────────────
+O cliente do professor agora mantém:
+
+• contexto curto em `AppData/professor/historico.json`;
+• respostas aceitas em `AppData/professor/cache_respostas.json`;
+• chave de cache baseada em versão, modelo e pergunta normalizada;
+• escrita atômica e limite de tamanho;
+• nenhum token ou segredo nos arquivos persistentes.
+
+O cache reduz chamadas repetidas, mas não substitui o aprendizado no SQLite.
+
+EVIDÊNCIA DO ÚLTIMO TESTE
+─────────────────────────
+O log corrigido registrou:
+
+• assunto tokenizado em `ola`, `mano`, `como`, `vc`, `esta`;
+• pergunta de aprendizagem correta para `ola`;
+• resposta de segurança rejeitada;
+• retry executado;
+• falha antiga causada apenas pelo ponto final da categoria, já corrigida.
+
+Validação atual:
+
+    35 testes automatizados aprovados
+    py_compile aprovado
+    git diff --check aprovado
+
+================================================================================
+SESSÃO 2 — PROFESSOR EXTERNO E CONTROLE DE CHAMADAS (2026-09-22)
+================================================================================
+
+SINTOMA REPORTADO PELO USUÁRIO
+───────────────────────────────
+"Se o professor mandar uma frase respondendo e nessa frase tiver alguma coisa
+que a Isana não sabe, ela tem que perguntar, porque a Isana é um bebê."
+
+─────────────────────────────────────────────────────────────────────────────
+1. hen-isana/main.py — aprendizagem de respostas em todos os níveis
+─────────────────────────────────────────────────────────────────────────────
+PROBLEMA: A resposta só era analisada quando `professor_nivel == 1`, então
+termos desconhecidos em respostas internas do aprendizado não entravam sempre
+na memória.
+
+SOLUÇÃO:
+  ANTES:
+      if professor_nivel == 1:
+          aprender_termos_da_resposta(resposta)
+  DEPOIS:
+      aprender_termos_da_resposta(resposta)
+
+O conjunto de termos já processados continua impedindo repetições e ciclos na
+mesma cadeia.
+
+2. hen-isana/professor/professor.py — redução de contexto e retry
+─────────────────────────────────────────────────────────────────────────────
+PROBLEMA: O histórico completo podia aumentar o raciocínio do roteador gratuito
+e respostas sem texto não explicavam claramente a causa.
+
+SOLUÇÃO:
+  DEPOIS:
+      "messages": self._historico_para_payload(),
+      "max_tokens": limite_tokens,
+  ...
+      conversas[-self.MAXIMO_MENSAGENS_DE_CONTEXTO :]
+
+Chamadas OpenRouter também recebem `reasoning` mínimo e excluído; respostas sem
+texto tentam novamente com orçamento maior.
+
+3. hen-isana/professor/professor.py e hen-isana/main.py — limite HTTP 429
+─────────────────────────────────────────────────────────────────────────────
+PROBLEMA: Depois da cota gratuita do provedor acabar, cada termo restante podia
+gerar uma nova tentativa recusada.
+
+SOLUÇÃO:
+  DEPOIS:
+      class ProfessorRateLimitError(RuntimeError):
+          """Indica que o provedor recusou a chamada por limite de uso."""
+
+      if erro.code == 429:
+          raise ProfessorRateLimitError(
+              f"limite do professor atingido (HTTP 429): {detalhe[:500]}"
+          ) from erro
+
+      if professor_indisponivel:
+          raise ProfessorRateLimitError(
+              "o professor está indisponível nesta sessão por limite de uso"
+          )
+
+A sessão interrompe novas chamadas depois do primeiro HTTP 429. A cota diária
+do provedor continua sendo uma limitação externa à aplicação.
+
+ARQUIVOS MODIFICADOS — SESSÃO 2
+─────────────────────────────────
+hen-isana/main.py
+hen-isana/professor/professor.py
+hen-isana/professor/__init__.py
+hen-isana/testes/test_professor.py
+
+Validação: 27 testes automatizados passaram.
+
+================================================================================
+SESSÃO 1 — VALIDAÇÃO ISOLADA E RESTAURAÇÃO (2026-09-22)
+================================================================================
+
+SINTOMA REPORTADO PELO USUÁRIO
+───────────────────────────────
+"Implementar o projeto hen-isana completo, com aprendizagem, escrita de
+arquivos próprios, isolamento e recuperação."
+
+─────────────────────────────────────────────────────────────────────────────
+1. hen-isana/core/validador.py — validação fora do processo principal
+─────────────────────────────────────────────────────────────────────────────
+PROBLEMA: Código gerado com erro ou loop infinito não pode travar o terminal.
+
+SOLUÇÃO:
+  ANTES:
+      [INFORMAÇÃO NÃO CONFIRMADA — o estado anterior desta sessão não foi
+       registrado como trecho comparável.]
+
+  DEPOIS:
+      processo = subprocess.run(
+          ["python", "-I", "-c", programa_teste],
+          input=fonte,
+          timeout=timeout_segundos,
+          check=False,
+      )
+
+      except subprocess.TimeoutExpired:
+          return ResultadoValidacao(
+              False,
+              "execucao",
+              "a execução excedeu o tempo limite",
+          )
+
+2. hen-isana/core/controlador.py — restauração após falha
+PROBLEMA: Uma alteração inválida em aprendizado/gerado/ não pode permanecer gravada.
+SOLUÇÃO:
+  ANTES:
+      [INFORMAÇÃO NÃO CONFIRMADA — não há trecho anterior registrado.]
+  DEPOIS:
+      if not validacao.valido:
+          restaurar(snapshot)
+          _registrar_falha(...)
+
+ARQUIVOS MODIFICADOS — SESSÃO 1
+────────────────────────────────
+hen-isana/main.py
+hen-isana/core/controlador.py
+hen-isana/core/roteador.py
+hen-isana/core/validador.py
+hen-isana/core/versionamento.py
+hen-isana/protocolo/regras.py
+hen-isana/protocolo/verificador.py
+hen-isana/bancos/conhecimento.py
+hen-isana/bancos/indice_codigo.py
+hen-isana/bancos/relacoes.py
+hen-isana/bancos/log_mudancas.py
+hen-isana/ferramentas/criacao.py
+hen-isana/ferramentas/edicao.py
+hen-isana/ferramentas/busca.py
+hen-isana/backup/snapshot.py
+hen-isana/backup/restaurador.py
+hen-isana/backup/diagnostico.py
+hen-isana/testes/test_core.py
+hen-isana/testes/test_roteador.py
+hen-isana/testes/test_sistema.py

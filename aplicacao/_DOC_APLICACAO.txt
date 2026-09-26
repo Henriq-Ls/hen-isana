@@ -1,0 +1,401 @@
+# aplicacao/_DOC_APLICACAO.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  HEN-ISANA — DOCUMENTO DA PASTA APLICACAO
+  Última atualização: 2026-09-26 (resposta estruturada opt-in da Fase 3.6)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HIERARQUIA DOS DOCUMENTOS
+─────────────────────────
+1. ../docs/_DOC_PROJETO.txt  ← visão geral e arquitetura do projeto
+2. _DOC_APLICACAO.txt        ← ESTE ARQUIVO — somente a pasta aplicacao/
+
+
+OBJETIVO DESTA PASTA
+────────────────────
+`aplicacao/` conecta a entrada de terminal aos fluxos de conversa,
+aprendizagem, ferramentas, núcleo, permissões e bancos. É a camada que
+coordena o que acontece numa sessão; não é dona da lógica de interpretação,
+das regras de segurança nem do armazenamento SQLite.
+
+Esta pasta é uma aplicação de terminal em Python. Ela não contém servidor web
+nem interface gráfica.
+
+
+ESCOPO E LIMITES
+────────────────
+Este documento descreve somente `aplicacao/`, suas subpastas e os arquivos
+contidos nela. Os pacotes `core/`, `bancos/`, `ferramentas/`, `professor/`,
+`protocolo/` e `backup/` são mencionados apenas para explicar dependências e
+fronteiras; suas implementações pertencem à documentação própria do projeto.
+
+As pastas `__pycache__/` e os arquivos `.pyc` são gerados pelo Python. Não são
+código-fonte nem configuração da aplicação, não devem ser editados manualmente
+e podem ser recriados ao importar ou compilar os módulos.
+
+
+ESTRUTURA DA PASTA
+──────────────────
+aplicacao/
+├── __init__.py
+├── terminal.py
+├── fluxo.py
+├── modo_sombra.py
+├── resposta_estruturada.py
+├── sessao.py
+├── _DOC_APLICACAO.txt
+├── conversa/
+│   ├── __init__.py
+│   └── sessao.py
+└── aprendizagem/
+    ├── __init__.py
+    ├── sessao.py
+    └── cascata.py
+
+`__pycache__/` também pode aparecer na raiz e dentro dos pacotes. São caches
+gerados e não fazem parte da estrutura-fonte acima.
+
+
+RESPONSABILIDADE DE CADA ARQUIVO
+────────────────────────────────
+
+`__init__.py`
+  Marca `aplicacao` como pacote Python e descreve seu propósito. Não contém
+  lógica de inicialização nem exportações de fluxo.
+
+`terminal.py`
+  Coordena a interface de terminal. Valida a escolha entre conversa e
+  aprendizagem e, quando necessário, entre as quatro fontes: ensino manual,
+  professor externo, pesquisa na internet e Llama local via Ollama. Abre e
+  fecha os bancos e demais recursos de sessão, registra o encerramento e envia
+  a execução para a sessão correspondente.
+
+  Funções centrais:
+  • `_escolher_modo()` — solicita o modo de execução e reconhece suas opções.
+  • `_escolher_fonte_aprendizagem()` — apresenta e reconhece as quatro fontes
+    de aprendizagem.
+  • `executar_terminal()` — inicializa os recursos, emite permissões quando a
+    aprendizagem foi escolhida, encaminha para a sessão e encerra os recursos.
+
+  A conversa recebe modo de aprendizagem desativado e não recebe permissões de
+  gravação. As permissões de conhecimento e relações são emitidas pelo fluxo
+  confiável do terminal e passadas às sessões de aprendizagem.
+
+`fluxo.py`
+  Orquestrador principal de frases. Contém a tokenização, o aprendizado de
+  termos e fatos, o processamento de propostas, a escolha entre resposta
+  conversacional, consulta direta, ferramenta autorizada ou desconhecimento,
+  além de helpers de contexto.
+
+  Interfaces importantes:
+  • `processar_frase()` — ponto central chamado pelas sessões. Recebe o banco,
+    o modo, a fonte, o callback para perguntas, permissões, contexto e propostas;
+    despacha a frase conforme esses parâmetros. Em aprendizagem, se os fluxos
+    de pergunta não identificarem um assunto mais específico, usa a entrada
+    inteira como termo ou expressão. Não rejeita a entrada por começar com uma
+    palavra funcional.
+  • `tokenizar()` — separa termos e preserva expressões compostas cadastradas.
+  • `termos_desconhecidos_no_texto()` — encontra candidatos que ainda não estão
+    no banco e descarta palavras funcionais e candidatos repetidos.
+  • `aprender_termo()` — identifica lacunas, pergunta os campos necessários,
+    valida confirmações e encaminha a gravação autorizada ao banco.
+  • `aprender_fato()` — coleta afirmação e contexto, trata duplicatas ou
+    correções e só grava com confirmação e permissão.
+  • `_eh_comando_proposta()` e `_processar_comando_proposta()` — reconhecem e
+    encaminham comandos explícitos de criação, aprovação, aplicação, recusa,
+    listagem e reversão de propostas.
+
+  Também centraliza o tratamento de intenções conversacionais, consultas
+  diretas, ferramentas autorizadas, ambiguidade, correções de digitação e
+  respostas baseadas em contexto recente. A interpretação e a recuperação usam
+  funções dos módulos `core/`; a aplicação não substitui essas regras por um
+  modelo externo.
+
+  As gravações passam pelos métodos dos bancos e pelas permissões recebidas.
+  Registrar uma proposta não equivale a gravar conhecimento: propostas que
+  exigem confirmação só são aplicadas após a ação autorizada correspondente.
+
+`modo_sombra.py`
+  Fornece a execução observacional e opt-in da Fase 3.5. Executa o analisador
+  simbólico novo e o callback legado na mesma entrada, compara uma projeção
+  lexical comum e registra resultados, diferenças, origem, status, idempotência
+  e fallback em memória. `processar_frase_em_modo_sombra()` devolve sempre a
+  saída do legado; não altera `processar_frase()`, o schema ou os bancos.
+  Também expõe a entrada opt-in da Fase 3.6 para executar um
+  `PlanoResposta` já estruturado com fallback explícito para o legado.
+
+`resposta_estruturada.py`
+  Coordena a geração baseada em estrutura sem receber a frase original no
+  gerador. `gerar_resposta_com_fallback()` valida a saída do gerador, devolve
+  a resposta estruturada quando suficiente e chama o legado em caso de
+  estrutura incompleta, informação insuficiente ou falha, registrando status,
+  origem, chave de idempotência e motivo. Não acessa SQLite nem persiste
+  inferências.
+
+`sessao.py`
+  Fachada de compatibilidade para imports antigos. Reexporta as sessões
+  separadas e fornece `_dependencias_do_fluxo()` para importar sob demanda
+  funções historicamente acessadas por este módulo. Não implementa um segundo
+  ciclo de conversa, não cria bancos e não contém regras próprias de
+  aprendizagem.
+
+`conversa/__init__.py`
+  Marca o pacote que reúne o ciclo interativo compartilhado de conversa,
+  aprendizagem manual e aprendizagem pela internet. Não contém lógica além da
+  descrição do pacote.
+
+`conversa/sessao.py`
+  Implementa `executar_conversa_pessoal()`, o loop de terminal para conversa
+  normal, modo manual e modo de aprendizagem pela internet.
+
+  • Na conversa normal, cria `ContextoConversa`, chama `processar_frase()` sem
+    aprendizagem e não oferece permissões para salvar conhecimento.
+  • Na aprendizagem manual, pergunta ao usuário, usa o mesmo fluxo adaptativo
+    `aprender_termo()` e ativa `CascataAprendizagem` para descobrir termos
+    desconhecidos nas respostas. Quando não há assunto mais específico
+    identificado, a entrada inteira é aprendida como um único termo ou expressão.
+  • Na aprendizagem pela internet, usa o fluxo compartilhado com a fonte
+    online e ativa a mesma cascata local. Definições externas são sugestões
+    que passam pela confirmação prevista no fluxo; somente o resumo aceito
+    pode alimentar a fila da cascata.
+
+  A sessão trata `sair`, `exit` e `quit`, EOF e interrupção do teclado; registra
+  entradas e respostas; contém falhas da interação atual no loop e limpa o
+  conjunto de termos da cadeia ao terminar cada entrada.
+
+`aprendizagem/__init__.py`
+  Marca o pacote de sessões e componentes próprios de aprendizagem autorizada.
+  Não contém implementação funcional.
+
+`aprendizagem/sessao.py`
+  Contém `executar_modo_professor()`, sessão usada tanto pelo cliente externo
+  `Professor` quanto pelo cliente local `ProfessorLlama`. O terminal injeta a
+  classe e o nome do cliente selecionado; a sessão envia a ele as perguntas
+  produzidas pelo fluxo compartilhado. Verifica a configuração, lê assuntos,
+  informa falhas e interrompe novas chamadas quando ocorre um limite de uso.
+
+  Também contém `imprimir_comandos_propostas()`, que apresenta os comandos
+  explícitos para propor, listar, aprovar, aplicar, recusar e reverter
+  alterações. Comandos de proposta são respondidos pela entrada local; as
+  perguntas normais de aprendizagem são encaminhadas ao cliente selecionado:
+  professor externo ou Llama local.
+
+`aprendizagem/cascata.py`
+  Implementa `CascataAprendizagem`, compartilhada pelos modos manual,
+  internet, professor externo e Llama local. Professor externo e Llama local
+  usam a mesma sessão de aprendizagem, com clientes diferentes.
+
+  • `registrar_entrada()` inclui na cadeia os termos da entrada original.
+  • `registrar_resposta()` ignora cancelamentos, respostas de controle e
+    respostas-padrão; para respostas ao campo de tipo, considera uma categoria
+    curta como candidato único; nos demais campos, procura termos desconhecidos
+    no texto e evita repetição.
+  • `processar_pendentes()` aprende os candidatos em sequência por meio de
+    `aprender_termo()`, com a mesma origem e permissões do fluxo que iniciou a
+    cadeia. As respostas dessas etapas também são analisadas, permitindo que a
+    cadeia continue com novos termos até não haver candidatos ou atingir os
+    limites definidos.
+  • `limpar_termos_em_cadeia()` encerra o escopo dos termos daquela entrada.
+
+  A cascata aceita no máximo quatro candidatos por resposta e limita cada
+  cadeia a 64 termos. Esses limites evitam expansão sem controle; não significam
+  que toda palavra encontrada será aprendida.
+
+`_DOC_APLICACAO.txt`
+  Este documento: inventário, responsabilidades, relações entre módulos e
+  limites específicos da pasta `aplicacao/`.
+
+
+COMO OS FLUXOS SE CONECTAM
+──────────────────────────
+
+1. ENTRADA E ESCOLHA
+   `main.py` chama `terminal.executar_terminal()`. O terminal seleciona
+   conversa ou aprendizagem. A aprendizagem oferece quatro fontes:
+   manual, professor, internet e Llama local do Ollama.
+
+2. CONVERSA NORMAL
+   `terminal.py` → `conversa.sessao.executar_conversa_pessoal()` →
+   `fluxo.processar_frase()` → interpretação/contexto e recuperação. A sessão
+   pode usar ferramentas autorizadas, mas não aprende nem persiste termos
+   desconhecidos.
+
+3. APRENDIZAGEM MANUAL
+   `terminal.py` → `conversa.sessao.executar_conversa_pessoal()` →
+   `fluxo.processar_frase()` → `aprender_termo()` / `aprender_fato()`.
+   O callback de pergunta recebe a resposta do usuário. `CascataAprendizagem`
+   examina respostas válidas, enfileira candidatos novos e chama novamente
+   `aprender_termo()` para cada candidato.
+
+4. APRENDIZAGEM COM PROFESSOR
+   `terminal.py` → `aprendizagem.sessao.executar_modo_professor()` →
+   `fluxo.processar_frase()` → `aprender_termo()` / `aprender_fato()`.
+   O callback envia as mesmas perguntas adaptativas ao cliente `Professor`.
+   Respostas do professor alimentam a mesma classe de cascata usada no modo
+   manual.
+
+5. APRENDIZAGEM PELA INTERNET
+   `terminal.py` → `conversa.sessao.executar_conversa_pessoal()` com fonte
+   online → `fluxo.processar_frase()` e `aprender_termo()`. A consulta externa
+   oferece conteúdo como sugestão; a confirmação do usuário continua sendo
+   necessária. Depois da confirmação, o conteúdo aceito alimenta a mesma
+   cascata usada nas demais fontes de aprendizagem.
+
+6. APRENDIZAGEM COM LLAMA LOCAL DO OLLAMA
+   `terminal.py` → `aprendizagem.sessao.executar_modo_professor()` com o cliente
+   `ProfessorLlama` → `fluxo.processar_frase()` → `aprender_termo()` /
+   `aprender_fato()`. O cliente local responde às perguntas adaptativas e usa a
+   mesma sessão e cascata do professor externo; a implementação do cliente
+   conecta-se ao Ollama local.
+
+7. PROPOSTAS EXPLÍCITAS
+   O terminal injeta `PropostasAprendizagem` nas sessões de aprendizagem.
+   `processar_frase()` reconhece comandos de proposta e delega a operação ao
+   banco de propostas. A criação da proposta não autoriza sua aplicação: a
+   aprovação/aplicação exigem os comandos e as permissões definidos pelo
+   protocolo.
+
+8. MODO SOMBRA OPT-IN
+   Um chamador que precisa observar a fronteira nova usa
+   `processar_frase_em_modo_sombra()`. O núcleo simbólico é executado para
+   observação; a tokenização legada e o processamento legado continuam sendo
+   executados, e somente a saída legada é devolvida. Intenção operacional,
+   comando legado, ambiguidade, incompletude e falha nova permanecem em
+   fallback.
+
+9. RESPOSTA BASEADA EM ESTRUTURA OPT-IN
+   Um chamador que já possui um `PlanoResposta` usa
+   `modo_sombra.processar_frase_com_plano_estruturado()`. O gerador novo
+   formata intenção, proposições, resultados, evidências, incertezas, conflitos
+   e inferências sem reinterpretar a frase original. Inferências são marcadas
+   como derivadas, conflitos não são resolvidos e ausência não é inventada.
+   Se a estrutura não for suficiente, somente o callback legado é executado e o
+   registro preserva o motivo do fallback.
+
+
+ORDEM INTERNA DE PROCESSAMENTO
+──────────────────────────────
+`processar_frase()` coordena, em alto nível:
+
+1. identifica comandos explícitos de proposta quando a sessão fornece o banco
+   de propostas;
+2. normaliza a entrada sem perder o texto original e resolve contexto permitido;
+3. segue o caminho do modo: conversa trata intenções, consultas diretas,
+   ferramentas autorizadas e contexto somente leitura; aprendizagem trata
+   consultas diretas e, quando nenhum fluxo identifica assunto mais específico,
+   aprende a entrada inteira como termo ou expressão, sem classificá-la pela
+   primeira palavra;
+4. pergunta apenas os campos necessários e pede confirmação quando as regras
+   da proposta exigem uma decisão humana;
+5. em todas as fontes de aprendizagem, processa candidatos descobertos nas
+   respostas via `CascataAprendizagem`; na fonte internet, apenas conteúdo
+   externo aceito alimenta a cascata;
+6. retorna respostas para a sessão apresentar e registrar.
+
+Nem toda frase resulta em aprendizado ou resposta completa. Ambiguidade,
+desconhecimento, cancelamento, falta de permissão, falha externa ou limite de
+uso podem interromper ou alterar o caminho.
+
+
+FRONTEIRAS DE RESPONSABILIDADE
+──────────────────────────────
+• `terminal.py` coordena sessão e permissões; não define a semântica de um termo.
+• `fluxo.py` seleciona e encadeia operações; interpretação, roteamento,
+  composição, acesso SQLite e ferramentas continuam em seus próprios pacotes.
+• `conversa/` e `aprendizagem/` controlam a interação e a origem das respostas;
+  não substituem os bancos nem o protocolo.
+• `CascataAprendizagem` encontra candidatos e enfileira aprendizagem; ela não
+  grava diretamente conhecimento nem decide que toda resposta é verdadeira.
+• Os bancos em `bancos/` persistem conteúdo. `protocolo/verificador.py` autoriza
+  ações de escrita. O modo conversa não recebe as permissões de aprendizagem.
+• `modo_sombra.py` não persiste inferências nem escolhe automaticamente entre
+  resultados; seu histórico é observacional e fica em memória.
+• `resposta_estruturada.py` não cria estrutura a partir de texto, não acessa
+  banco e não substitui o caminho padrão; sua entrada é opt-in e o fallback
+  legado é explícito.
+• `Professor` e serviços web são dependências externas. O código pode lidar com
+  falhas e limites, mas não garante disponibilidade nem correção do conteúdo.
+
+
+ERROS, REGISTROS E ENCERRAMENTO
+───────────────────────────────
+As sessões registram as entradas e respostas e capturam erros da interação para
+informar falha controlada e continuar quando possível. A sessão do professor
+trata especificamente o limite de uso, impedindo novas chamadas naquela sessão.
+Falhas ao aprender termos em cascata são registradas com o termo correspondente.
+
+`terminal.py` é responsável por fechar recursos e finalizar o registro da sessão
+mesmo quando o loop termina por comando de saída ou interrupção. Isso não deve
+ser interpretado como transação global ou reversão automática de gravações
+anteriores.
+
+
+DEPENDÊNCIAS DIRETAS
+────────────────────
+`aplicacao/` coordena chamadas para:
+
+• `core/` — interpretação, perguntas adaptativas, contexto, roteamento e
+  composição de respostas;
+• `bancos/` — conhecimento, fatos, relações, propostas, índices e logs;
+• `ferramentas/` — busca e consultas externas ou operacionais;
+• `professor/` — cliente HTTP do professor externo e cliente local Llama/Ollama;
+• `protocolo/` — tipos de ação, alvos e autorização de escrita;
+• `_APPDATA_` e `_LOGS_` — caminhos de configuração/dados e registro da sessão.
+
+Os imports da camada de aplicação são locais ao projeto; o runtime descrito
+utiliza a biblioteca padrão do Python e os pacotes internos.
+
+
+EXECUÇÃO E VERIFICAÇÃO
+──────────────────────
+Na raiz do projeto:
+
+  python hen-isana/main.py
+
+Para conferir os módulos desta pasta:
+
+  cd hen-isana
+  python -m compileall -q aplicacao
+
+A suíte automatizada geral fica em `testes/`, fora do escopo deste documento:
+
+  cd hen-isana
+  python -m unittest discover -s testes -p "test_*.py" -v
+
+
+LIMITES CONHECIDOS
+──────────────────
+• A interação desta camada é por terminal.
+• `fluxo.py` concentra muitas decisões de orquestração; mover lógica para outro
+  pacote exige manter os contratos de entrada, permissões e respostas usados
+  pelas sessões.
+• A cascata é limitada e baseada em candidatos lexicais; não é compreensão
+  semântica garantida.
+• No modo de aprendizagem, uma entrada com várias palavras é tratada como um
+  único assunto quando os fluxos de pergunta não extraem um assunto mais
+  específico. Isso permite ensinar expressões; não tenta separar automaticamente
+  vários conceitos independentes digitados na mesma entrada.
+• As respostas do professor externo e da internet dependem de serviços externos;
+  o Llama local depende do Ollama estar disponível. As respostas das três
+  fontes automatizadas não são determinísticas.
+• Os contratos de dados definidos em outras partes do projeto só são consumidos
+  se o fluxo chamar explicitamente essas interfaces; a presença de um contrato
+  não significa integração automática.
+• A equivalência da Fase 3.5 é lexical/simbólica. Não representa equivalência
+  de resposta textual, que depende da Fase 3.6.
+
+
+REGRAS LOCAIS DA PASTA
+──────────────────────
+AP-01  `terminal.py` é o coordenador da escolha de modo e fonte.
+AP-02  `conversa.sessao` atende conversa normal, aprendizagem manual e pela
+       internet; use os parâmetros explícitos para distinguir esses caminhos.
+AP-03  `aprendizagem.sessao` atende o professor externo e o Llama local; não
+       duplicar nela o fluxo comum de perguntas que pertence a `fluxo.py`.
+AP-04  Manual, internet, professor e Llama local usam o mesmo mecanismo de
+       cascata; preservar os limites por resposta e por cadeia.
+AP-05  Toda gravação de aprendizagem deve continuar passando pelo banco e pelas
+       permissões recebidas; não gravar diretamente a partir da interface.
+AP-06  `sessao.py` existe para compatibilidade; mudanças de fluxo devem ser
+       implementadas nos módulos específicos, não duplicadas na fachada.
+AP-07  A aprendizagem pela internet usa a mesma cascata das demais fontes;
+       resumos externos só entram na cascata depois da confirmação do usuário.

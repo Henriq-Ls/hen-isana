@@ -1,0 +1,4 @@
+- [Lotes JSON da Fase 3.7](json-batches.md) — lotes são propostas determinísticas por fonte/assunto/versão; bancos, código e configuração não são fontes automáticas.
+- [Efeitos colaterais da suíte legada](legacy-test-side-effects.md) — a suíte completa pode alterar o banco de diagnóstico; a preservação deve ser verificada por hashes em execução sequencial.
+- [Fronteira do modo sombra](modo-sombra-boundary.md) — a Fase 3.5 compara apenas a projeção lexical; equivalência de respostas pertence à Fase 3.6.
+- [Limites das relações legadas](limites-relacoes-legadas.md) — relações expressão→lexema e relações temáticas simétricas permanecem pendentes no contrato atual.

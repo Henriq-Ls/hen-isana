@@ -1,0 +1,2028 @@
+{
+  "phase": "1.0",
+  "purpose": "baseline isolado e rollback reproduzível",
+  "created_at_utc": "2026-09-26T01:07:00.632635+00:00",
+  "git_head": "ac06b9437e48f121f9dc9b3a28a9521cafcda40e",
+  "sources": [
+    {
+      "path": "aprendizado/bancos/conhecimento.db",
+      "copy_path": "copies/aprendizado/bancos/conhecimento.db",
+      "before": {
+        "size_bytes": 151552,
+        "sha256": "f47f9ae9a293d831ff82805c3e958cadff8a88623455b984a9683a9c150f3697",
+        "journal_mode": "delete",
+        "user_version": 3,
+        "schema_version": 10,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_conhecimento_contexto",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_contexto\n                ON conhecimento(termo COLLATE NOCASE, contexto_uso)"
+          },
+          {
+            "type": "index",
+            "name": "idx_conhecimento_termo",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_termo\n                ON conhecimento(termo COLLATE NOCASE)"
+          },
+          {
+            "type": "index",
+            "name": "idx_conhecimento_termo_chave_contexto",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_termo_chave_contexto\n                ON conhecimento(termo_chave, contexto_uso)\n                "
+          },
+          {
+            "type": "index",
+            "name": "idx_evidencias_conhecimento",
+            "table": "evidencias_conhecimento",
+            "sql": "CREATE INDEX idx_evidencias_conhecimento\n                ON evidencias_conhecimento(conhecimento_id, campo)"
+          },
+          {
+            "type": "index",
+            "name": "idx_evidencias_fatos",
+            "table": "evidencias_fatos",
+            "sql": "CREATE INDEX idx_evidencias_fatos\n                    ON evidencias_fatos(fato_id)"
+          },
+          {
+            "type": "index",
+            "name": "idx_fatos_contexto",
+            "table": "fatos_conhecimento",
+            "sql": "CREATE INDEX idx_fatos_contexto\n                    ON fatos_conhecimento(contexto COLLATE NOCASE)"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_evidencias_conhecimento_1",
+            "table": "evidencias_conhecimento",
+            "sql": null
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_evidencias_fatos_1",
+            "table": "evidencias_fatos",
+            "sql": null
+          },
+          {
+            "type": "table",
+            "name": "conhecimento",
+            "table": "conhecimento",
+            "sql": "CREATE TABLE conhecimento (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                termo TEXT NOT NULL,\n                termo_original TEXT,\n                termo_chave TEXT,\n                tipo TEXT,\n                significado TEXT,\n                contexto_uso TEXT,\n                resposta_padrao TEXT,\n                relacionados TEXT,\n                exemplo_uso TEXT\n            )"
+          },
+          {
+            "type": "table",
+            "name": "evidencias_conhecimento",
+            "table": "evidencias_conhecimento",
+            "sql": "CREATE TABLE evidencias_conhecimento (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                conhecimento_id INTEGER NOT NULL,\n                campo TEXT NOT NULL,\n                valor TEXT NOT NULL,\n                origem TEXT NOT NULL,\n                estado TEXT NOT NULL,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                FOREIGN KEY (conhecimento_id)\n                    REFERENCES conhecimento(id) ON DELETE CASCADE,\n                UNIQUE (conhecimento_id, campo, valor, origem, estado)\n            )"
+          },
+          {
+            "type": "table",
+            "name": "evidencias_fatos",
+            "table": "evidencias_fatos",
+            "sql": "CREATE TABLE evidencias_fatos (\n                    id INTEGER PRIMARY KEY AUTOINCREMENT,\n                    fato_id INTEGER NOT NULL,\n                    afirmacao TEXT NOT NULL,\n                    contexto TEXT NOT NULL,\n                    origem TEXT NOT NULL,\n                    estado TEXT NOT NULL,\n                    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                    FOREIGN KEY (fato_id)\n                        REFERENCES fatos_conhecimento(id) ON DELETE CASCADE,\n                    UNIQUE (fato_id, afirmacao, contexto, origem, estado)\n                )"
+          },
+          {
+            "type": "table",
+            "name": "fatos_conhecimento",
+            "table": "fatos_conhecimento",
+            "sql": "CREATE TABLE fatos_conhecimento (\n                    id INTEGER PRIMARY KEY AUTOINCREMENT,\n                    afirmacao TEXT NOT NULL,\n                    contexto TEXT NOT NULL,\n                    origem TEXT NOT NULL,\n                    estado TEXT NOT NULL,\n                    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                    atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n                )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "termo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "termo_original",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "termo_chave",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "tipo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "significado",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto_uso",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "resposta_padrao",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "relacionados",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "exemplo_uso",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              }
+            ],
+            "count": 37
+          },
+          {
+            "name": "evidencias_conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "conhecimento_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "campo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "valor",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 217
+          },
+          {
+            "name": "evidencias_fatos",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "fato_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "afirmacao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          },
+          {
+            "name": "fatos_conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "afirmacao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              },
+              {
+                "name": "atualizado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "92a775f2ba1a32ac40d6b1b5368a409b390bbbf2f73f2a553ef75cdd9e7eff44"
+      },
+      "copy": {
+        "size_bytes": 151552,
+        "sha256": "5f90f89a21fff063ebe230b0cc241b2d1b191600a260426910fb23152ebbf2c9",
+        "journal_mode": "delete",
+        "user_version": 3,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_conhecimento_contexto",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_contexto\n                ON conhecimento(termo COLLATE NOCASE, contexto_uso)"
+          },
+          {
+            "type": "index",
+            "name": "idx_conhecimento_termo",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_termo\n                ON conhecimento(termo COLLATE NOCASE)"
+          },
+          {
+            "type": "index",
+            "name": "idx_conhecimento_termo_chave_contexto",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_termo_chave_contexto\n                ON conhecimento(termo_chave, contexto_uso)\n                "
+          },
+          {
+            "type": "index",
+            "name": "idx_evidencias_conhecimento",
+            "table": "evidencias_conhecimento",
+            "sql": "CREATE INDEX idx_evidencias_conhecimento\n                ON evidencias_conhecimento(conhecimento_id, campo)"
+          },
+          {
+            "type": "index",
+            "name": "idx_evidencias_fatos",
+            "table": "evidencias_fatos",
+            "sql": "CREATE INDEX idx_evidencias_fatos\n                    ON evidencias_fatos(fato_id)"
+          },
+          {
+            "type": "index",
+            "name": "idx_fatos_contexto",
+            "table": "fatos_conhecimento",
+            "sql": "CREATE INDEX idx_fatos_contexto\n                    ON fatos_conhecimento(contexto COLLATE NOCASE)"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_evidencias_conhecimento_1",
+            "table": "evidencias_conhecimento",
+            "sql": null
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_evidencias_fatos_1",
+            "table": "evidencias_fatos",
+            "sql": null
+          },
+          {
+            "type": "table",
+            "name": "conhecimento",
+            "table": "conhecimento",
+            "sql": "CREATE TABLE conhecimento (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                termo TEXT NOT NULL,\n                termo_original TEXT,\n                termo_chave TEXT,\n                tipo TEXT,\n                significado TEXT,\n                contexto_uso TEXT,\n                resposta_padrao TEXT,\n                relacionados TEXT,\n                exemplo_uso TEXT\n            )"
+          },
+          {
+            "type": "table",
+            "name": "evidencias_conhecimento",
+            "table": "evidencias_conhecimento",
+            "sql": "CREATE TABLE evidencias_conhecimento (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                conhecimento_id INTEGER NOT NULL,\n                campo TEXT NOT NULL,\n                valor TEXT NOT NULL,\n                origem TEXT NOT NULL,\n                estado TEXT NOT NULL,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                FOREIGN KEY (conhecimento_id)\n                    REFERENCES conhecimento(id) ON DELETE CASCADE,\n                UNIQUE (conhecimento_id, campo, valor, origem, estado)\n            )"
+          },
+          {
+            "type": "table",
+            "name": "evidencias_fatos",
+            "table": "evidencias_fatos",
+            "sql": "CREATE TABLE evidencias_fatos (\n                    id INTEGER PRIMARY KEY AUTOINCREMENT,\n                    fato_id INTEGER NOT NULL,\n                    afirmacao TEXT NOT NULL,\n                    contexto TEXT NOT NULL,\n                    origem TEXT NOT NULL,\n                    estado TEXT NOT NULL,\n                    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                    FOREIGN KEY (fato_id)\n                        REFERENCES fatos_conhecimento(id) ON DELETE CASCADE,\n                    UNIQUE (fato_id, afirmacao, contexto, origem, estado)\n                )"
+          },
+          {
+            "type": "table",
+            "name": "fatos_conhecimento",
+            "table": "fatos_conhecimento",
+            "sql": "CREATE TABLE fatos_conhecimento (\n                    id INTEGER PRIMARY KEY AUTOINCREMENT,\n                    afirmacao TEXT NOT NULL,\n                    contexto TEXT NOT NULL,\n                    origem TEXT NOT NULL,\n                    estado TEXT NOT NULL,\n                    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                    atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n                )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "termo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "termo_original",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "termo_chave",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "tipo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "significado",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto_uso",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "resposta_padrao",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "relacionados",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "exemplo_uso",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              }
+            ],
+            "count": 37
+          },
+          {
+            "name": "evidencias_conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "conhecimento_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "campo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "valor",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 217
+          },
+          {
+            "name": "evidencias_fatos",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "fato_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "afirmacao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          },
+          {
+            "name": "fatos_conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "afirmacao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              },
+              {
+                "name": "atualizado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "92a775f2ba1a32ac40d6b1b5368a409b390bbbf2f73f2a553ef75cdd9e7eff44"
+      },
+      "after": {
+        "size_bytes": 151552,
+        "sha256": "f47f9ae9a293d831ff82805c3e958cadff8a88623455b984a9683a9c150f3697",
+        "journal_mode": "delete",
+        "user_version": 3,
+        "schema_version": 10,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_conhecimento_contexto",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_contexto\n                ON conhecimento(termo COLLATE NOCASE, contexto_uso)"
+          },
+          {
+            "type": "index",
+            "name": "idx_conhecimento_termo",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_termo\n                ON conhecimento(termo COLLATE NOCASE)"
+          },
+          {
+            "type": "index",
+            "name": "idx_conhecimento_termo_chave_contexto",
+            "table": "conhecimento",
+            "sql": "CREATE INDEX idx_conhecimento_termo_chave_contexto\n                ON conhecimento(termo_chave, contexto_uso)\n                "
+          },
+          {
+            "type": "index",
+            "name": "idx_evidencias_conhecimento",
+            "table": "evidencias_conhecimento",
+            "sql": "CREATE INDEX idx_evidencias_conhecimento\n                ON evidencias_conhecimento(conhecimento_id, campo)"
+          },
+          {
+            "type": "index",
+            "name": "idx_evidencias_fatos",
+            "table": "evidencias_fatos",
+            "sql": "CREATE INDEX idx_evidencias_fatos\n                    ON evidencias_fatos(fato_id)"
+          },
+          {
+            "type": "index",
+            "name": "idx_fatos_contexto",
+            "table": "fatos_conhecimento",
+            "sql": "CREATE INDEX idx_fatos_contexto\n                    ON fatos_conhecimento(contexto COLLATE NOCASE)"
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_evidencias_conhecimento_1",
+            "table": "evidencias_conhecimento",
+            "sql": null
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_evidencias_fatos_1",
+            "table": "evidencias_fatos",
+            "sql": null
+          },
+          {
+            "type": "table",
+            "name": "conhecimento",
+            "table": "conhecimento",
+            "sql": "CREATE TABLE conhecimento (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                termo TEXT NOT NULL,\n                termo_original TEXT,\n                termo_chave TEXT,\n                tipo TEXT,\n                significado TEXT,\n                contexto_uso TEXT,\n                resposta_padrao TEXT,\n                relacionados TEXT,\n                exemplo_uso TEXT\n            )"
+          },
+          {
+            "type": "table",
+            "name": "evidencias_conhecimento",
+            "table": "evidencias_conhecimento",
+            "sql": "CREATE TABLE evidencias_conhecimento (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                conhecimento_id INTEGER NOT NULL,\n                campo TEXT NOT NULL,\n                valor TEXT NOT NULL,\n                origem TEXT NOT NULL,\n                estado TEXT NOT NULL,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                FOREIGN KEY (conhecimento_id)\n                    REFERENCES conhecimento(id) ON DELETE CASCADE,\n                UNIQUE (conhecimento_id, campo, valor, origem, estado)\n            )"
+          },
+          {
+            "type": "table",
+            "name": "evidencias_fatos",
+            "table": "evidencias_fatos",
+            "sql": "CREATE TABLE evidencias_fatos (\n                    id INTEGER PRIMARY KEY AUTOINCREMENT,\n                    fato_id INTEGER NOT NULL,\n                    afirmacao TEXT NOT NULL,\n                    contexto TEXT NOT NULL,\n                    origem TEXT NOT NULL,\n                    estado TEXT NOT NULL,\n                    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                    FOREIGN KEY (fato_id)\n                        REFERENCES fatos_conhecimento(id) ON DELETE CASCADE,\n                    UNIQUE (fato_id, afirmacao, contexto, origem, estado)\n                )"
+          },
+          {
+            "type": "table",
+            "name": "fatos_conhecimento",
+            "table": "fatos_conhecimento",
+            "sql": "CREATE TABLE fatos_conhecimento (\n                    id INTEGER PRIMARY KEY AUTOINCREMENT,\n                    afirmacao TEXT NOT NULL,\n                    contexto TEXT NOT NULL,\n                    origem TEXT NOT NULL,\n                    estado TEXT NOT NULL,\n                    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                    atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n                )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "termo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "termo_original",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "termo_chave",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "tipo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "significado",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto_uso",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "resposta_padrao",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "relacionados",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "exemplo_uso",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              }
+            ],
+            "count": 37
+          },
+          {
+            "name": "evidencias_conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "conhecimento_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "campo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "valor",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 217
+          },
+          {
+            "name": "evidencias_fatos",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "fato_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "afirmacao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          },
+          {
+            "name": "fatos_conhecimento",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "afirmacao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "origem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "estado",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              },
+              {
+                "name": "atualizado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "92a775f2ba1a32ac40d6b1b5368a409b390bbbf2f73f2a553ef75cdd9e7eff44"
+      },
+      "source_hash_unchanged": true,
+      "logical_state_matches_copy": true
+    },
+    {
+      "path": "aprendizado/bancos/indice_codigo.db",
+      "copy_path": "copies/aprendizado/bancos/indice_codigo.db",
+      "before": {
+        "size_bytes": 16384,
+        "sha256": "89257a77bb395d80681cceb22652f243436fdc32f25448b7549e5938c5ee5446",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 2,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_indice_categoria",
+            "table": "indice_codigo",
+            "sql": "CREATE INDEX idx_indice_categoria\n            ON indice_codigo(categoria)\n            "
+          },
+          {
+            "type": "table",
+            "name": "indice_codigo",
+            "table": "indice_codigo",
+            "sql": "CREATE TABLE indice_codigo (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                categoria TEXT NOT NULL,\n                arquivo TEXT NOT NULL,\n                classe TEXT,\n                funcao TEXT,\n                status TEXT NOT NULL DEFAULT 'ativo',\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "indice_codigo",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "categoria",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "arquivo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "classe",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "funcao",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "status",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "'ativo'",
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "0e52625f41dd902eb29fda382d70d5aabd9e4c0b987ed6328a78f765a62fbce2"
+      },
+      "copy": {
+        "size_bytes": 16384,
+        "sha256": "304ec59e768254cfe09be63d35cb29a74c7d676e29cdf5e2d2d95b96287d295c",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_indice_categoria",
+            "table": "indice_codigo",
+            "sql": "CREATE INDEX idx_indice_categoria\n            ON indice_codigo(categoria)\n            "
+          },
+          {
+            "type": "table",
+            "name": "indice_codigo",
+            "table": "indice_codigo",
+            "sql": "CREATE TABLE indice_codigo (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                categoria TEXT NOT NULL,\n                arquivo TEXT NOT NULL,\n                classe TEXT,\n                funcao TEXT,\n                status TEXT NOT NULL DEFAULT 'ativo',\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "indice_codigo",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "categoria",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "arquivo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "classe",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "funcao",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "status",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "'ativo'",
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "0e52625f41dd902eb29fda382d70d5aabd9e4c0b987ed6328a78f765a62fbce2"
+      },
+      "after": {
+        "size_bytes": 16384,
+        "sha256": "89257a77bb395d80681cceb22652f243436fdc32f25448b7549e5938c5ee5446",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 2,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_indice_categoria",
+            "table": "indice_codigo",
+            "sql": "CREATE INDEX idx_indice_categoria\n            ON indice_codigo(categoria)\n            "
+          },
+          {
+            "type": "table",
+            "name": "indice_codigo",
+            "table": "indice_codigo",
+            "sql": "CREATE TABLE indice_codigo (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                categoria TEXT NOT NULL,\n                arquivo TEXT NOT NULL,\n                classe TEXT,\n                funcao TEXT,\n                status TEXT NOT NULL DEFAULT 'ativo',\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "indice_codigo",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "categoria",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "arquivo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "classe",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "funcao",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "status",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "'ativo'",
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "0e52625f41dd902eb29fda382d70d5aabd9e4c0b987ed6328a78f765a62fbce2"
+      },
+      "source_hash_unchanged": true,
+      "logical_state_matches_copy": true
+    },
+    {
+      "path": "aprendizado/bancos/log_mudancas.db",
+      "copy_path": "copies/aprendizado/bancos/log_mudancas.db",
+      "before": {
+        "size_bytes": 12288,
+        "sha256": "d9e0d1fc594885385b990cee59faa5be763945ea5085fe17d2e58b2ed3b90dfe",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "table",
+            "name": "log_mudancas",
+            "table": "log_mudancas",
+            "sql": "CREATE TABLE log_mudancas (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                acao TEXT NOT NULL,\n                arquivo TEXT,\n                sucesso INTEGER NOT NULL,\n                mensagem TEXT NOT NULL,\n                contexto TEXT,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "log_mudancas",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "acao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "arquivo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "sucesso",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "mensagem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "2f58d7cd462c912827b03562bd4cf13b6d01bed5f40f57809cab36c77765bb64"
+      },
+      "copy": {
+        "size_bytes": 12288,
+        "sha256": "5838a80b61d9c90265f34ffd0c6da4c890461e64a409e0a641a82d40fe6d84c8",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "table",
+            "name": "log_mudancas",
+            "table": "log_mudancas",
+            "sql": "CREATE TABLE log_mudancas (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                acao TEXT NOT NULL,\n                arquivo TEXT,\n                sucesso INTEGER NOT NULL,\n                mensagem TEXT NOT NULL,\n                contexto TEXT,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "log_mudancas",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "acao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "arquivo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "sucesso",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "mensagem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "2f58d7cd462c912827b03562bd4cf13b6d01bed5f40f57809cab36c77765bb64"
+      },
+      "after": {
+        "size_bytes": 12288,
+        "sha256": "d9e0d1fc594885385b990cee59faa5be763945ea5085fe17d2e58b2ed3b90dfe",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "table",
+            "name": "log_mudancas",
+            "table": "log_mudancas",
+            "sql": "CREATE TABLE log_mudancas (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                acao TEXT NOT NULL,\n                arquivo TEXT,\n                sucesso INTEGER NOT NULL,\n                mensagem TEXT NOT NULL,\n                contexto TEXT,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "log_mudancas",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "acao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "arquivo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "sucesso",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "mensagem",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 0
+          }
+        ],
+        "logical_state_sha256": "2f58d7cd462c912827b03562bd4cf13b6d01bed5f40f57809cab36c77765bb64"
+      },
+      "source_hash_unchanged": true,
+      "logical_state_matches_copy": true
+    },
+    {
+      "path": "aprendizado/bancos/relacoes.db",
+      "copy_path": "copies/aprendizado/bancos/relacoes.db",
+      "before": {
+        "size_bytes": 16384,
+        "sha256": "d278c4eee7a98fb95929032211c69699b799f32f019df7ed5fe867d8167b0296",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 2,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_relacoes_termo",
+            "table": "relacoes",
+            "sql": "CREATE INDEX idx_relacoes_termo\n            ON relacoes(termo_id)\n            "
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_relacoes_1",
+            "table": "relacoes",
+            "sql": null
+          },
+          {
+            "type": "table",
+            "name": "relacoes",
+            "table": "relacoes",
+            "sql": "CREATE TABLE relacoes (\n                termo_id INTEGER NOT NULL,\n                termo_relacionado_id INTEGER NOT NULL,\n                tipo TEXT NOT NULL DEFAULT 'relacionado',\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                PRIMARY KEY (termo_id, termo_relacionado_id)\n            )"
+          }
+        ],
+        "tables": [
+          {
+            "name": "relacoes",
+            "columns": [
+              {
+                "name": "termo_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "termo_relacionado_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 2
+              },
+              {
+                "name": "tipo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "'relacionado'",
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 66
+          }
+        ],
+        "logical_state_sha256": "fb7fd7f05344498820343e267b2caa98dfc29ac6ddd49fa8435d0c7bba4c82bf"
+      },
+      "copy": {
+        "size_bytes": 16384,
+        "sha256": "7278083bbbbf91b1edad524d89d8a2d36a3f8cd131d04acde44736cd88ff37e2",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_relacoes_termo",
+            "table": "relacoes",
+            "sql": "CREATE INDEX idx_relacoes_termo\n            ON relacoes(termo_id)\n            "
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_relacoes_1",
+            "table": "relacoes",
+            "sql": null
+          },
+          {
+            "type": "table",
+            "name": "relacoes",
+            "table": "relacoes",
+            "sql": "CREATE TABLE relacoes (\n                termo_id INTEGER NOT NULL,\n                termo_relacionado_id INTEGER NOT NULL,\n                tipo TEXT NOT NULL DEFAULT 'relacionado',\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                PRIMARY KEY (termo_id, termo_relacionado_id)\n            )"
+          }
+        ],
+        "tables": [
+          {
+            "name": "relacoes",
+            "columns": [
+              {
+                "name": "termo_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "termo_relacionado_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 2
+              },
+              {
+                "name": "tipo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "'relacionado'",
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 66
+          }
+        ],
+        "logical_state_sha256": "fb7fd7f05344498820343e267b2caa98dfc29ac6ddd49fa8435d0c7bba4c82bf"
+      },
+      "after": {
+        "size_bytes": 16384,
+        "sha256": "d278c4eee7a98fb95929032211c69699b799f32f019df7ed5fe867d8167b0296",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 2,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "index",
+            "name": "idx_relacoes_termo",
+            "table": "relacoes",
+            "sql": "CREATE INDEX idx_relacoes_termo\n            ON relacoes(termo_id)\n            "
+          },
+          {
+            "type": "index",
+            "name": "sqlite_autoindex_relacoes_1",
+            "table": "relacoes",
+            "sql": null
+          },
+          {
+            "type": "table",
+            "name": "relacoes",
+            "table": "relacoes",
+            "sql": "CREATE TABLE relacoes (\n                termo_id INTEGER NOT NULL,\n                termo_relacionado_id INTEGER NOT NULL,\n                tipo TEXT NOT NULL DEFAULT 'relacionado',\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                PRIMARY KEY (termo_id, termo_relacionado_id)\n            )"
+          }
+        ],
+        "tables": [
+          {
+            "name": "relacoes",
+            "columns": [
+              {
+                "name": "termo_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "termo_relacionado_id",
+                "type": "INTEGER",
+                "notnull": 1,
+                "default": null,
+                "pk": 2
+              },
+              {
+                "name": "tipo",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "'relacionado'",
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 66
+          }
+        ],
+        "logical_state_sha256": "fb7fd7f05344498820343e267b2caa98dfc29ac6ddd49fa8435d0c7bba4c82bf"
+      },
+      "source_hash_unchanged": true,
+      "logical_state_matches_copy": true
+    },
+    {
+      "path": "data/diagnostico.db",
+      "copy_path": "copies/data/diagnostico.db",
+      "before": {
+        "size_bytes": 57344,
+        "sha256": "b0ab59eedc14fbecbd796a4e30d41ceda069cb87ff242b9e591bb5bb1ce0722b",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "table",
+            "name": "diagnostico",
+            "table": "diagnostico",
+            "sql": "CREATE TABLE diagnostico (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                acao TEXT NOT NULL,\n                alvo TEXT,\n                erro TEXT NOT NULL,\n                contexto TEXT,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "diagnostico",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "acao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "alvo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "erro",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 366
+          }
+        ],
+        "logical_state_sha256": "c67b7a8f830ef7ecb7ebe5f70e469f592b5777cb23e582bd6e977fdae0b7b8ae"
+      },
+      "copy": {
+        "size_bytes": 57344,
+        "sha256": "709fd685a4eda4e7ec39347451b0d50f3b03be2a75709052d3d8210c88fdcaa8",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "table",
+            "name": "diagnostico",
+            "table": "diagnostico",
+            "sql": "CREATE TABLE diagnostico (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                acao TEXT NOT NULL,\n                alvo TEXT,\n                erro TEXT NOT NULL,\n                contexto TEXT,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "diagnostico",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "acao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "alvo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "erro",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 366
+          }
+        ],
+        "logical_state_sha256": "c67b7a8f830ef7ecb7ebe5f70e469f592b5777cb23e582bd6e977fdae0b7b8ae"
+      },
+      "after": {
+        "size_bytes": 57344,
+        "sha256": "b0ab59eedc14fbecbd796a4e30d41ceda069cb87ff242b9e591bb5bb1ce0722b",
+        "journal_mode": "delete",
+        "user_version": 0,
+        "schema_version": 1,
+        "integrity_check": [
+          "ok"
+        ],
+        "foreign_key_check": [],
+        "objects": [
+          {
+            "type": "table",
+            "name": "diagnostico",
+            "table": "diagnostico",
+            "sql": "CREATE TABLE diagnostico (\n                id INTEGER PRIMARY KEY AUTOINCREMENT,\n                acao TEXT NOT NULL,\n                alvo TEXT,\n                erro TEXT NOT NULL,\n                contexto TEXT,\n                criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n            )"
+          },
+          {
+            "type": "table",
+            "name": "sqlite_sequence",
+            "table": "sqlite_sequence",
+            "sql": "CREATE TABLE sqlite_sequence(name,seq)"
+          }
+        ],
+        "tables": [
+          {
+            "name": "diagnostico",
+            "columns": [
+              {
+                "name": "id",
+                "type": "INTEGER",
+                "notnull": 0,
+                "default": null,
+                "pk": 1
+              },
+              {
+                "name": "acao",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "alvo",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "erro",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "contexto",
+                "type": "TEXT",
+                "notnull": 0,
+                "default": null,
+                "pk": 0
+              },
+              {
+                "name": "criado_em",
+                "type": "TEXT",
+                "notnull": 1,
+                "default": "CURRENT_TIMESTAMP",
+                "pk": 0
+              }
+            ],
+            "count": 366
+          }
+        ],
+        "logical_state_sha256": "c67b7a8f830ef7ecb7ebe5f70e469f592b5777cb23e582bd6e977fdae0b7b8ae"
+      },
+      "source_hash_unchanged": true,
+      "logical_state_matches_copy": true
+    }
+  ],
+  "restore_check": [
+    {
+      "path": "aprendizado/bancos/conhecimento.db",
+      "logical_state_matches_copy": true,
+      "integrity_check": [
+        "ok"
+      ]
+    },
+    {
+      "path": "aprendizado/bancos/indice_codigo.db",
+      "logical_state_matches_copy": true,
+      "integrity_check": [
+        "ok"
+      ]
+    },
+    {
+      "path": "aprendizado/bancos/log_mudancas.db",
+      "logical_state_matches_copy": true,
+      "integrity_check": [
+        "ok"
+      ]
+    },
+    {
+      "path": "aprendizado/bancos/relacoes.db",
+      "logical_state_matches_copy": true,
+      "integrity_check": [
+        "ok"
+      ]
+    },
+    {
+      "path": "data/diagnostico.db",
+      "logical_state_matches_copy": true,
+      "integrity_check": [
+        "ok"
+      ]
+    }
+  ]
+}

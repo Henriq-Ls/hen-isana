@@ -1,0 +1,54 @@
+{
+  "proposta_id": "exemplo-incerteza",
+  "entrada": "json",
+  "idempotencia": "exemplo-incerteza:v1",
+  "incertezas": [
+    "o tipo semântico ainda precisa de confirmação independente"
+  ],
+  "evidencias": [
+    {
+      "evidencia_id": "ev-incerteza",
+      "fonte_tipo": "professor",
+      "fonte_identificador": "professor-exemplo",
+      "origem": "exemplo documental",
+      "trecho": "movimento",
+      "confianca": 0.4
+    }
+  ],
+  "objetos": [
+    {
+      "objeto_id": "conceito-movimento",
+      "tipo": "conceito",
+      "chave": "movimento",
+      "incertezas": [
+        "a classificação como evento é apenas candidata"
+      ],
+      "campos": [
+        {
+          "nome": "chave",
+          "valor": "movimento",
+          "origem": "professor",
+          "estado": "proposta",
+          "confianca": 0.4,
+          "evidencia_ids": ["ev-incerteza"]
+        },
+        {
+          "nome": "rotulo",
+          "valor": "Movimento",
+          "origem": "professor",
+          "estado": "proposta",
+          "confianca": 0.4,
+          "evidencia_ids": ["ev-incerteza"]
+        },
+        {
+          "nome": "tipo",
+          "valor": "evento",
+          "origem": "professor",
+          "estado": "proposta",
+          "confianca": 0.4,
+          "evidencia_ids": ["ev-incerteza"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,429 @@
+# docs/_DOC_PROJETO.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  HEN-ISANA — DOCUMENTO MESTRE
+  Última atualização: 2026-09-26 (primeira etapa da Fase 3.7)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HIERARQUIA DOS DOCUMENTOS
+─────────────────────────
+1. docs/_DOC_PROJETO.txt       ← ESTE ARQUIVO — visão geral e arquitetura
+
+2. docs/_DOC_RESUMO.txt        ← estado atual agregado de todos os módulos
+3. docs/_DOC_PERFORMANCE.txt   ← histórico de performance e fixes
+4. _STATUS_HEN_ISANA.txt       ← pronto, pendente e problemas conhecidos
+5. aplicacao/_DOC_APLICACAO.txt ← detalhes da pasta aplicacao/
+
+OBJETIVO DO PROJETO
+───────────────────
+Sistema simbólico escrito em Python padrão. A interpretação e a conversa locais
+são determinísticas. A Fase 4 e as etapas dependentes estão congeladas. O
+conhecimento persistente fica em SQLite. Código em `aprendizado/gerado/` é
+reservado a ferramentas e comportamentos executáveis solicitados explicitamente;
+aprender conteúdo não gera módulos por palavra ou categoria. A conversa normal
+é somente leitura; a gravação de conhecimento acontece apenas em um fluxo
+explícito de aprendizagem.
+
+ESTADO ATUAL
+────────────
+As fases simbólicas legadas 1 a 7 permanecem concluídas. Na nova sequência de
+fundação, a Parte 1 também foi concluída: baseline e rollback (1.0), schema
+físico isolado (1.1), contratos Python intermediários (1.2) e contrato
+conceitual de cadastro multifonte/JSON (1.3). A Parte 2 — núcleo linguístico
+simbólico — também foi concluída, com léxico, parser, semântica e contexto
+validados em memória. Na Parte 3, as Fases 3.1, 3.2, 3.3, 3.4, 3.5 e 3.6
+foram implementadas e validadas. O modo sombra e a resposta baseada em
+estrutura permanecem opt-in; a Fase 3.7, incluindo migração e desligamento
+controlado, permanece pendente e sem autorização.
+
+As interfaces de interpretação, seleção de perguntas, validação, armazenamento,
+recuperação e composição de resposta estão separadas por módulo. Os contratos
+de dados para essas camadas estão definidos em `core/contratos.py`, mas ainda
+não foram conectados ao fluxo de conversa. O SQLite é a memória persistente
+canônica; a geração de código não é acionada por aprendizagem de conteúdo.
+
+`aprendizado/gerado/` não existe no checkout auditado e não há carregador no
+runtime para módulos de categoria ou snapshots repetidos. A aproximação
+disponível é somente uma sugestão lexical por `SequenceMatcher`; não implementa
+generalização semântica ou por categoria. Os 84 arquivos `.py.snapshot` em
+`backup/snapshots/` são históricos e não são dependências de execução.
+
+O código local usa a biblioteca padrão. A aprendizagem explícita pode usar o
+professor externo, a internet ou o Llama local conectado ao Ollama; esses
+caminhos são distintos da conversa normal.
+
+COMO INSTALAR E RODAR
+─────────────────────
+1. Instalar Python 3 com SQLite e Git disponíveis no sistema.
+2. Não é necessário instalar dependências externas.
+3. Na raiz do projeto, executar:
+   python hen-isana/main.py
+4. Digitar frases no terminal e usar "sair" para encerrar.
+5. Executar os testes com:
+   python -m unittest discover -s hen-isana/testes -p "test_*.py" -v
+
+INTERFACE — O QUE O USUÁRIO VÊ
+────────────────────────────────
+A interação atual é exclusivamente por terminal. O primeiro menu separa:
+
+  1 - Conversa
+  2 - Aprendizagem
+
+No modo conversa, o programa interpreta primeiro a frase inteira, consulta a
+memória e as ferramentas autorizadas, mas não grava termos desconhecidos nem
+inicia perguntas de aprendizagem. Uma expressão conversacional conhecida pode
+receber a réplica cadastrada; uma consulta explicativa recebe os campos
+solicitados. Quando não há correspondência nem continuação sustentada, informa
+que ainda não sabe, sem reutilizar a ficha do tópico anterior.
+
+No modo aprendizagem, há uma segunda escolha de fonte:
+
+  1 - Conversar e ensinar manualmente
+  2 - Consultar o professor
+  3 - Pesquisar na internet e confirmar
+  4 - Usar o Llama local do Ollama
+
+A consulta de definição online atualmente usa a Wikipédia em português como
+fonte pública de sugestão. A sugestão não é aceita sem confirmação.
+
+CASOS DE USO
+────────────
+• Ensinar um termo novo respondendo tipo, significado, contexto e resposta.
+• Consultar novamente um termo completo sem repetir as perguntas.
+• Reconhecer expressões compostas que já existem no banco.
+• Manter o conteúdo aprendido no SQLite sem criar código por termo ou categoria.
+• Gerar uma ferramenta executável somente após solicitação explícita, usando o
+  controlador e as validações de segurança existentes.
+• Usar o modo professor para receber um assunto, separar seus termos desconhecidos,
+  responder automaticamente às perguntas adaptativas necessárias e encadear
+  termos desconhecidos encontrados nas respostas.
+• Aprender manualmente com as mesmas perguntas adaptativas e a mesma cascata do
+  professor, respondendo às perguntas no terminal.
+• Escolher explicitamente entre conversa segura e aprendizagem.
+• Usar internet como fonte opcional de uma aprendizagem, sem transformar a
+  conversa normal em gravação automática.
+• Usar o Llama local do Ollama como quarta fonte de aprendizagem, separada do
+  professor externo e da pesquisa na internet.
+• Testar frases informais sem contaminar o banco com palavras isoladas.
+• Aprender conceitos relevantes encontrados nas respostas do professor sem transformar
+  toda palavra auxiliar em uma nova chamada.
+• Reverter uma escrita de código gerado que falhou na validação.
+
+ARQUITETURA GERAL
+─────────────────
+main.py
+  └─ aplicacao.terminal.executar_terminal()
+      ├─ menu de conversa/aprendizagem e seleção da fonte
+      ├─ conversa/manual/internet:
+      │    └─ aplicacao.conversa.sessao.executar_conversa_pessoal()
+      └─ professor externo/Llama local:
+           └─ aplicacao.aprendizagem.sessao.executar_modo_professor()
+
+As duas sessões chamam `aplicacao.fluxo.processar_frase()`, o fluxo compartilhado:
+  ├─ tokenizar() e ferramentas/busca.py
+  │    └─ bancos/conhecimento.py → aprendizado/bancos/conhecimento.db
+  ├─ core/interpretacao.py → interpretar_pergunta()
+  ├─ core/perguntas.py → gerar_pergunta_adaptativa()
+  ├─ core/composicao_resposta.py → compor_resposta_dinamica()
+  ├─ ferramentas/internet.py
+  │    ├─ consultar_clima()
+  │    ├─ consultar_url()
+  │    └─ consultar_definicao() → sugestão pública da Wikipédia
+  ├─ aprender_termo()
+  │    └─ bancos/relacoes.py → aprendizado/bancos/relacoes.db
+  └─ core/controlador.py
+       ├─ core/roteador.py → intenções operacionais determinísticas
+       ├─ protocolo/verificador.py
+       ├─ backup/snapshot.py
+       ├─ core/validador.py
+       ├─ ferramentas/criacao.py ou edicao.py
+       ├─ bancos/indice_codigo.py → aprendizado/bancos/indice_codigo.db
+       ├─ bancos/log_mudancas.py → aprendizado/bancos/log_mudancas.db
+       ├─ backup/diagnostico.py
+       └─ core/versionamento.py
+
+`conversa.sessao` executa a conversa somente leitura e também é reutilizada para
+aprendizagem manual e pela internet. As quatro fontes usam
+`aprendizagem.cascata.CascataAprendizagem`. `aprendizagem.sessao` fornece a
+sessão compartilhada pelo professor externo e pelo cliente local
+`ProfessorLlama`; o terminal injeta o cliente correspondente à opção escolhida.
+`aplicacao.sessao` mantém os imports antigos como fachada de compatibilidade.
+
+ESTRUTURA DE MÓDULOS
+────────────────────
+pasta          | responsabilidade                         | doc de referência
+aplicacao/     | menu, sessões e coordenação dos fluxos    | aplicacao/_DOC_APLICACAO.txt
+core/          | núcleo protegido e controlador           | docs/_DOC_PROJETO.txt
+protocolo/     | regras e verificador                     | docs/_DOC_PROJETO.txt
+ferramentas/   | ações autorizadas                        | docs/_DOC_PROJETO.txt
+bancos/        | acesso aos bancos SQLite                 | docs/_DOC_PROJETO.txt
+aprendizado/   | memória, relações, índices e código gerado| docs/_DOC_PROJETO.txt
+backup/        | snapshot, restauração e diagnóstico       | docs/_DOC_PROJETO.txt
+data/          | regras fixas e diagnóstico operacional    | docs/_DOC_PROJETO.txt
+professor/     | cliente externo e controle de limite     | docs/_DOC_PROJETO.txt
+main.py        | entrada terminal e fachada compatível    | docs/_DOC_PROJETO.txt
+testes/        | validação automatizada                   | docs/_DOC_PROJETO.txt
+
+REGRAS GLOBAIS
+──────────────
+RG-01  core/ nunca é importado por ferramentas/ ou aprendizado/gerado/ —
+       isolamento estrutural.
+RG-02  Toda ação de ferramentas/ passa por protocolo/verificador.py antes de executar.
+RG-03  Código gerado é permitido somente para comportamento executável
+        explicitamente solicitado; toda escrita em aprendizado/gerado/ é
+        precedida de snapshot e validada com ast.parse() e execução isolada.
+RG-04  O controlador de escrita fica em core/ e é chamado por main.py, nunca
+       colocado dentro de ferramentas/.
+RG-05  O banco SQLite é a fonte persistente da memória aprendida.
+RG-06  Respostas válidas da aprendizagem manual, do professor, do Llama local e
+         conteúdo da internet aceito no fluxo podem gerar aprendizagem de novos
+         termos; a seleção é limitada por resposta e termos já processados na
+         mesma cadeia não devem ser repetidos.
+RG-07  HTTP 429 do provedor externo interrompe novas chamadas na sessão atual.
+RG-08  Histórico e cache do professor ficam no AppData local, separados do SQLite;
+        nenhum token ou configuração secreta pode ser persistido nesses arquivos.
+RG-09  O modo conversa do terminal é somente leitura: não pode criar conhecimento,
+         fazer perguntas de aprendizagem ou gerar módulos para termos desconhecidos.
+RG-10  A aprendizagem precisa ser iniciada explicitamente e escolher uma das
+          quatro fontes: manual, professor externo, internet ou Llama local.
+RG-11  Conteúdo encontrado na internet é uma sugestão externa; precisa ser
+         confirmado antes de preencher o significado e nunca é executado como código.
+RG-12  Aprendizagem de conteúdo não cria módulos; termos, fatos, relações e
+          propostas são dados persistidos em SQLite.
+
+DEPENDÊNCIAS
+────────────
+Somente biblioteca padrão do Python: ast, dataclasses, difflib, enum, json,
+pathlib, re, sqlite3, subprocess, time, typing, unicodedata, urllib e uuid.
+Git é chamado pelo terminal através de subprocess, sem biblioteca externa.
+
+FLUXOS PRINCIPAIS
+─────────────────
+F-01  Aprendizagem de termo novo
+  main.py → aplicacao.terminal → escolher fonte
+    → conversa.sessao (manual/internet) ou aprendizagem.sessao
+      (professor/Llama local)
+    → aplicacao.fluxo.processar_frase → tokenizar → ferramentas/busca → bancos/conhecimento
+    → aprender_termo → identificar lacunas → perguntas adaptativas necessárias
+    → salvar_termo → na cascata compartilhada, enfileirar termos desconhecidos
+      válidos das respostas e repetir sem duplicar
+    → conhecimento, exemplos, fatos e relações permanecem no SQLite
+
+F-02  Escrita autorizada de ferramenta/comportamento explicitamente solicitado
+  solicitação explícita → main.py → core/controlador → protocolo/verificador
+  → backup/snapshot → core/validador → ferramentas/criacao ou edicao
+  → validação final → índice/log → Git
+  → backup/restaurador + diagnóstico em caso de falha
+
+F-03  Consulta de termo completo
+  main.py → tokenizar → ferramentas/busca
+   → aprendizado/bancos/conhecimento → resposta_padrao
+
+F-04  Modo professor externo
+    main.py → aplicacao.terminal → escolher aprendizagem/professor
+    → aplicacao.aprendizagem.sessao → tokenizar o assunto → buscar cada termo
+    → aplicacao.fluxo.processar_frase
+    → aprender_termo → perguntas adaptativas dos campos necessários
+   → professor.Professor → API HTTP compatível
+    → CascataAprendizagem compartilhada → candidatos relevantes na fila após o termo atual
+   → parada controlada ao receber HTTP 429
+
+F-05  Conversa segura
+     main.py → aplicacao.terminal → aplicacao.conversa.sessao
+     → aplicacao.fluxo.processar_frase → ferramentas autorizadas ou
+     aprendizado/bancos/conhecimento
+    → resposta conversacional, consulta explícita ou mensagem de desconhecimento
+    → nenhuma gravação nem geração de código
+
+F-06  Aprendizagem com Llama local do Ollama
+    main.py → aplicacao.terminal → escolher aprendizagem/Llama local
+    → aplicacao.aprendizagem.sessao com `ProfessorLlama`
+    → aplicacao.fluxo.processar_frase → perguntas adaptativas
+    → cliente local conectado ao Ollama → cascata compartilhada
+
+INTERFACES SIMBÓLICAS ESTÁVEIS
+──────────────────────────────
+• Interpretação de perguntas: core/interpretacao.py;
+  intenções operacionais: core/roteador.py.
+• Seleção de perguntas adaptativas: core/perguntas.py.
+• Validação de código: protocolo/verificador.py (AST e isolamento estrutural)
+  e core/validador.py (sintaxe e execução em subprocesso).
+• Armazenamento: bancos/conhecimento.py, bancos/relacoes.py e
+  bancos/propostas_aprendizagem.py.
+• Recuperação: ferramentas/busca.py.
+• Composição de respostas: core/composicao_resposta.py.
+O fluxo simbólico usa essas interfaces diretamente. Uma implementação futura
+pode oferecer interpretação ou composição alternativas sem substituir o
+armazenamento SQLite nem o protocolo de segurança.
+
+CONTRATOS DE DADOS ENTRE CAMADAS
+─────────────────────────────────
+`core/contratos.py` define objetos imutáveis e independentes do banco para
+transportar:
+
+• Interpretação: intenção, expressão candidata, entidades, slots, referências
+  a turnos da sessão, confiança opcional e necessidade de esclarecimento.
+• Recuperação: referências tipadas aos registros candidatos e campos com
+  valor, origem, estado de confirmação, IDs de evidência e contexto relevante.
+• Resposta: texto, evidências usadas, incertezas e necessidade de esclarecimento.
+
+Esses contratos não substituem nem alteram as funções simbólicas existentes:
+seus chamadores ainda não foram migrados para os novos objetos. Eles não
+carregam conexão, consulta ou objeto SQLite, não concedem permissões e não
+executam ações. O coordenador confiável é responsável por validar estado e
+evidências antes de compor ou apresentar uma resposta. Nenhuma ferramenta ou
+código em `aprendizado/gerado/` deve importar `core/`; dados externos são
+validados na fronteira confiável.
+
+ROADMAP IMEDIATO
+────────────────
+Partes 1 e 2 concluídas; as Fases 3.1, 3.2, 3.3, 3.4, 3.5 e 3.6 da Parte 3
+também estão validadas. A Fase 3.7 — migração e desligamento controlado —
+permanece pendente e sem autorização. Sua execução dependerá de autorização
+explícita em uma etapa futura.
+
+Não há migração de dados nem aplicação automática fora do fluxo autorizado.
+Esses itens permanecem pendentes na Parte 3.
+
+INFERÊNCIA SIMBÓLICA — FASE 3.4
+────────────────────────────────
+A primeira camada de inferência é um motor determinístico em memória em
+`core/inferencia_simbolica.py`. Ela aceita somente regras explícitas e
+afirmações já estruturadas, preservando premissas, evidências, regra, estado,
+incerteza, conflito e origem `inferencia` em cada conclusão.
+
+Premissa ausente ou negativa não produz a conclusão; premissa incerta não vira
+certeza; P e não-P são registrados sem resolução automática; cadeias só avançam
+quando cada etapa está explicitamente sustentada. A camada não acessa SQLite,
+não executa texto e não grava conclusões como fatos.
+
+O schema atual não possui uma representação suficiente para regra, cadeia de
+derivação e conflito. Por isso a 3.4 não alterou o schema nem inventou
+persistência parcial; a decisão estrutural de persistir inferências fica para
+fase futura.
+
+MODO SOMBRA — FASE 3.5
+──────────────────────
+`aplicacao/modo_sombra.py` fornece uma execução observacional e opt-in. O
+analisador simbólico novo e a tokenização do fluxo legado recebem a mesma
+entrada; suas representações lexicais comuns são canonicalizadas e comparadas.
+O registro em memória contém entrada, resultados, representações, diferenças,
+origem, status, chave de idempotência e fallback.
+
+O retorno ao chamador permanece sempre a resposta legada. Falha no novo,
+ausência de suporte, incompletude ou ambiguidade não substituem o legado. O
+fluxo normal `processar_frase()` não foi alterado e nenhuma fonte nova escreve
+diretamente nele.
+
+O escopo não declara equivalência automática entre análise estruturada e resposta
+textual. A geração de resposta baseada em estrutura é uma camada opt-in
+separada, descrita na Fase 3.6. Não houve alteração de schema, migração,
+persistência de inferências nem modificação dos adaptadores de professor.
+
+RESPOSTA BASEADA EM ESTRUTURA — FASE 3.6
+─────────────────────────────────────────
+`core/resposta_estruturada.py` recebe um `PlanoResposta` já estruturado e
+renderiza intenção, proposições, resultados, evidências, incertezas, conflitos
+e inferências sem receber nem reinterpretar a frase original. O texto recebido
+nas evidências e nos resultados é tratado como dado.
+
+`aplicacao/resposta_estruturada.py` separa a geração nova do callback legado.
+Quando o plano é suficiente, a resposta estruturada é devolvida; quando há
+estrutura incompleta, informação insuficiente, condição não suportada ou falha
+do gerador, o legado é chamado e o registro mantém explicitamente o motivo do
+fallback. `aplicacao/modo_sombra.py` expõe essa integração somente por
+`processar_frase_com_plano_estruturado()`.
+
+Inferências são identificadas como conclusões derivadas, com premissas, regra,
+origem da regra e proveniência. Conflitos permanecem sem resolução automática e
+ausências não são inventadas. O caminho padrão `processar_frase()` não foi
+alterado, não há escrita em SQLite e não há persistência de inferências.
+
+Validação da fase: 17 testes específicos e 98 testes direcionados aprovados;
+suíte completa com 278 testes, 275 aprovados e somente as três falhas legadas
+conhecidas de aprendizagem conversacional. `compileall`,
+`integrity_check` e `foreign_key_check` foram aprovados.
+
+ARQUITETURA DE CADASTRO ASSISTIDO
+─────────────────────────────────
+O cadastro novo não usa uma sequência universal de perguntas. Cadastro manual,
+JSON e IA/professor convergem para um contrato estruturado comum, validado por
+Python e encaminhado à API de conhecimento. O mapeamento para `linguagem.db`
+fica sob controle da API; professor, internet e outros adaptadores não escrevem
+diretamente no SQLite nem escolhem tabelas físicas.
+
+`professor/professor.py` e `professor/professor_llama.py` permanecem como
+infraestrutura. O professor pode atuar como respondente de perguntas específicas
+ou estruturador de propostas, sempre preservando incerteza, fonte e evidência.
+O cadastro manual poderá funcionar como entrevista dinâmica orientada pelo
+estado atual: identificar o objeto, detectar lacunas, formular a próxima
+pergunta, validar a resposta e pedir autorização antes da persistência.
+
+O sistema deve funcionar sem IA. JSON é formato de entrada/proposta, não cópia
+do schema nem código executável. Informação fornecida, proposta e confirmada
+devem permanecer diferenciadas; fontes automáticas não aprovam a própria
+proposta.
+
+COMPORTAMENTO ATUAL DO MODO PROFESSOR
+──────────────────────────────────────
+• O modo professor existente permanece infraestrutura legada até a substituição
+  testada do cadastro.
+• O assunto digitado pelo usuário não é enviado inteiro ao professor como pergunta.
+• Pontuação final como `?`, `!` e `.` é descartada pelo tokenizador para separar os
+  termos; ela ainda não é ensinada como conhecimento.
+• Para cada termo sem registro completo, `aprender_termo()` pergunta automaticamente
+  os quatro campos necessários ao professor.
+• O modo professor é escolhido dentro de aprendizagem e não é ativado pelo menu
+   de conversa.
+• A internet não é usada automaticamente no modo conversa. Ela é uma fonte
+   separada, escolhida no menu de aprendizagem, e a definição encontrada precisa
+   ser confirmada.
+• Uma resposta de categoria pode ter pontuação final; ela é normalizada antes de ser
+  validada e salva.
+• Metadados de segurança, raciocínio interno e categorias longas continuam inválidos.
+• A cascata manual e a do professor aceitam no máximo quatro candidatos por
+  resposta, filtram palavras funcionais e respostas de controle e respeitam o
+  limite de 64 termos por cadeia.
+• Candidatos descobertos ficam em fila e só são processados depois da conclusão do
+  termo que originou a resposta.
+• `AppData/professor/historico.json` mantém contexto curto; `cache_respostas.json`
+  evita repetir chamadas para a mesma pergunta/modelo/versão. Isso não substitui o
+   conhecimento salvo em `aprendizado/bancos/conhecimento.db`.
+
+OBSERVAÇÕES IMPORTANTES
+───────────────────────
+• core/roteador.py possui uma API pública e agora é consultado antes da
+   tokenização para reconhecer intenções operacionais.
+• A execução isolada com timeout protege o processo principal contra erros e
+  loops simples, mas ainda não é um sandbox completo do sistema operacional.
+• O roteador `openrouter/free` é um serviço externo sujeito à cota diária da
+  conta; essa cota não é controlada pelo SQLite nem pelo código local.
+• As funções internas de gravação exigem autorização do protocolo; propostas de
+    aprendizagem não gravam conteúdo até aprovação e aplicação explícitas.
+• A aprendizagem de conceitos não aciona o controlador de código gerado.
+• A associação geral ainda é por proximidade textual, não por compreensão
+   semântica. A primeira camada determinística já reconhece variações de consulta
+   de hora e data antes da tokenização; outras intenções ainda precisam crescer.
+• A sugestão lexical existente não é generalização por categoria. Não há módulos
+   de categoria ativos, carregador de snapshots ou dependência de arquivos
+   estáticos repetidos no runtime.
+• Uma frase reconhecida como intenção operacional é tratada como unidade antes
+   da busca de termos. Por exemplo, `quero saber quantas horas?` encaminha para
+   a consulta do relógio, sem pesquisar cada palavra separadamente.
+• Prefixos conversacionais, como `ola mano`, não impedem uma intenção de
+   consulta reconhecida no final da frase.
+• A fonte de aprendizagem pela internet exibe seu modo próprio e informa quando
+   a consulta externa falha ou não encontra definição; não se apresenta como
+   aprendizagem manual.
+• A Fase 4 e as etapas dependentes estão congeladas; `docs/_FUTURO_NEURAL.txt`
+   registra esse congelamento e não é um roteiro ativo.
+• O contexto da sessão mantém nomes e perguntas pendentes somente em memória.
+   Frases comuns não exibem a ficha de um termo como fallback; fatos e relações
+   confirmados continuam disponíveis quando são relevantes para a entrada.
+• O banco de desenvolvimento ainda contém registros antigos possivelmente
+   deslocados para `fenômeno`, `geológico` e `processo`; eles devem ser revisados
+   antes de serem usados como referência.
+• [INFORMAÇÃO NÃO CONFIRMADA] Licença e crédito formal ainda não foram definidos.
+
+LICENÇA / CRÉDITOS
+──────────────────
+[INFORMAÇÃO NÃO CONFIRMADA] Definir licença e créditos do projeto.

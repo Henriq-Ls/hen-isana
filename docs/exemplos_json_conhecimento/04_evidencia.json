@@ -1,0 +1,49 @@
+{
+  "proposta_id": "exemplo-evidencia",
+  "entrada": "json",
+  "idempotencia": "exemplo-evidencia:v1",
+  "evidencias": [
+    {
+      "evidencia_id": "ev-conceito",
+      "fonte_tipo": "manual",
+      "fonte_identificador": "documentacao",
+      "origem": "exemplo documental",
+      "trecho": "movimento",
+      "referencia": "registro-documental-1",
+      "confianca": 0.9
+    }
+  ],
+  "objetos": [
+    {
+      "objeto_id": "conceito-movimento",
+      "tipo": "conceito",
+      "chave": "movimento",
+      "campos": [
+        {
+          "nome": "chave",
+          "valor": "movimento",
+          "origem": "usuario",
+          "estado": "confirmada",
+          "confianca": 0.9,
+          "evidencia_ids": ["ev-conceito"]
+        },
+        {
+          "nome": "rotulo",
+          "valor": "Movimento",
+          "origem": "usuario",
+          "estado": "confirmada",
+          "confianca": 0.9,
+          "evidencia_ids": ["ev-conceito"]
+        },
+        {
+          "nome": "tipo",
+          "valor": "evento",
+          "origem": "usuario",
+          "estado": "confirmada",
+          "confianca": 0.9,
+          "evidencia_ids": ["ev-conceito"]
+        }
+      ]
+    }
+  ]
+}

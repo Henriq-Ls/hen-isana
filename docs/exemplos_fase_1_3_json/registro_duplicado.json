@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "package_id": "duplicado",
+  "created_at": "2026-09-25T00:00:00Z",
+  "source": {
+    "type": "manual",
+    "identifier": "teste",
+    "origin": "teste",
+    "confidence": 0.5
+  },
+  "purpose": "teste",
+  "requested_action": "propose",
+  "records": [
+    {
+      "record_id": "mesmo-id",
+      "unit_type": "lexeme",
+      "data": {},
+      "status": "candidate",
+      "evidence_refs": []
+    },
+    {
+      "record_id": "mesmo-id",
+      "unit_type": "concept",
+      "data": {},
+      "status": "candidate",
+      "evidence_refs": []
+    }
+  ],
+  "evidence": [],
+  "relations": []
+}

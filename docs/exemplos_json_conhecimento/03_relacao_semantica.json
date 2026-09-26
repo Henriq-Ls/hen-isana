@@ -1,0 +1,88 @@
+{
+  "proposta_id": "exemplo-relacao",
+  "entrada": "json",
+  "idempotencia": "exemplo-relacao:v1",
+  "evidencias": [
+    {
+      "evidencia_id": "ev-relacao",
+      "fonte_tipo": "manual",
+      "fonte_identificador": "documentacao",
+      "origem": "exemplo documental",
+      "trecho": "movimento associado a correr"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto_id": "lexema-correr",
+      "tipo": "lexema",
+      "chave": "correr",
+      "campos": [
+        {
+          "nome": "lema",
+          "valor": "correr",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-relacao"]
+        },
+        {
+          "nome": "categoria_lexical",
+          "valor": "verbo",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-relacao"]
+        }
+      ]
+    },
+    {
+      "objeto_id": "sentido-correr",
+      "tipo": "sentido",
+      "chave": "correr:movimento",
+      "campos": [
+        {
+          "nome": "definicao",
+          "valor": "deslocar-se rapidamente",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-relacao"]
+        },
+        {
+          "nome": "lexema",
+          "valor": "correr",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-relacao"]
+        }
+      ]
+    },
+    {
+      "objeto_id": "conceito-movimento",
+      "tipo": "conceito",
+      "chave": "movimento",
+      "campos": [
+        {
+          "nome": "chave",
+          "valor": "movimento",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-relacao"]
+        },
+        {
+          "nome": "rotulo",
+          "valor": "Movimento",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-relacao"]
+        },
+        {
+          "nome": "tipo",
+          "valor": "evento",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-relacao"]
+        }
+      ],
+      "relacoes": [
+        {
+          "tipo": "associado_a",
+          "origem_objeto_id": "conceito-movimento",
+          "destino_tipo": "sentido",
+          "destino_chave": "correr:movimento",
+          "evidencia_ids": ["ev-relacao"]
+        }
+      ]
+    }
+  ]
+}

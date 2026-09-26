@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "package_id": "parcialmente-invalido",
+  "created_at": "2026-09-25T00:00:00Z",
+  "source": {
+    "type": "manual",
+    "identifier": "teste",
+    "origin": "teste",
+    "confidence": 0.5
+  },
+  "purpose": "teste",
+  "requested_action": "apply",
+  "records": [
+    {
+      "record_id": "valido",
+      "unit_type": "concept",
+      "data": {
+        "chave": "VALIDO"
+      },
+      "status": "candidate",
+      "evidence_refs": []
+    },
+    {
+      "record_id": "invalido",
+      "data": {},
+      "status": "candidate",
+      "evidence_refs": []
+    }
+  ],
+  "evidence": [],
+  "relations": []
+}

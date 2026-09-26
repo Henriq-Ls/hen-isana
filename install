@@ -1,0 +1,44 @@
+hls-IDE ENV ZED
+
+# ------------------------- OBRIGATÓRIO --------------------------------
+py -3.11 -m venv .venv
+python -m venv .venv
+
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+.\.venv\Scripts\Activate.ps1
+
+python.exe -m pip install --upgrade pip     # Atualiza o pip
+python -m pip install --upgrade setuptools wheel    # Atualiza ferramentas essenciais de build
+
+# THEMAS E APP:
+
+
+# MODULOS  IAS:
+
+
+# MODULOS AUXILIARES:
+
+
+# OUTRAS DEPENDECIAS:
+
+
+TEMA: conversação básica
+
+TEMA: vocabulário básico
+
+TEMA: expressões básicas
+
+TEMA: frases básicas
+
+TEMA: situações do cotidiano
+
+
+
+TEMA: conversação temática
+
+TEMA: família
+TEMA: trabalho
+TEMA: compras
+TEMA: restaurante
+TEMA: viagem
+TEMA: escola

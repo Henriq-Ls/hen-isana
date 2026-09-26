@@ -1,0 +1,174 @@
+# HEN-ISANA — INVENTÁRIO DE FONTES LEGADAS
+
+Data do levantamento: 2026-09-26
+Modo: somente leitura
+Objetivo: registrar o estado observado antes de qualquer futura migração.
+
+## 1. GARANTIAS DESTE LEVANTAMENTO
+
+Este inventário foi executado com conexões SQLite `mode=ro`, consultas de
+schema, contagem e leitura controlada. Não houve:
+
+- `INSERT`, `UPDATE`, `DELETE`, `ALTER`, `VACUUM` ou `ATTACH`;
+- criação de cópia de banco;
+- geração de JSON de migração;
+- alteração no banco canônico;
+- migração ou aplicação de qualquer registro.
+
+Os hashes abaixo são uma identificação do snapshot observado. Qualquer
+execução futura deve recalculá-los e interromper se forem diferentes do
+manifesto aprovado.
+
+## 2. BANCOS ENCONTRADOS
+
+| Arquivo | `user_version` | Tamanho | Linhas principais | Papel |
+|---|---:|---:|---:|---|
+| `aprendizado/bancos/conhecimento.db` | 3 | 151552 | 37 conhecimentos; 217 evidências; 0 fatos; 0 evidências de fatos | fonte linguística legada candidata a análise |
+| `aprendizado/bancos/relacoes.db` | 0 | 16384 | 66 relações | fonte de relações legadas, sem tipos semânticos completos |
+| `aprendizado/bancos/linguagem.db` | 110 | 167936 | 0 em todas as 14 tabelas | destino canônico vazio; não é fonte |
+| `aprendizado/bancos/indice_codigo.db` | 0 | 16384 | 0 | índice operacional de código; excluído |
+| `aprendizado/bancos/log_mudancas.db` | 0 | 12288 | 0 | log operacional; excluído |
+| `data/diagnostico.db` | 0 | 57344 | 379 diagnósticos | diagnóstico operacional; excluído |
+
+Hashes SHA-256 do snapshot:
+
+```text
+f47f9ae9a293d831ff82805c3e958cadff8a88623455b984a9683a9c150f3697  aprendizado/bancos/conhecimento.db
+d278c4eee7a98fb95929032211c69699b799f32f019df7ed5fe867d8167b0296  aprendizado/bancos/relacoes.db
+30148ebd9a6c9093c395430cbfe7f9b5cfd4356b36a72f9fe5b1e368497b40fa  aprendizado/bancos/linguagem.db
+89257a77bb395d80681cceb22652f243436fdc32f25448b7549e5938c5ee5446  aprendizado/bancos/indice_codigo.db
+d9e0d1fc594885385b990cee59faa5be763945ea5085fe17d2e58b2ed3b90dfe  aprendizado/bancos/log_mudancas.db
+3027e27733f62934afc7afc26d9ca4259e37d2a5ac76037057561109c66df3c4  data/diagnostico.db
+```
+
+> Observação: o hash de `data/diagnostico.db` usado no comando de verificação é
+> `3027e27733f62934afc7afc26d9ca4259e37d2a5ac76037057561109c66df3c4`.
+
+Todos os bancos estavam com `PRAGMA integrity_check = ok` e zero violações
+reportadas por `PRAGMA foreign_key_check`. Isso atesta integridade física, não
+compatibilidade semântica para migração.
+
+## 3. `conhecimento.db`
+
+### 3.1 Tabelas e esquema
+
+`conhecimento` contém:
+
+```text
+id, termo, termo_original, termo_chave, tipo, significado,
+contexto_uso, resposta_padrao, relacionados, exemplo_uso
+```
+
+`evidencias_conhecimento` contém:
+
+```text
+id, conhecimento_id, campo, valor, origem, estado, criado_em
+```
+
+`fatos_conhecimento` e `evidencias_fatos` existem, mas estão vazias. A tabela
+`propostas_aprendizagem` não está presente no arquivo observado, embora a
+documentação histórica mencione que ela poderia ser criada por uma conexão
+específica.
+
+### 3.2 Distribuição observada
+
+Os 37 registros de `conhecimento` não têm `termo`, `termo_chave` ou `tipo`
+vazios. Não foram encontrados termos repetidos nem chaves repetidas.
+
+Tipos legados:
+
+```text
+saudação coletiva                         7
+saudação coletiva informal                5
+saudação interrogativa                    3
+saudação de período do dia                3
+substantivo em expressão de saudação      3
+expressão de reencontro                   3
+expressão de acolhimento                  2
+expressão de apresentação                 2
+saudação informal                         2
+adjetivo em expressões de saudação       1
+advérbio em expressão de saudação        1
+expressão de saudação                    1
+expressão geral de cumprimento           1
+saudação telefônica                      1
+substantivo em expressão de apresentação 1
+substantivo em saudação coletiva          1
+```
+
+Os valores de `resposta_padrao` estão ausentes em 5 dos 37 registros. Os
+demais campos textuais estão preenchidos nos 37 registros, mas preenchimento
+não equivale a correspondência no modelo novo.
+
+As 217 evidências estão distribuídas assim:
+
+```text
+tipo                    37
+significado             37
+contexto_uso            37
+relacionados            37
+exemplo_uso             37
+resposta_padrao         32
+```
+
+Todas possuem `origem = curadoria_assistente` e `estado = confirmada`.
+Nenhuma evidência aponta para um `conhecimento_id` inexistente.
+
+O estado `confirmada` do legado não será convertido automaticamente em
+`aprovado` no destino. A semântica dos estados deve ser revisada no fluxo
+futuro.
+
+## 4. `relacoes.db`
+
+### 4.1 Esquema
+
+A tabela `relacoes` contém:
+
+```text
+termo_id, termo_relacionado_id, tipo, criado_em
+```
+
+Não há chave estrangeira declarada para `conhecimento.db`; os dois bancos são
+conectados somente por convenção de IDs.
+
+### 4.2 Distribuição e integridade lógica observada
+
+```text
+componente_de_expressao   16 linhas = 8 pares não direcionados
+relacionado_no_tema       50 linhas = 25 pares não direcionados
+total                     66 linhas = 33 pares não direcionados
+```
+
+As 66 linhas possuem a linha reversa correspondente. Não foram encontrados
+auto-relacionamentos, duplicatas do mesmo par/tipo ou pontas sem correspondência
+entre os IDs 1–37 de `conhecimento`.
+
+Isso é integridade referencial por convenção, não prova de que os endpoints
+tenham o tipo lógico exigido pelo destino. A tabela não informa ordem de
+componentes, direção semântica, conceito, sentido, evidência, estado ou
+validade.
+
+## 5. DESTINO CANÔNICO
+
+`aprendizado/bancos/linguagem.db` contém o schema de 14 tabelas da Fase 1.1 e
+está vazio:
+
+```text
+fontes, lexemas, formas_lexicais, analises_morfologicas,
+sentidos, conceitos, sentidos_conceitos, expressoes,
+expressao_componentes, proposicoes, proposicao_argumentos,
+fatos, relacoes_semanticas, evidencias
+```
+
+O contrato lógico atual (`ContratoCadastro`) aceita objetos como `lexema`,
+`forma_lexical`, `sentido`, `conceito`, `expressao`, `proposicao`, `fato` e
+`relacao_semantica`, mas não é uma cópia do schema. A migração futura deve
+produzir propostas no contrato, e não SQL nem registros físicos diretamente.
+
+## 6. CONCLUSÃO DO INVENTÁRIO
+
+As únicas fontes linguísticas candidatas a um planejamento posterior são
+`conhecimento.db` e `relacoes.db`. Mesmo nelas, nenhum registro foi classificado
+como automaticamente migrável por este levantamento. O resultado é um mapa de
+candidatos que exige regras, revisão, manifesto de cobertura, dry-run e
+autorização futura descritos em `docs/PLANO_MIGRACAO_AUDITAVEL.txt`.

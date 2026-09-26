@@ -1,0 +1,16 @@
+"""Organização gerada para a categoria 'despedida'."""
+
+
+class CategoriaDespedida:
+    """Ponte da categoria para o banco de conhecimento."""
+
+    nome_categoria = 'despedida'
+
+    def __init__(self, banco):
+        self.banco = banco
+
+    def buscar(self, termo):
+        return self.banco.buscar_termo(termo)
+
+    def lacunas(self, termo):
+        return self.banco.identificar_lacunas(termo)

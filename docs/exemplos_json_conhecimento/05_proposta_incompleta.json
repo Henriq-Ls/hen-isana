@@ -1,0 +1,33 @@
+{
+  "proposta_id": "exemplo-incompleto",
+  "entrada": "json",
+  "idempotencia": "exemplo-incompleto:v1",
+  "pendencias": [
+    "categoria lexical ainda não foi informada"
+  ],
+  "evidencias": [
+    {
+      "evidencia_id": "ev-incompleto",
+      "fonte_tipo": "manual",
+      "fonte_identificador": "documentacao",
+      "origem": "exemplo documental",
+      "trecho": "correr"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto_id": "lexema-correr",
+      "tipo": "lexema",
+      "chave": "correr",
+      "campos": [
+        {
+          "nome": "lema",
+          "valor": "correr",
+          "origem": "usuario",
+          "estado": "fornecida",
+          "evidencia_ids": ["ev-incompleto"]
+        }
+      ]
+    }
+  ]
+}

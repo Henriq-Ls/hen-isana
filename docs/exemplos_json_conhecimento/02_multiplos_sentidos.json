@@ -1,0 +1,75 @@
+{
+  "proposta_id": "exemplo-multiplos-sentidos",
+  "entrada": "json",
+  "idempotencia": "exemplo-multiplos-sentidos:v1",
+  "evidencias": [
+    {
+      "evidencia_id": "ev-sentidos",
+      "fonte_tipo": "manual",
+      "fonte_identificador": "documentacao",
+      "origem": "exemplo documental",
+      "trecho": "correr"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto_id": "lexema-correr",
+      "tipo": "lexema",
+      "chave": "correr",
+      "campos": [
+        {
+          "nome": "lema",
+          "valor": "correr",
+          "origem": "usuario",
+          "estado": "fornecida",
+          "evidencia_ids": ["ev-sentidos"]
+        },
+        {
+          "nome": "categoria_lexical",
+          "valor": "verbo",
+          "origem": "usuario",
+          "estado": "fornecida",
+          "evidencia_ids": ["ev-sentidos"]
+        }
+      ]
+    },
+    {
+      "objeto_id": "sentido-correr-mover",
+      "tipo": "sentido",
+      "chave": "correr:movimento",
+      "campos": [
+        {
+          "nome": "definicao",
+          "valor": "deslocar-se rapidamente",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-sentidos"]
+        },
+        {
+          "nome": "lexema",
+          "valor": "correr",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-sentidos"]
+        }
+      ]
+    },
+    {
+      "objeto_id": "sentido-correr-disputa",
+      "tipo": "sentido",
+      "chave": "correr:disputa",
+      "campos": [
+        {
+          "nome": "definicao",
+          "valor": "disputar uma corrida",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-sentidos"]
+        },
+        {
+          "nome": "lexema",
+          "valor": "correr",
+          "origem": "usuario",
+          "evidencia_ids": ["ev-sentidos"]
+        }
+      ]
+    }
+  ]
+}

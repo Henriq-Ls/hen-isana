@@ -1,0 +1,578 @@
+HEN-ISANA — CONTEXTO ATUAL PARA FUTURAS IAS
+============================================
+Última atualização: 25/09/2026
+
+FINALIDADE DESTE DOCUMENTO
+--------------------------
+Este arquivo descreve a realidade atual do projeto para uma próxima IA. Ele
+não é uma lista de tarefas e não autoriza novas implementações por conta
+própria. As Fases 1 a 3 da etapa simbólica estão registradas como concluídas e
+verificadas. A Fase 4 e as etapas posteriores permanecem congeladas.
+
+Antes de alterar qualquer coisa, a próxima IA deve ler também:
+
+- docs/_DOC_PROJETO.txt — documento mestre de arquitetura;
+- docs/_DOC_RESUMO.txt — estado agregado dos módulos;
+- 02_IMPLEMENTAR_ AGORA.txt — plano detalhado, regras permanentes e pendências;
+- docs/_FUTURO_NEURAL.txt — registro de congelamento, não plano de trabalho.
+
+ESTADO ATUAL
+------------
+O Hen-Isana é um sistema local de terminal, escrito em Python puro e sem
+interface web ou gráfica. A implementação atual:
+
+- aprende conceitos, sentidos, fatos, relações, contextos e exemplos;
+- armazena a memória canônica em SQLite;
+- faz perguntas de aprendizagem conforme as lacunas e ambiguidades;
+- usa contexto curto da conversa para recuperar informações;
+- separa conversa somente leitura de aprendizagem explícita;
+- aceita aprendizagem manual, por professor externo, por uma fonte online e
+  pelo Llama local via Ollama;
+- mantém propostas, origens, estados e permissões auditáveis;
+- não cria código por palavra, termo ou categoria aprendida;
+- preserva geração de código somente para comportamentos executáveis pedidos
+  explicitamente;
+- mantém o núcleo protegido contra acesso de ferramentas e código gerado.
+
+Os documentos antigos registravam 131 testes aprovados, além de `compileall` e
+`git diff --check`; esse resultado é histórico e não está vinculado por hash ao
+checkout atual. A auditoria local mais recente está registrada abaixo.
+
+REGRAS PERMANENTES
+------------------
+Estas regras fazem parte da arquitetura e não devem ser removidas:
+
+1. O código local permanece em Python padrão e a conversa local é
+   determinística. A Fase 4 e as etapas dependentes estão congeladas. Os modos
+   explícitos de aprendizagem por professor externo, internet e Llama local
+   são separados da conversa normal determinística.
+2. `core/` é o núcleo protegido. `ferramentas/` e `aprendizado/gerado/` não
+   podem importá-lo nem receber acesso direto a ele.
+3. Toda ação de ferramenta passa pelo protocolo e pelo verificador.
+4. Toda escrita de conhecimento, relação ou código exige a permissão prevista.
+5. Uma proposta não grava sozinha: ela precisa ser validada, aprovada e
+   aplicada pelo fluxo autorizado.
+6. O modo conversa é somente leitura. Ele não aprende termos desconhecidos,
+   não inicia entrevista de aprendizagem e não cria código.
+7. Aprender conteúdo e alterar o código são operações diferentes. A
+   aprendizagem de conteúdo permanece no SQLite.
+8. O trabalho deve avançar módulo por módulo, sem inventar arquivos,
+   comportamentos ou refatorações fora do pedido explícito.
+
+ESTRUTURA DO ESTADO APRENDIDO
+-----------------------------
+Os caminhos canônicos do estado aprendido são:
+
+hen-isana/aprendizado/
+├── bancos/
+│   ├── conhecimento.db
+│   ├── relacoes.db
+│   ├── indice_codigo.db
+│   └── log_mudancas.db
+└── gerado/
+
+`aprendizado/` e seus bancos são criados em tempo de execução quando
+necessários. Por isso, uma cópia de código pode não conter a pasta vazia antes
+da inicialização.
+
+`aprendizado/bancos/` contém a memória persistente, as relações, o índice de
+código gerado e o log de alterações. `aprendizado/gerado/` é reservado a
+ferramentas ou comportamentos executáveis solicitados explicitamente; não é
+uma pasta para guardar termos aprendidos.
+
+Permanecem fora dessa pasta:
+
+- `data/linguagem.json`: regras fixas de linguagem e normalização;
+- `data/diagnostico.db`: diagnóstico operacional;
+- `backup/snapshots/`: cópias de segurança;
+- `_APPDATA_/`: configurações, cache e histórico local do professor;
+- `_LOGS_/`: log operacional;
+- o código fixo do projeto.
+
+Se `aprendizado/` for removida com o programa fechado, a inicialização recria
+os quatro bancos vazios. O conhecimento apagado não é reconstruído. A pasta
+`gerado/` só volta a existir quando um comportamento executável autorizado for
+gerado; snapshots antigos não são restaurados automaticamente no startup.
+
+FLUXO VISÍVEL NO TERMINAL
+-------------------------
+O menu inicial separa:
+
+  1 - Conversa
+  2 - Aprendizagem
+
+No modo conversa, a frase inteira é interpretada antes da tokenização. A
+Isana consulta conhecimento, contexto e ferramentas autorizadas, mas não grava.
+Frases desconhecidas podem receber associações por proximidade textual, sem
+serem tratadas como aprendizagem.
+
+No modo aprendizagem, o usuário escolhe uma fonte:
+
+  1 - Conversar e ensinar manualmente
+  2 - Consultar o professor
+  3 - Pesquisar na internet e confirmar
+  4 - Usar o Llama local do Ollama
+
+A Wikipédia em português é usada atualmente como fonte pública de sugestão
+online. A definição encontrada não é gravada sem confirmação explícita.
+
+APRENDIZAGEM E MEMÓRIA
+----------------------
+O SQLite pode representar:
+
+- conceitos e expressões compostas;
+- mais de um sentido para o mesmo termo;
+- tipo, significado, contexto de uso, resposta e exemplo;
+- fatos/afirmações independentes associados a contexto;
+- relações entre conceitos;
+- evidências com origem e estado;
+- propostas de aprendizagem pendentes, aprovadas ou rejeitadas.
+
+O fluxo seleciona perguntas conforme o que falta ou está ambíguo. Ele pode
+pedir significado, exemplo, distinção ou contexto, em vez de repetir sempre
+quatro perguntas fixas. Quando existem sentidos concorrentes ou uma
+interpretação incerta, a Isana mostra a proposta e pede escolha/confirmação.
+
+`termo: ...` preserva uma expressão composta como uma unidade. `fato: ...`
+registra uma afirmação independente depois de esclarecer contexto e confirmar
+a proposta. Fatos já existentes no mesmo contexto exigem escolha explícita
+entre inclusão e correção.
+
+O modo conversa não transforma observações em aprendizagem automática.
+Propostas de aprendizagem por uso só aparecem em comandos explícitos no modo
+aprendizagem e registram motivo, origem, estado e valores antes/depois.
+
+CONTEXTO CURTO DA CONVERSA
+--------------------------
+`core/contexto_conversa.py` mantém somente durante a sessão atual:
+
+- os cinco turnos mais recentes;
+- a última frase normalizada;
+- o tópico atual;
+- entidades mencionadas;
+- posição, turno e tipo conhecido de cada menção.
+
+Esse contexto não é salvo no SQLite, não é persistido em arquivo, não
+continua após o encerramento e não é compartilhado com professor, ferramentas,
+cascata de aprendizagem ou código gerado.
+
+A resolução de referências é determinística. Para pronomes e demonstrativos,
+ela considera entidades recentes, gênero e número quando disponíveis, sujeito
+da frase anterior e entidade mais recente. Em empate ou ambiguidade, pede
+esclarecimento em vez de escolher arbitrariamente.
+
+NORMALIZAÇÃO E INTENÇÕES
+------------------------
+A frase original é registrada no log junto com a versão normalizada. Antes do
+roteamento e da tokenização, a implementação pode:
+
+- expandir abreviações aprovadas, como `qt horas` para `quantas horas`;
+- normalizar acentos e pontuação;
+- ignorar vocativos informais conhecidos antes de um assunto;
+- reconhecer intenções operacionais da frase inteira.
+
+Consultas de hora, data e data/hora já aceitam variações de formulação,
+pontuação, acento, abreviações e prefixos conversacionais. Uma frase como
+`quero saber quantas horas?` vai ao relógio sem transformar cada palavra em
+termo desconhecido.
+
+MODO PROFESSOR E CASCATA
+------------------------
+O assunto é tokenizado antes das perguntas. O assunto inteiro não é enviado
+como uma única pergunta. Para termos incompletos, `aprender_termo()` gera as
+perguntas necessárias e o cliente do professor faz chamadas HTTP controladas.
+
+Respostas válidas podem apresentar candidatos novos, mas:
+
+- há limite de quatro candidatos por resposta;
+- há limite total de 64 termos por cadeia;
+- candidatos repetidos são deduplicados e colocados em fila;
+- palavras funcionais e assuntos sem conteúdo claro são rejeitados;
+- metadados de segurança, raciocínio interno e categorias inválidas são
+  rejeitados com retry controlado;
+- pontuação final de categorias é normalizada antes do salvamento;
+- HTTP 429 encerra novas chamadas na sessão atual;
+- histórico curto e cache persistente ficam em `_APPDATA_/professor/` e não
+  substituem o conhecimento canônico do SQLite.
+
+A aprendizagem manual usa a mesma cascata compartilhada: respostas digitadas
+podem enfileirar termos desconhecidos, e cada termo passa pelas perguntas
+adaptativas de `aprender_termo()`. Comandos explícitos de proposta e respostas de
+controle não alimentam a fila. Os limites permanecem quatro candidatos por
+resposta e 64 termos por cadeia. A aprendizagem pela internet não foi alterada.
+
+FONTES E PROPOSTAS
+------------------
+Professor externo, Llama local e internet fornecem conteúdo dentro dos fluxos
+de aprendizagem; nenhum deles autoriza por si só operações protegidas ou
+propostas. Sugestões da internet continuam sem gravação até a confirmação
+explícita do usuário.
+
+As escritas oficiais passam por validação e permissão. Relações, fatos,
+evidências, memória oficial e arquivos de código gerado não devem ser
+alterados por chamadas internas não autorizadas.
+
+GERAÇÃO E EDIÇÃO DE CÓDIGO
+--------------------------
+Aprender uma palavra, categoria, conceito, sentido ou fato não cria arquivo
+Python. O código em `aprendizado/gerado/` só pode existir para um
+comportamento executável solicitado explicitamente.
+
+Quando permitido, a escrita passa pelo controlador, protocolo, snapshot,
+análise sintática, validação e execução isolada. O código gerado não pode
+importar `core/` nem acessar diretamente a memória protegida. A execução
+isolada com timeout reduz riscos de erros e loops simples, mas ainda não é um
+sandbox completo do sistema operacional. A edição autorizada ainda substitui
+o arquivo inteiro; edição AST incremental é uma pendência futura.
+
+ARQUITETURA ATUAL
+-----------------
+Os módulos permanecem separados por responsabilidade:
+
+- `core/`: interpretação, normalização, perguntas, contexto, composição,
+  roteamento, controlador e validação;
+- `protocolo/`: regras, permissões e verificação estrutural/AST;
+- `bancos/`: acesso à memória, relações, propostas, índice e log;
+- `ferramentas/`: busca, internet, criação, edição e ações autorizadas;
+- `professor/`: cliente HTTP, validação, retry, histórico e cache;
+- `backup/`: snapshot, restauração e diagnóstico;
+- `aprendizado/`: estado aprendido em SQLite e código executável autorizado;
+- `data/`: regras fixas e diagnóstico;
+- `main.py`: menus, coordenação e fluxos explícitos;
+- `testes/`: regressão e segurança.
+
+As interfaces simbólicas de interpretação, perguntas, validação, armazenamento,
+recuperação e composição são independentes. O SQLite é a memória persistente
+canônica; associação geral ainda é determinística e principalmente textual.
+
+VERIFICAÇÃO HISTÓRICA — 24/09/2026
+----------------------------------
+Verificado em 24/09/2026:
+
+  python -m unittest discover -s hen-isana/testes -p "test_*.py" -v
+  Ran 131 tests
+  OK
+
+Também passaram:
+
+- `python -m compileall -q hen-isana`;
+- `git diff --check`;
+- testes de conversa sem gravação;
+- aprendizagem manual, por professor e pela internet;
+- perguntas adaptativas, propostas, confirmação e permissões;
+- fatos, relações, duplicatas, migração e persistência SQLite;
+- contexto, referências, ambiguidades e expressões compostas;
+- cascata limitada, cache e tratamento de limite do professor;
+- isolamento de código gerado e ausência de importação de `core/`.
+
+AUDITORIA LOCAL DO CHECKOUT — 24/09/2026
+---------------------------------------
+Esta execução verifica somente os arquivos presentes no checkout local atual.
+Ela não confirma que esse código seja o usado no log de conversa do usuário nem
+o código que produziu o registro histórico de 131 testes.
+
+Comandos executados a partir de `hen-isana/`:
+
+  python -m unittest discover -s testes -p 'test_*.py' -v
+  Ran 139 tests in 14.869s
+  OK
+
+  python -m compileall -q .
+  OK
+
+  git diff --check  (a partir da raiz do workspace)
+  OK para as alterações rastreadas neste roteiro; os arquivos de código/teste
+  do checkout continuam não rastreados pelo Git local.
+
+A suíte foi executada com `HOME` temporário. Os testes de banco usam bancos em
+diretórios temporários; nenhum banco de conhecimento do projeto foi alterado.
+O `HOME` temporário também isolou os arquivos de log recriados pelo logger.
+
+Impressão digital SHA-256 do manifesto dos arquivos `.py` e `.json` do checkout
+na auditoria anterior à alteração da cascata manual (caminhos ordenados, com
+SHA-256 individual de cada arquivo):
+
+  d66ca4d1ce891b28b538b8c53fa218875e5ec10f0a14df411a9dc80a14d1943a
+
+Resultado da auditoria funcional:
+
+- Fase A: a normalização, as chaves de busca e a migração aditiva estão
+  implementadas e cobertas pelos testes de normalização e conhecimento,
+  inclusive preservação da forma canônica e interrupção segura em colisões.
+  Permanecem sem aprovação explícita a política `ola`/`olá`, o teste de pares
+  acentuados em contexto ambíguo e a preservação da pontuação na composição
+  final da resposta.
+- Fase B: os testes focados encontrados e executados nesta revisão estão
+  identificados abaixo. A regressão de sequência usa `processar_frase` e um
+  SQLite temporário; não é um teste do terminal interativo. A reprodução real
+  confirmou saudação, pergunta social, apresentação/nome, despedida e consulta
+  isolada de `chuva`. `esta com chuva` não foi duplicada como `chuva com chuva`,
+  mas recebeu resposta de desconhecimento. A regressão só proíbe a duplicação
+  e não exige que a frase composta seja interpretada.
+- Fase C: os objetos de contrato e seus testes existem, mas a inspeção do fluxo
+  atual não encontrou consumo desses objetos pela conversa. A integração não
+  está feita.
+
+VERIFICAÇÃO DIRECIONADA E REPRODUÇÃO NO TERMINAL — 24/09/2026
+-------------------------------------------------------------
+Testes encontrados para os casos solicitados:
+
+- `testes/test_roteador.py::TestRoteador.test_reconhece_saudacao_composta_com_pontuacao`
+  reconhece `Olá, bom dia!` como intenção de saudação; verifica roteamento,
+  não a resposta completa do terminal.
+- `testes/test_roteador.py::TestRoteador.test_reconhece_pergunta_social_de_estado`
+  reconhece `Como você está?` como pergunta social; verifica roteamento.
+- `testes/test_roteador.py::TestRoteador.test_reconhece_despedida_real`
+  reconhece `Até logo!` como despedida; verifica roteamento.
+- `testes/test_conversa_regressao.py::TestConversaRegressao.test_sequencia_autorizada_de_conversa_sem_escrita`
+  percorre a sequência `ola`, `Olá, bom dia`, `Olá, bom dia!`, `Como você
+  está?`, apresentação/pergunta de nome, `Até logo!`, `chuva` e `esta com
+  chuva`, usando o fluxo real `processar_frase` com banco SQLite temporário.
+  Confirma resposta de chuva e ausência do texto `chuva com chuva`; não exige
+  resposta útil para `esta com chuva`.
+
+Comando executado a partir de `hen-isana/` (com `HOME` temporário):
+
+  python -m unittest -v \
+    testes.test_roteador.TestRoteador.test_reconhece_saudacao_composta_com_pontuacao \
+    testes.test_roteador.TestRoteador.test_reconhece_pergunta_social_de_estado \
+    testes.test_roteador.TestRoteador.test_reconhece_despedida_real \
+    testes.test_conversa_regressao.TestConversaRegressao.test_sequencia_autorizada_de_conversa_sem_escrita
+
+Saída real: `Ran 4 tests in 0.237s` / `OK`.
+
+O terminal foi executado em PTY com o código e os bancos atuais copiados para
+`/tmp/hen-isana-live-check.3r6kXy/hen-isana`, e `HOME` apontando para uma pasta
+temporária. A entrada foi exatamente:
+
+  1
+  ola
+  Olá, bom dia
+  Olá, bom dia!
+  Como você está?
+  Meu nome é Carlos. Qual é o seu nome?
+  Até logo!
+  chuva
+  esta com chuva
+
+Saídas observadas:
+
+- `ola` → `Olá! Como posso ajudar?`
+- `Olá, bom dia` e `Olá, bom dia!` → `Olá! Bom dia! Como posso ajudar?`
+- `Como você está?` → `Tudo certo por aqui. Obrigada por perguntar! E você?`
+- apresentação/pergunta de nome → `Meu nome é Isana. Prazer, Carlos.`
+- `Até logo!` → `Até logo!`
+- `chuva` → `chuva: Gotas de água que caem das nuvens até o chão.; exemplo: A chuva molhou as plantas.`
+- `esta com chuva` → `Ainda não sei responder a 'esta com chuva' com o conhecimento confirmado que está disponível.`
+
+Assim, os cinco casos apontados têm teste automatizado e os três casos de
+roteamento passaram. A execução real confirma a resposta dos quatro casos
+positivos, mas não confirma interpretação útil de `esta com chuva`: o critério
+negativo de não duplicar `chuva` passa, enquanto a frase continua desconhecida.
+
+Na primeira reprodução, o SHA-256 de `conhecimento.db` mudou, mas essa medição
+isolada não permitia distinguir escrita lógica de alteração interna do SQLite.
+Foi então feita uma verificação precisa em uma única sessão contínua, sem
+sincronização externa durante o teste, usando uma cópia isolada do checkout.
+Uma conexão observadora foi aberta antes do terminal e mantida até a leitura
+posterior. A entrada foi a mesma sequência acima; o processo terminou com
+código 0 e sem saída em `stderr`.
+
+Resultado antes/depois:
+
+- `conhecimento.db`: `PRAGMA data_version` 1 → 1; `user_version` 3 → 3;
+  `conhecimento` 138 → 138; `evidencias_conhecimento` 442 → 442;
+  `fatos_conhecimento` 0 → 0; `evidencias_fatos` 0 → 0;
+  `propostas_aprendizagem` 61 → 61.
+- `relacoes.db`: `data_version` 1 → 1; `relacoes` 0 → 0.
+- `indice_codigo.db`: `data_version` 1 → 1; `indice_codigo` 0 → 0.
+- `log_mudancas.db`: `data_version` 1 → 1; `log_mudancas` 0 → 0.
+- A `sqlite_sequence` do `conhecimento.db` permaneceu igual:
+  `conhecimento=138`, `evidencias_conhecimento=3498`,
+  `propostas_aprendizagem=61`.
+- O SHA-256 de `conhecimento.db` também permaneceu igual:
+  `be526c674ce35d259e4c9e975056297b4654a70ad60200111363c0758dd19caa`.
+  Os três outros bancos também mantiveram seus hashes.
+
+A causa da alteração anterior foi confirmada: a abertura de um banco já
+migrado chamava `_registrar_evidencias_legadas()` e repetia
+`INSERT OR IGNORE` em uma tabela com `AUTOINCREMENT`. Mesmo ignoradas, as
+tentativas avançavam `sqlite_sequence` de `3498` para `3718`, sem aumentar a
+contagem de linhas. A inicialização foi corrigida para executar essa
+retroalimentação somente durante migração de banco antigo (`user_version < 3`).
+O teste de reabertura de banco migrado e a reprodução completa acima passaram.
+Portanto, no checkout atual e após a correção, o modo conversa não escreveu nos
+bancos SQLite durante essa sequência. A medição anterior baseada apenas em hash
+fica substituída por esta verificação de `data_version`, contagens e sequência.
+
+As caixas marcadas em `02_IMPLEMENTAR_ AGORA.txt` referem-se ao código e aos
+testes deste checkout local. O Portão 0 continua bloqueado para comparar esse
+checkout com as duas versões externas ainda sem identificador.
+
+CONCILIAÇÃO DOS ROTEIROS — 24/09/2026
+-------------------------------------
+- `01_PROXIMOS_PASSOS.txt` continua sendo a lista canônica de trabalho futuro.
+  Nenhum item foi marcado como concluído ou promovido nesta revisão: a lista
+  exige implementação e teste para cada item, e esta revisão não alterou código.
+- `02_IMPLEMENTAR_ AGORA.txt` continua sendo o roteiro ativo, bloqueado no
+  Portão 0. Os resultados locais e as caixas `[x]` desse roteiro não identificam
+  as duas versões externas nem encerram as Fases A, B ou C.
+- Sobreposição parcial com a Prioridade 2 de `01`: o checkout tem propostas
+  SQLite para termos e fatos, com estado, origem, motivo, aprovação/rejeição,
+  aplicação autorizada, persistência e reversão. Os testes da cópia atual
+  cobrem esses caminhos. Isso não comprova o atendimento conjunto de todos os
+  critérios da prioridade; ela permanece pendente em `01`.
+- O `03` repetia tópicos do `01` como se fossem uma segunda lista de tarefas.
+  O checklist detalhado fica somente em `01`; este documento mantém o estado
+  verificado e os limites atuais, sem duplicar as caixas pendentes.
+- Suíte reexecutada nesta conciliação, com `HOME` temporário:
+  139 testes aprovados em 14.869s. A execução alterou
+  `data/diagnostico.db`; o arquivo foi restaurado ao estado anterior. Nenhum
+  código foi alterado.
+
+LIMITES CONHECIDOS E PRÓXIMAS DECISÕES
+--------------------------------------
+Os tópicos que antes apareciam também aqui — limites do sandbox e edição AST
+incremental, auditoria de registros, ampliação da interpretação e ampliação da
+busca online — têm seus critérios e status centralizados em
+`01_PROXIMOS_PASSOS.txt`. As seções acima descrevem os limites técnicos atuais;
+este documento não duplica a lista de tarefas.
+
+A Fase 4 e as etapas posteriores estão congeladas, não são trabalho ativo e não
+devem ser reabertas como pendências. `docs/_FUTURO_NEURAL.txt` é somente o
+registro desse limite.
+
+INFORMAÇÕES NÃO DEFINIDAS
+-------------------------
+[INFORMAÇÃO NÃO CONFIRMADA] A licença e os créditos formais do projeto ainda
+não foram definidos.
+
+HISTÓRICO CONSOLIDADO TRANSFERIDO DE IMPLEMENTAR_ AGORA.txt
+-----------------------------------------------------------
+Este registro reúne as verificações que estavam marcadas como concluídas no
+plano de implementação. Elas são histórico, não pendências novas.
+
+BASELINE OBSERVADO — 24/09/2026
+------------------------------
+- Logs e documentos enviados foram lidos; o log da conversa registrou 13
+  registros consultados e nenhuma gravação naquela sessão.
+- O modo conversa mantém contexto temporário entre turnos.
+- `aprendizado/gerado/` não existia no checkout verificado; snapshots históricos
+  não eram carregados pelo runtime.
+- Não havia geração evolutiva de classes por categoria nem carregador de módulos
+  gerados durante a conversa.
+- A busca lexical por proximidade foi identificada como sugestão textual, não
+  como generalização semântica ou por categoria.
+- Foi criada regressão para essa sugestão sem criar conhecimento novo.
+- Testes com banco temporário reproduziram as falhas de reutilização indevida de
+  fichas e confirmaram contagem zero de alterações no SQLite.
+- O teste controlado não usou nem alterou o banco real.
+- As três falhas foram convertidas em testes automatizados multiturno.
+- A suíte passou a cobrir os diálogos de regressão, pronomes, ambiguidade e
+  contexto curto.
+- A evolução de métodos gerados por categoria não está implementada nem testada
+  e não há dependência do runtime em arquivos estáticos repetidos.
+
+FASES 1 E 2 — RESULTADOS TRANSFERIDOS
+--------------------------------------
+- Foram reunidos transcript, logs reais, respostas esperadas e regressões para
+  frase conhecida, paráfrase, fragmento, pergunta pendente, mudança de assunto
+  e entrada desconhecida.
+- Foi confirmado que significado, contexto e exemplo só aparecem quando
+  respondem à pergunta; uma fala normal não recebe a ficha automaticamente.
+- Foi verificado que o SQLite não é alterado durante a conversa.
+- O reaproveitamento de tópico foi restringido a continuações compreensíveis ou
+  perguntas e slots pendentes.
+- Consulta explicativa e resposta conversacional foram separadas.
+- Perguntas pendentes, nomes temporários, respostas curtas, apresentações,
+  retomadas de assunto e neutralização de nomes em exemplos foram tratados.
+- Entradas sem correspondência ou continuação justificável usam desconhecimento
+  ou esclarecimento, sem selecionar topicamente uma ficha antiga.
+- Fases 1 e 2 foram verificadas sem alterar os bancos reais.
+- Expressões conversacionais cadastradas usam suas réplicas; consultas
+  explicativas recebem a ficha somente quando solicitadas.
+- `licença` sem correspondência confirmada não herda a ficha anterior de
+  `bom dia`.
+- Nomes e perguntas pendentes ficam somente em `ContextoConversa`.
+- A suíte, `compileall` e a checagem de espaços em branco foram aprovados na
+  verificação registrada.
+
+FASE 3 — CONTRATOS TRANSFERIDOS
+-------------------------------
+- Foram documentados contratos independentes para interpretação, recuperação e
+  composição de resposta.
+- A interpretação estruturada representa intenção, candidato, entidades, slots,
+  referências de sessão, confiança e necessidade de esclarecimento.
+- A recuperação representa candidatos, campos, origem, confirmação, evidências
+  e contexto relevante.
+- A resposta representa texto, evidências, incertezas e pedido de esclarecimento.
+- As interfaces foram mantidas separadas do banco, permissões e execução.
+- A inspeção concluiu que não havia necessidade de novos campos ou migração.
+- Os documentos mestre e de direção futura foram atualizados.
+- Foram registrados 131 testes aprovados, `compileall` aprovado e checagem de
+  espaços em branco aprovada.
+
+LIMITE REGISTRADO
+-----------------
+A camada de conversa ainda não consome diretamente os objetos da Fase 3; o
+fluxo usa suas interfaces simbólicas determinísticas existentes. Esse limite
+faz parte do histórico e não deve ser tratado como tarefa ativa neste arquivo.
+
+
+REORGANIZAÇÃO DA CAMADA DE APLICAÇÃO — 24/09/2026
+------------------------------------------------
+- Criados os pacotes `aplicacao/conversa/` e `aplicacao/aprendizagem/`.
+- A sessão interativa do usuário (conversa e aprendizagem manual/online) ficou
+  em `conversa/sessao.py`; a sessão do professor e a exibição dos comandos de
+  propostas ficaram em `aprendizagem/sessao.py`.
+- `aplicacao/sessao.py` agora é uma fachada de compatibilidade, e
+  `aplicacao/terminal.py` importa as sessões diretamente dos pacotes de domínio.
+- `main.py` continua sendo a entrada/fachada compatível; a propagação temporária
+  de substituições usada pelos testes também inclui os novos módulos de sessão.
+- `aplicacao/terminal.py` permanece na raiz como coordenador do menu.
+  `aplicacao/fluxo.py` também permanece na raiz porque `processar_frase` atende
+  aos dois modos. A separação interna desse fluxo grande não foi feita nesta
+  atualização.
+- Verificação isolada: 16 testes de regressão, menu e compatibilidade aprovados;
+  as sessões separadas também passaram por inicialização controlada.
+- A suíte completa não foi executada nesta atualização. Nenhum banco do projeto
+  foi usado pelos testes direcionados; não há confirmação adicional sobre as
+  versões externas referidas no Portão 0 do roteiro `02`.
+
+
+ALTERAÇÃO PONTUAL — CASCATA DA APRENDIZAGEM MANUAL — 24/09/2026
+---------------------------------------------------------------
+- Registro de escopo: nas mensagens disponíveis, a igualação da cascata manual
+  com a cascata do professor não foi solicitada diretamente pelo usuário à
+  época; foi uma iniciativa do agente durante a implementação anterior. Esse
+  registro descreve o histórico consultado naquele momento e não atribui a
+  solicitação a mensagens antigas.
+- Confirmação atual, nesta conversa (2026-09-25): o usuário confirmou que o
+  alinhamento da cascata manual com a do professor era intencional. A partir
+  desta confirmação, a alteração deixa de ser tratada como não solicitada,
+  sem modificar retroativamente o registro histórico anterior.
+- A sessão manual agora usa `CascataAprendizagem`, o mesmo mecanismo da sessão
+  do professor, para examinar respostas, deduplicar termos desconhecidos e
+  enfileirá-los para as mesmas perguntas adaptativas.
+- Mantidos os limites existentes do professor: quatro candidatos por resposta
+  e 64 termos por cadeia. Comandos de proposta e respostas de controle não
+  viram candidatos. A aprendizagem pela internet permanece inalterada.
+- Oito testes focados passaram: cascata manual, cascata do professor, limites,
+  respostas de controle, seleção do menu e regressões existentes do professor.
+- A execução real do menu `2 → 1`, em cópia temporária do projeto, aprendeu
+  `qvzxarborium`; a resposta `plutofraxine` gerou a cascata e as perguntas para
+  aprender esse segundo termo.
+- A suíte completa executou 154 testes: 153 passaram e um falhou em
+  `test_conversa_retorna_fala_b_e_pergunta_de_significado_e_estruturada`, que
+  espera `Bom dia, como posso ajudar?` enquanto o código retorna
+  `Olá! Bom dia! Como posso ajudar?`. A saudação não foi alterada nesta tarefa.
+  `python -m compileall -q .` passou.
+- Os testes e a execução do menu usaram diretórios e cópias temporárias; os
+  bancos originais do workspace não foram abertos pela execução do terminal.
+- Manifesto SHA-256 atual dos arquivos `.py` e `.json` de `hen-isana/`,
+  calculado com caminhos ordenados e SHA-256 individual por arquivo:
+
+  `96c0f6789fea31980fc8868a5b5c0e988ddff090d7a85ea5c8f51f892f389201`
+
+- O Portão 0 permanece bloqueado para identificar as versões externas, e a
+  Fase B permanece incompleta pelos critérios já registrados em `02`.

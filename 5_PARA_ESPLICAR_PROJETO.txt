@@ -1,0 +1,373 @@
+Quero que você faça uma análise técnica COMPLETA do projeto atual da Isana, diretamente olhando o código, arquivos, banco de dados, módulos e fluxo real de execução.
+
+NÃO quero uma explicação genérica de como uma IA poderia funcionar.
+NÃO quero que você proponha uma arquitetura nova neste momento.
+NÃO quero que você invente componentes que não existem.
+
+Quero que você me explique COMO O PROJETO FUNCIONA HOJE, baseado exclusivamente no código existente.
+
+O objetivo dessa análise é que eu possa enviar sua resposta para outra IA, que vai estudar a arquitetura e criar uma analogia entre a arquitetura da Isana e um cérebro humano em desenvolvimento.
+
+Portanto, seja extremamente preciso e identifique também aquilo que ainda NÃO existe ou está incompleto.
+
+Organize a resposta exatamente nestas partes:
+
+1. VISÃO GERAL DA ISANA
+
+Explique:
+- qual é o fluxo completo desde o usuário enviar uma mensagem até a Isana responder;
+- quais módulos participam desse processo;
+- quem chama quem;
+- onde a informação entra;
+- onde é processada;
+- onde é armazenada;
+- onde é recuperada;
+- onde a resposta é montada.
+
+Faça um fluxo técnico, por exemplo:
+
+Entrada
+→ interpretação
+→ busca
+→ contexto
+→ memória
+→ decisão
+→ resposta
+
+Mas substitua os nomes genéricos pelos nomes reais dos módulos, classes e funções encontrados no projeto.
+
+2. MAPA COMPLETO DOS MÓDULOS
+
+Para cada módulo importante, informe:
+
+- caminho do arquivo;
+- responsabilidade;
+- principais classes;
+- principais funções;
+- quem chama esse módulo;
+- quais módulos ele chama;
+- quais dados recebe;
+- quais dados devolve;
+- se ele altera estado;
+- se ele acessa SQLite;
+- se ele gera código;
+- se ele executa código;
+- se ele participa da conversa.
+
+Não simplifique nomes.
+
+3. PIPELINE COMPLETA DA CONVERSA
+
+Pegue uma mensagem hipotética:
+
+"Olá, tudo bem?"
+
+E explique passo a passo o que realmente acontece no código.
+
+Depois faça outro exemplo:
+
+"Meu nome é João."
+
+E explique o que acontece.
+
+Depois:
+
+"Qual é o meu nome?"
+
+Explique como a informação é recuperada.
+
+Depois:
+
+"Você sabe o que significa computador?"
+
+Explique como uma consulta de significado funciona.
+
+O objetivo é descobrir exatamente a diferença entre:
+- entrada;
+- interpretação;
+- contexto;
+- conhecimento;
+- memória;
+- lembrança;
+- recuperação;
+- resposta.
+
+4. BANCO DE DADOS
+
+Analise todos os bancos SQLite relacionados ao projeto.
+
+Para cada banco:
+
+- nome;
+- localização;
+- tabelas;
+- colunas;
+- finalidade;
+- quem grava;
+- quem lê;
+- quando grava;
+- quando lê;
+- relacionamento entre tabelas.
+
+Explique especificamente como o projeto armazena:
+
+- palavras;
+- expressões;
+- significados;
+- perguntas;
+- respostas;
+- exemplos;
+- relações;
+- evidências;
+- variações;
+- contexto;
+- propostas de aprendizagem;
+- qualquer outro tipo de conhecimento.
+
+Não presuma que uma tabela representa algo só pelo nome. Verifique o código que realmente usa essa tabela.
+
+5. PERGUNTA E RESPOSTA
+
+Explique como uma pergunta e sua resposta são representadas atualmente.
+
+Por exemplo:
+
+"Olá"
+→ resposta correspondente
+
+ou:
+
+"O que significa X?"
+→ significado de X
+
+Quero saber se o banco armazena:
+- pergunta e resposta diretamente;
+- conceito e resposta;
+- intenção e resposta;
+- expressão e resposta;
+- ou uma combinação dessas coisas.
+
+Mostre os campos reais utilizados.
+
+6. APRENDIZADO
+
+Explique detalhadamente como o aprendizado funciona atualmente.
+
+Quero saber:
+
+- onde uma informação nova entra;
+- como ela vira uma proposta;
+- como é validada;
+- onde fica armazenada;
+- quando passa a ser conhecimento confirmado;
+- se uma conversa normal pode alterar o banco;
+- como uma correção do usuário é tratada;
+- como uma nova variação é tratada;
+- como relações novas são criadas.
+
+Separe claramente:
+
+APRENDIZADO QUE JÁ EXISTE
+
+APRENDIZADO QUE ESTÁ PLANEJADO
+
+APRENDIZADO QUE AINDA NÃO FOI IMPLEMENTADO
+
+7. GERAÇÃO DE CÓDIGO
+
+Essa parte é MUITO importante.
+
+Analise especificamente:
+
+aprendizado/gerado/
+
+e todos os módulos responsáveis por criação, edição, validação e execução de código.
+
+Quero saber:
+
+- essa pasta existe atualmente?
+- quem deveria criá-la?
+- como uma classe é gerada?
+- como uma categoria é escolhida?
+- como novos métodos podem ser adicionados?
+- como uma função nova seria criada?
+- como o código gerado é validado?
+- como ele é ativado?
+- como ele é carregado posteriormente?
+- como ele participa da conversa?
+- o código gerado pode modificar a si próprio?
+- o código gerado pode criar outro código?
+- o código gerado consegue acessar o banco?
+- o código gerado consegue acessar o core?
+- o que impede código gerado de fazer coisas que não deveria?
+
+Se alguma dessas coisas ainda NÃO estiver implementada, diga explicitamente:
+
+"NÃO IMPLEMENTADO"
+
+Não transforme intenção/documentação em funcionalidade existente.
+
+8. CLASSES EVOLUTIVAS
+
+Quero saber exatamente qual é o conceito de "classe por categoria" implementado ou planejado.
+
+Explique:
+
+Categoria
+→ classe
+→ métodos
+→ funções auxiliares
+→ conhecimento relacionado
+→ comportamento
+
+Mostre exemplos reais do projeto, se existirem.
+
+Depois explique o que ainda falta para essa classe realmente evoluir durante o aprendizado.
+
+9. MEMÓRIA
+
+Separe os conceitos abaixo e diga como cada um existe tecnicamente no projeto:
+
+- memória persistente;
+- memória da sessão;
+- contexto;
+- conhecimento;
+- lembrança;
+- histórico;
+- evidência;
+- experiência;
+- aprendizado.
+
+Para cada um, indique o componente real responsável.
+
+Não use a palavra "memória" simplesmente porque algo está armazenado. Quero a função real daquele armazenamento.
+
+10. "NEURÔNIOS" — SEM INVENTAR
+
+Eu quero futuramente criar uma analogia entre a arquitetura da Isana e um cérebro humano.
+
+Mas NÃO quero que você faça essa analogia ainda.
+
+Primeiro me diga quais componentes técnicos poderiam, futuramente, ser comparados a:
+
+- neurônio;
+- sinapse;
+- memória;
+- lembrança;
+- córtex;
+- circulação;
+- sentidos;
+- aprendizado;
+- associação;
+- tomada de decisão.
+
+Mas faça isso somente como POSSÍVEIS correspondências arquiteturais.
+
+Não diga que determinado módulo "é um neurônio".
+Diga:
+
+"Este componente poderia ser comparado a X porque tecnicamente ele faz Y."
+
+11. FLUXO DA INFORMAÇÃO
+
+Faça um mapa mostrando para onde os dados vão.
+
+Por exemplo:
+
+USUÁRIO
+ ↓
+[ módulo ]
+ ↓
+[ módulo ]
+ ↓
+[ banco ]
+ ↓
+[ recuperação ]
+ ↓
+[ contexto ]
+ ↓
+[ decisão ]
+ ↓
+[ resposta ]
+
+Depois faça o mesmo para aprendizado:
+
+USUÁRIO ENSINA
+ ↓
+[ captura ]
+ ↓
+[ proposta ]
+ ↓
+[ validação ]
+ ↓
+[ memória ]
+ ↓
+[ geração de comportamento ]
+ ↓
+[ classe evolutiva ]
+ ↓
+[ próximo uso ]
+
+Novamente: use somente componentes que realmente existem ou marque claramente os que ainda não existem.
+
+12. O QUE ESTÁ FALTANDO
+
+Depois de entender todo o projeto, liste:
+
+A. Componentes já implementados
+B. Componentes parcialmente implementados
+C. Componentes apenas planejados
+D. Componentes mencionados na documentação mas inexistentes no código
+E. Dependências entre componentes que ainda não foram conectadas
+
+13. PIPELINE FINAL REAL
+
+No final, monte uma única pipeline completa mostrando o estado REAL atual:
+
+Entrada
+→ processamento
+→ interpretação
+→ recuperação
+→ contexto
+→ memória
+→ decisão
+→ resposta
+→ aprendizado
+→ geração de comportamento
+→ evolução
+
+Coloque [IMPLEMENTADO], [PARCIAL] ou [NÃO IMPLEMENTADO] em cada etapa.
+
+14. NOMES TÉCNICOS
+
+Por último, faça uma tabela com:
+
+CONCEITO DO PROJETO | COMPONENTE REAL | FUNÇÃO | ESTADO
+
+Exemplo:
+
+Memória persistente | bancos/conhecimento.py + SQLite | armazenamento de conhecimento | IMPLEMENTADO
+
+Não use nomes inventados.
+
+IMPORTANTE:
+
+Eu vou usar sua resposta como documentação técnica para outra IA analisar a arquitetura.
+
+Portanto:
+- leia o código real;
+- siga chamadas reais;
+- verifique imports;
+- verifique tabelas e SQL;
+- verifique classes e funções;
+- não confunda documentação com implementação;
+- não invente comportamento;
+- não esconda partes incompletas;
+- não proponha melhorias ainda;
+- não escreva código;
+- não altere nenhum arquivo.
+
+Quero primeiro entender exatamente "o cérebro que já existe" antes de decidir como vamos nomear cada parte dele.
+
+
+QUANDO ACABAR CRIE UMA ARQUIVO .TXT E COLQUE TODO O RESULTADO LA DENTRO !!!!!

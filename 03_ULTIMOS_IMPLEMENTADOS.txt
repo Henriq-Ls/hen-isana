@@ -1,0 +1,831 @@
+# HEN-ISANA — ÚLTIMOS IMPLEMENTADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Partes consolidadas: PARTE 1 — FUNDAÇÃO, SCHEMA, CONTRATOS E ENTRADAS CONTROLADAS
+                    PARTE 2 — NÚCLEO LINGUÍSTICO SIMBÓLICO
+                     PARTE 3 — FASES 3.1, 3.2, 3.3, 3.4, 3.5 E 3.6;
+                     GERADOR, PREPARAÇÃO E DRY-RUN DE LOTES DA FASE 3.7
+Data de fechamento: 2026-09-26
+Status: HISTÓRICO CONSOLIDADO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+## FASE 3.7 — GERADOR, PREPARAÇÃO E DRY-RUN DE LOTES IMPLEMENTADOS
+
+- Gerador definitivo e determinístico em `aplicacao/gerador_json.py`.
+- Fronteira de contrato sem dependência da camada SQLite em
+  `aplicacao/contrato_entrada.py`.
+- Saída individual e por lote seguro, sempre como proposta JSON não aplicada.
+- Relatórios explícitos para aceito, pendente, conflito e rejeitado.
+- Validação do fluxo real somente por `IngestaoJSON.dry_run()` injetado.
+- 18 testes específicos aprovados e 14 testes da ferramenta de teste aprovados;
+- preparação segura de lotes em `aplicacao/lotes_json.py`, com 9 testes
+  específicos aprovados;
+- geração auditável dos lotes legados em
+  `aplicacao/migracao_legado_json.py`, com leitura SQLite exclusivamente em
+  `mode=ro`, manifesto, ledger, classificação, proveniência e dry-run;
+- a Fase 3.7 completa permanece pendente por causa da aplicação, migração física
+  e desligamento do legado.
+- nenhum lote real foi criado ou aplicado, nenhuma migração foi executada e o
+  legado não foi desligado.
+
+### REVALIDAÇÃO DA CÓPIA TRANSFERIDA — 2026-09-26
+
+- O gerador definitivo já existente foi revalidado sem alteração de código.
+- O conjunto direcionado das Fases 3.1–3.6, do gerador definitivo e da
+  ferramenta de teste executou 130 testes, todos aprovados.
+- `python -m compileall -q core aplicacao bancos testes` foi aprovado.
+- `integrity_check` retornou `ok` e `foreign_key_check` retornou zero violações
+  nos seis bancos.
+- Os hashes dos seis bancos permaneceram inalterados antes e depois da
+  validação.
+- Nenhuma geração massiva, aplicação de lote, migração ou desligamento do legado
+  foi iniciado.
+
+### PREPARAÇÃO DE LOTES — 2026-09-26
+
+- Fontes foram inventariadas sem leitura de bancos: somente os sete JSONs de
+  `docs/exemplos_json_conhecimento/` são elegíveis para reempacotamento
+  documental.
+- `data/linguagem.json`, bancos legados, `linguagem.db`, fixtures inválidos e
+  os 84 snapshots de código foram excluídos explicitamente.
+- `LotesJSONConhecimento` organiza fonte, assunto, lote e versão em diretórios
+  determinísticos, grava manifesto canônico, soma contagens, preserva hashes e
+  rejeita sobrescrita diferente.
+- A validação opcional injeta `IngestaoJSON.dry_run()` e não chama registro,
+  revisão, autorização ou aplicação.
+- `testes.test_lotes_json_fase_3_7` executou 9 testes aprovados.
+- Detalhamento operacional: `docs/LOTES_JSON_FASE_3_7.txt`.
+
+### GERAÇÃO DOS LOTES LEGADOS — 2026-09-26
+
+- Corrigida a contagem de relações sem direção/ordem para consultar
+  `relacoes.db`, sem atravessar conexões SQLite.
+- Corrigida a atualização do ledger de rejeições para usar o `proposta_id`
+  real do payload, sem derivá-lo do nome do arquivo.
+- A execução real produziu 2 lotes e 70 propostas JSON; 66 linhas de relações
+  foram classificadas sem direção/ordem.
+- `testes.test_migracao_legado_json` executou 3 testes aprovados, incluindo
+  hashes antes/depois, dry-run, idempotência e rejeição por `proposta_id`.
+- O conjunto direcionado das Fases 3.1–3.7 executou 143 testes, todos
+  aprovados; `compileall`, `integrity_check` e `foreign_key_check` também
+  foram aprovados.
+- Os hashes dos seis bancos permaneceram inalterados. Registro, autorização,
+  aplicação, migração física e desligamento do legado continuam fora desta
+  etapa.
+
+## FASES CONCLUÍDAS — PARTE 1
+
+- Fase 1.0 — baseline, cópias e rollback.
+- Fase 1.1 — schema físico isolado de `linguagem.db`.
+- Fase 1.2 — contratos Python da representação intermediária.
+- Fase 1.3 — contrato conceitual de cadastro multifonte e JSON.
+
+## PRINCIPAIS IMPLEMENTAÇÕES
+
+- Baseline reproduzível, cópias isoladas e validação de restauração.
+- Banco novo `linguagem.db`, separado dos bancos legados, com schema físico
+  validado e sem dados migrados.
+- Contratos Python imutáveis em memória para enunciado, token, análise
+  morfológica, estrutura sintática, semântica, proposição, intenção, contexto,
+  hipótese e alternativas.
+- Spans, confiança, proveniência, polaridade, modalidade, escopo e estados
+  inválidos são tratados explicitamente.
+- Contrato JSON operacional para pacotes de propostas com fonte, evidência,
+  relações lógicas, idempotência, dry-run, auditoria e rejeição atômica.
+- Leitor de ingestão controlada, aplicador transacional, auditoria e rollback
+  foram implementados na Fase 3.3; os exemplos documentais continuam fora dos
+  bancos.
+
+## ARQUIVOS TÉCNICOS CRIADOS OU ALTERADOS
+
+- `core/contratos.py`
+- `aplicacao/lotes_json.py`
+- `testes/test_lotes_json_fase_3_7.py`
+- `testes/test_contratos_fase_1_2.py`
+- `aprendizado/bancos/linguagem_schema.sql`
+- `aprendizado/bancos/linguagem.db`
+- `testes/validar_schema_fase_1_1.py`
+- `.baseline/fase-1.0/`
+
+Os exemplos JSON antigos usados somente para planejamento foram removidos após a
+validação. Os sete exemplos JSON documentais atuais permanecem em
+`docs/exemplos_json_conhecimento/` e não foram importados. O controle
+operacional e o resumo/mestre do projeto foram atualizados; este arquivo é o
+histórico consolidado permanente das Partes 1, 2 e 3.
+
+## TESTES E VALIDAÇÕES
+
+- `python -m py_compile core/contratos.py testes/test_contratos.py testes/test_contratos_fase_1_2.py`
+  — concluído sem erro.
+- `python -m unittest -v testes.test_contratos testes.test_contratos_fase_1_2`
+  — 15 testes executados, 15 aprovados.
+- Validação estrutural dos exemplos JSON de planejamento — 1 caso válido aceito,
+  9 casos inválidos rejeitados; nenhum banco acessado e nenhum JSON executado.
+- `python -m unittest discover -s testes -p "test_*.py" -v`
+  — 180 testes executados, 177 aprovados e 3 falhas legadas conhecidas.
+
+As três falhas da suíte completa pertencem aos cenários legados de aprendizagem
+de expressões conversacionais. Elas já estavam registradas como divergência
+legada da Fase 1.0, não foram causadas por esta execução e não foram mascaradas
+com alteração de código ou de testes.
+
+## DECISÕES IMPORTANTES
+
+- Contratos intermediários não abrem SQLite, não persistem dados, não executam
+  ferramentas e não concedem permissões.
+- Alternativas de análise não são descartadas silenciosamente.
+- Proposição intermediária não é fato persistente automaticamente.
+- O cadastro futuro será orientado a pacote, com fonte e evidência explícitas.
+- IDs do pacote são lógicos; não há dependência obrigatória de IDs físicos de
+  outra instalação SQLite.
+- Professor, Llama, internet e outras fontes não gravam diretamente.
+- A Parte 1 não migra dados nem altera o fluxo legado.
+
+## LIMITAÇÕES CONHECIDAS
+
+- Migração e desligamento controlado ainda não foram implementados.
+- Os contratos ainda não estão conectados ao fluxo de conversa.
+- O sandbox de execução continua limitado em recursos do sistema operacional.
+- As três falhas legadas da suíte completa permanecem para revisão posterior.
+
+## PRESERVAÇÃO DO LEGADO
+
+Confirmado: bancos legados, fluxo de conversa, módulos de segurança e testes
+existentes foram preservados. Nenhum dado foi migrado. O registro histórico da
+Parte 2 abaixo foi incorporado para contexto futuro e revalidado nesta execução;
+nenhuma funcionalidade nova foi adicionada nesta rodada.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 1.1 — SCHEMA FÍSICO DE `linguagem.db`
+Status: concluída e aplicada em banco isolado em 2026-09-25.
+
+### Base conceitual revisada
+
+O desenho foi confrontado com a proposta de representação intermediária e
+arquitetura linguística simbólica, especialmente suas seções 5, 7, 8 e 10.
+
+O banco novo separa explicitamente:
+
+- lexema, forma lexical e análise morfológica;
+- sentido e conceito;
+- expressão e seus componentes;
+- proposição, argumentos e escopo;
+- fato como tratamento separado de uma proposição;
+- relação semântica tipada;
+- fonte e evidência.
+
+Não foram persistidos tokens de cada turno, árvores sintáticas temporárias,
+entidades discursivas, contexto de sessão, intenções transitórias, planos de
+resposta ou hipóteses descartadas. Esses objetos pertencem às fases posteriores
+e permanecem em memória conforme o modelo conceitual.
+
+### Decisões físicas
+
+- Todas as tabelas usam `INTEGER PRIMARY KEY`, com IDs locais ao banco novo.
+  Não foi usado `AUTOINCREMENT`; o schema não cria `sqlite_sequence`.
+- Nenhum ID é importado do legado ou tratado como identificador externo.
+- Registros que podem ser propostos usam os estados `candidato`, `aprovado`,
+  `recusado` e `revertido`.
+- Campos de confiança são `REAL` limitados ao intervalo fechado `[0.0, 1.0]`,
+  com padrão `candidato` para evitar transformar proposta em verdade por omissão.
+- `fontes` identifica a origem declarada e sua confiabilidade.
+- `evidencias` liga uma fonte a um alvo por `alvo_tipo` e `alvo_id`, preservando
+  trecho, referência, data, estado e necessidade de revisão.
+- Relações entre conceitos, sentidos, proposições, fatos e entidades usam pares
+  numéricos `<tipo, id>` com `CHECK` de tipos permitidos. Entidades discursivas
+  são temporárias e não possuem tabela persistente.
+- SQLite não possui FK nativa para uma coluna que aponta para várias tabelas.
+  FKs reais foram usadas quando o alvo é uma tabela única; a validação semântica
+  dos pares polimórficos pertence à API de conhecimento.
+- Uma proposição pode ser afirmativa, negativa ou interrogativa, com modalidade
+  separada. Um fato referencia proposição, fonte, estado, validade e confiança;
+  criar uma proposição não cria fato automaticamente.
+- Foram aplicados FKs com ações de exclusão explícitas, unicidade, `CHECK` para
+  estados, enumerações, confiança, IDs, polaridade, modalidade, tipos de alvo,
+  datas e componentes de expressão, além de índices para os caminhos de consulta.
+
+### Tabelas e colunas
+
+O desenho mantém as 14 tabelas iniciais do modelo aprovado, com 125 colunas
+aplicacionais no total, excluindo índices internos do SQLite:
+
+- `lexemas` — 7 colunas: `id`, `lema`, `categoria_lexical`, `descricao`,
+  `estado`, `criado_em`, `atualizado_em`. Representa a unidade lexical abstrata.
+- `formas_lexicais` — 8 colunas: `id`, `lexema_id`, `forma`, `normalizada`,
+  `tipo_forma`, `estado`, `criado_em`, `atualizado_em`. Cada forma pertence a um
+  lexema; a unicidade é por lexema e forma normalizada.
+- `analises_morfologicas` — 11 colunas: `id`, `forma_lexical_id`,
+  `classe_gramatical`, `genero`, `numero`, `pessoa`, `tempo`, `modo`, `aspecto`,
+  `voz`, `confianca`. Alternativas candidatas são preservadas.
+- `sentidos` — 9 colunas: `id`, `lexema_id`, `definicao`, `contexto_uso`,
+  `classe_gramatical`, `dominio`, `estado`, `confianca`, `criado_em`.
+  Um lexema pode possuir vários sentidos.
+- `conceitos` — 8 colunas: `id`, `chave`, `rotulo`, `descricao`, `tipo`,
+  `estado`, `confianca`, `criado_em`. É a unidade semântica independente da
+  forma linguística.
+- `sentidos_conceitos` — 6 colunas: `sentido_id`, `conceito_id`, `tipo_ligacao`,
+  `confianca`, `estado`, `criado_em`. Associação muitos-para-muitos.
+- `expressoes` — 8 colunas: `id`, `forma`, `normalizada`, `tipo`, `fixidez`,
+  `estado`, `confianca`, `criado_em`. Distingue expressões fixas, semifixas,
+  conversacionais e produtivas.
+- `expressao_componentes` — 7 colunas: `expressao_id`, `ordem`,
+  `tipo_componente`, `texto`, `lexema_id`, `opcional`, `restricao`.
+  Componentes lexicais apontam para lexemas; literais e variáveis preservam tipo.
+- `proposicoes` — 12 colunas: `id`, `predicado_sentido_id`,
+  `predicado_conceito_id`, `tipo_predicado`, `polaridade`, `modalidade`,
+  `tempo_referencia`, `escopo_id`, `estado`, `confianca`, `fonte_id`, `criado_em`.
+  O predicado pode ligar-se a sentido, conceito ou ambos.
+- `proposicao_argumentos` — 9 colunas: `id`, `proposicao_id`, `ordem`, `papel`,
+  `alvo_tipo`, `alvo_id`, `funcao_sintatica`, `confianca`, `criado_em`.
+  Alvos persistentes são conceito, sentido, proposição ou fato.
+- `fatos` — 10 colunas: `id`, `proposicao_id`, `estado`, `validade_inicio`,
+  `validade_fim`, `fonte_id`, `confianca`, `contexto`, `criado_em`,
+  `atualizado_em`. Fato é uma camada de aceitação e proveniência.
+- `relacoes_semanticas` — 11 colunas: `id`, `tipo_relacao`, `origem_tipo`,
+  `origem_id`, `destino_tipo`, `destino_id`, `direcao`, `estado`, `contexto`,
+  `confianca`, `criado_em`. Origem e destino são referências tipadas.
+- `fontes` — 8 colunas: `id`, `tipo`, `identificador`, `origem`, `descricao`,
+  `confiabilidade`, `estado`, `criado_em`. Não contém segredo.
+- `evidencias` — 11 colunas: `id`, `fonte_id`, `alvo_tipo`, `alvo_id`, `trecho`,
+  `referencia`, `data_evidencia`, `estado`, `confianca`, `revisao_necessaria`,
+  `criado_em`.
+
+### Arquivos, aplicação e limites
+
+- DDL aplicado: `aprendizado/bancos/linguagem_schema.sql`.
+- Banco criado vazio e isolado: `aprendizado/bancos/linguagem.db`.
+- Validador: `testes/validar_schema_fase_1_1.py`.
+- O DDL foi executado em banco novo, sem anexar, consultar ou copiar dados dos
+  bancos legados. O banco final contém somente o schema e nenhum registro.
+- Não houve migração de `conhecimento.db`, `relacoes.db` ou qualquer outro banco.
+- O código legado não foi modificado.
+- Nenhum contrato Python, importador JSON, regra de inferência, proposta de
+  aprendizagem ou entidade persistente foi criado dentro desta fase.
+- A validação de referências polimórficas além de tipo e ID positivo ficou para
+  a API estruturada do conhecimento.
+
+Rollback registrado originalmente: remover o banco e o DDL de `linguagem.db`,
+o validador físico e o registro documental consolidado, mantendo os bancos
+legados intactos e independentes do banco novo.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 1.2 — CONTRATOS PYTHON DA REPRESENTAÇÃO INTERMEDIÁRIA
+Status: concluída e validada em 2026-09-25.
+
+### Escopo
+
+Foram definidos contratos imutáveis, independentes de SQLite, para transportar
+dados entre as camadas futuras sem persistência automática:
+
+- `SpanTexto`, `Token` e `CandidatoLexical`;
+- `AnaliseMorfologica` e `AnaliseMorfologicaAlternativa`;
+- `NoSintatico`, `DependenciaSintatica` e `EstruturaSintatica`;
+- `AlvoSemantico`, `PredicadoSemantico` e `ArgumentoSemantico`;
+- `ProposicaoIntermediaria`;
+- `EntidadeDiscursiva`, somente como objeto temporário de sessão;
+- `HipoteseAnalise`;
+- `IntencaoIntermediaria`;
+- `ContextoAnalise`;
+- `Enunciado`.
+
+Os contratos anteriores de interpretação, recuperação e resposta foram
+preservados. A extensão ocorreu no mesmo módulo para manter compatibilidade com
+os consumidores atuais.
+
+### Decisões de contrato
+
+- Todos os objetos são `dataclass(frozen=True)`.
+- Spans usam início inclusivo e fim exclusivo, ambos não negativos.
+- Coleções são tuplas imutáveis e rejeitam listas mutáveis.
+- Confiança e saliência ficam no intervalo `[0.0, 1.0]`.
+- Alternativas morfológicas e sintáticas são preservadas, sem escolha silenciosa.
+- Polaridade, modalidade e escopo são campos distintos.
+- Proposição não possui estado de fato nem é convertida automaticamente em fato.
+- Entidades discursivas carregam origem de análise e não representam persistência
+  global.
+- Referências semânticas usam tipo e identificador local, sem exigir SQLite.
+- Estados impossíveis, spans invertidos, referências próprias e tipos inválidos
+  são rejeitados na construção.
+
+### Arquivos, evidência e limites
+
+- Implementação: `core/contratos.py`.
+- Testes: `testes/test_contratos_fase_1_2.py`.
+- Foram executados `py_compile` e os testes de contratos.
+- Resultado: 15 testes executados, 15 aprovados, nenhum banco acessado.
+- Os testes cobrem criação válida, estados impossíveis, spans, alternativas,
+  polaridade, modalidade, escopo e separação entre proposição e fato.
+- Esta fase não implementa parser, análise morfológica, persistência, migração,
+  API de conhecimento, intenção executável ou importação JSON.
+
+Rollback registrado originalmente: remover as extensões novas de
+`core/contratos.py` e o teste específico, restaurando os contratos anteriores e
+o fluxo legado. O registro desta fase permanece consolidado neste histórico.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 1.3 — CONTRATO DE CADASTRO MULTIFONTE E JSON
+Status: concluída como contrato conceitual revisado em 2026-09-25.
+Escopo: especificação, exemplos e testes de planejamento.
+Fora do escopo original: importador, aplicação transacional e persistência.
+
+### Objetivo e envelope conceitual
+
+Manual, professor, Llama e agentes especializados podem propor conhecimento
+estruturado por meio de pacotes. Uma fonte fornece uma proposta; ela não grava
+diretamente, não aprova a própria proposta e não transforma ausência de
+evidência em verdade.
+
+O contrato não espelha cegamente as 14 tabelas de `linguagem.db`. Usa
+identificadores lógicos locais ao pacote. A resolução para IDs físicos,
+duplicidade e aplicação ficam sob controle da API, depois da validação e
+aprovação.
+
+O envelope conceitual exigia:
+
+- `schema_version`, `package_id`, `created_at`, `source`, `purpose`;
+- `requested_action`, `records`, `evidence` e `relations`.
+
+`requested_action` podia ser `propose`, `validate`, `approve` ou `apply`, mas
+não autorizava sozinho uma escrita. A fonte exigia tipo, identificador não
+secreto, origem declarada e confiança entre 0 e 1. Senhas, tokens, chaves,
+cookies, segredos e identificadores de credenciais eram proibidos.
+
+Cada registro exigia `record_id`, `unit_type`, `data`, `status` e
+`evidence_refs`, com tipos iniciais para lexema, forma lexical, análise
+morfológica, sentido, conceito, expressão, proposição e fato. Dados eram
+declarativos e não podiam conter Python, SQL, instruções executáveis ou IDs
+físicos obrigatórios do SQLite.
+
+Cada evidência exigia identificador, conteúdo, origem, referência opcional e
+estado. Cada relação exigia identificador, registro de origem, registro de
+destino, tipo e evidências. Todas as referências deveriam existir no pacote.
+
+### Validação, aplicação e decisões sobre o legado
+
+A ordem conceitual era:
+
+```text
+arquivo externo -> parsing seguro -> validação estrutural
+-> validação semântica -> duplicidade e referências -> dry-run
+-> revisão/aprovação -> transação pela API -> auditoria
+```
+
+As regras eram: JSON tratado como dado; campos e tipos obrigatórios validados;
+identidades e referências duplicadas ou inexistentes rejeitadas; aplicação
+atômica; reprocessamento idempotente; `apply` sujeito a autorização externa;
+dry-run sem alteração de `linguagem.db`; relatório com aceitos, rejeitados,
+duplicados, pendências e erros; fontes sem escrita direta; internet fora do
+cadastro principal; e nenhuma cascata legada automática.
+
+O cadastro novo foi definido como orientado a pacote, não como entrevista
+sequencial. Lacunas, desambiguação, relação, fato e confirmação permanecem
+situações distintas. Candidatos adicionais formam lote revisável, e campos
+legados como `resposta_padrao` e `relacionados` não são convertidos
+automaticamente em sentido, fato ou relação formal.
+
+### Exemplos, testes e limites
+
+Os exemplos conceituais foram mantidos em `docs/exemplos_fase_1_3_json/`,
+incluindo casos válido, sintaticamente inválido, campo obrigatório ausente,
+tipo incorreto, registro duplicado, referência inexistente, evidência ausente,
+ID físico, código ou segredo e pacote parcialmente inválido.
+
+Os testes de planejamento cobriram parsing, campos, tipos, unicidade,
+referências, segurança de conteúdo e rejeição atômica. Nenhum exemplo foi
+importado para banco.
+
+Esta fase não criou importador, leitor de diretório, aplicador transacional,
+resolvedor de referências físicas ou tabela de staging. A API de conhecimento
+e a ingestão controlada foram implementadas posteriormente nas Fases 3.1–3.3,
+com contrato operacional atualizado e sem aplicação dos exemplos documentais.
+
+Rollback registrado originalmente: remover o registro histórico conceitual e os
+exemplos de planejamento, sem banco, schema ou módulo de produção específico
+desta fase para restaurar.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## PARTE 2 — NÚCLEO LINGUÍSTICO SIMBÓLICO
+Registro histórico consolidado para contexto futuro
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+### Fase 2.1 — Léxico e morfologia
+
+Status histórico: concluída e validada.
+
+Implementação: `core/nucleo_simbolico.py`
+
+Testes: `testes/test_nucleo_simbolico.py`
+
+Resultados:
+
+- tokenização preserva spans no texto original;
+- forma original e forma normalizada são mantidas;
+- candidatos lexicais podem ser fornecidos por forma;
+- palavras sem candidato são reportadas sem descarte do texto;
+- análises morfológicas incluem lema, classe e traços básicos;
+- alternativas morfológicas são preservadas;
+- não há acesso ao SQLite;
+- nenhum resultado é persistido automaticamente.
+
+O teste da Fase 2.1 foi aprovado junto com os testes das demais fases da Parte
+2. A lista de desconhecidos é uma pista de análise, não uma proposta de
+aprendizagem nem uma gravação.
+
+Limite: o analisador é um subconjunto determinístico inicial; flexões,
+categorias e expressões fora das regras explícitas permanecem candidatas ou
+desconhecidas para camadas posteriores.
+
+### Fase 2.2 — Gramática e parser
+
+Status histórico: concluída e validada.
+
+O parser simbólico inicial produz estruturas para o subconjunto explícito
+sujeito-verbo-objeto. Registra nós, spans, dependências e funções sintáticas.
+Quando há mais de um verbo candidato, mantém uma estrutura para cada predicado
+em vez de escolher silenciosamente uma leitura.
+
+Resultados:
+
+- sujeito e objeto são ligados ao predicado por dependências tipadas;
+- spans dos nós são preservados;
+- enunciados nominais têm estrutura própria;
+- estruturas alternativas para mais de um verbo são preservadas;
+- dependências para nós inexistentes são rejeitadas pelos contratos;
+- nenhuma estrutura cria fato ou escreve em banco.
+
+Limite: o parser não cobre toda a gramática do português. O subconjunto não
+resolvido permanece explícito como alternativa ou hipótese.
+
+### Fase 2.3 — Representação semântica e proposições
+
+Status histórico: concluída e validada.
+
+A camada semântica converte as estruturas do parser em entidades discursivas
+temporárias, predicados e argumentos. Polaridade, modalidade e escopo usam os
+campos dos contratos intermediários. Uma proposição não é fato e não é
+persistida automaticamente.
+
+Resultados:
+
+- predicados recebem sentido local sem exigir ID físico;
+- sujeitos e objetos tornam-se argumentos com papel explícito;
+- polaridade negativa é preservada;
+- modalidades epistêmica, deôntica e condicional têm caminhos distintos;
+- hipóteses do parser permanecem registradas;
+- proposições não possuem nem criam fatos;
+- não há acesso ao SQLite.
+
+Limite: a ligação de sentidos locais a conceitos persistentes pertence à API da
+Parte 3. Inferência, conflito e aprovação ficam fora desta fase.
+
+### Fase 2.4 — Contexto e resolução de referências
+
+Status histórico: concluída e validada.
+
+Referências pronominais são resolvidas somente contra entidades discursivas em
+memória. Uma entidade única pode ser resolvida; várias candidatas mantêm a
+ambiguidade e geram pendência; ausência de antecedente também gera pendência.
+
+Implementação: `core/nucleo_simbolico.py`
+
+Contratos: `core/contratos.py`
+
+Testes: `testes/test_nucleo_simbolico.py`
+
+Resultados:
+
+- pronomes resolvidos preservam o ID local da entidade;
+- ambiguidades não são descartadas;
+- referências de turno são registradas no contexto imutável;
+- pendências ficam explícitas;
+- contexto de sessão não vira fato nem registro permanente;
+- o módulo não acessa SQLite.
+
+Limite: gênero, número, saliência avançada e resolução discursiva completa
+continuam dependentes de análises futuras. O módulo não altera
+`core/contexto_conversa.py` nem o fluxo legado.
+
+### Validação histórica da Parte 2
+
+As quatro fases usaram o módulo isolado e o teste
+`testes/test_nucleo_simbolico.py`. O conjunto cobre spans, candidatos lexicais,
+ambiguidade morfológica, sujeito-verbo-objeto, múltiplos predicados,
+polaridade, modalidade, argumentos, proposições sem fatos, resolução única e
+ambiguidade de referências. A camada permanece em memória, sem persistência
+automática.
+
+Validação registrada:
+
+- `python -m unittest -v testes.test_nucleo_simbolico` — 8 testes aprovados;
+- `python -m py_compile core/nucleo_simbolico.py core/contratos.py
+  testes/test_nucleo_simbolico.py` — concluído sem erro;
+- suíte completa — 180 testes executados, 177 aprovados e 3 falhas legadas
+  conhecidas, nenhuma pertencente à Parte 2.
+
+Rollback histórico: remover o comportamento novo e seus testes; o fluxo legado
+não depende do núcleo simbólico. O contexto documental desta Parte 2 permanece
+consolidado neste arquivo.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 3.1 — API E CONTRATO ESTRUTURADO DO CONHECIMENTO
+Status: concluída e validada em 2026-09-25.
+
+### Implementação
+
+- `core/contratos.py` mantém o contrato lógico comum para entradas manual, JSON,
+  Professor e ProfessorLlama, sem conexão, cursor, tabela ou coluna SQLite.
+- O contrato representa objetos distintos de lexema, forma lexical, análise
+  morfológica, sentido, conceito, expressão, proposição, argumento, fato e
+  relação semântica.
+- Propostas incompletas e ambíguas permanecem representáveis por pendências,
+  incertezas e ambiguidades explícitas.
+- Proveniência, evidência, estado do campo, confiança e idempotência permanecem
+  rastreáveis. Proposição não é fato confirmado.
+- `bancos/api_conhecimento.py` concentra o mapeamento privado para o schema real,
+  consulta registros em modo somente leitura e devolve registros lógicos.
+- A API separa registro da proposta, revisão e autorização; a autorização exige
+  proposta válida e impede a fonte de autorizar a própria proposta.
+- A persistência transacional não foi implementada: `persistir()` rejeita a
+  operação como fora do escopo da Fase 3.1.
+
+### Testes e validações
+
+- `python -m unittest -v testes.test_contratos_parte_3 testes.test_api_conhecimento_fase_3_1`
+  — 26 testes aprovados.
+- `python -m unittest discover -s testes -p "test_*.py" -v`
+  — 206 testes executados, 203 aprovados e 3 falhas legadas conhecidas de
+  aprendizagem conversacional; nenhuma pertence à Fase 3.1.
+- `python -m compileall -q .` — aprovado.
+- `python testes/validar_schema_fase_1_1.py` — schema real, 125 colunas,
+  constraints, rollback e recriação aprovados.
+- `PRAGMA integrity_check` — `ok` em `linguagem.db` e nos cinco bancos legados.
+- `PRAGMA foreign_key_check` — zero registros em todos os bancos verificados.
+- Comparação SHA-256 antes/depois — bancos legados preservados; os módulos
+  `professor/professor.py` e `professor/professor_llama.py` permaneceram
+  inalterados.
+- Nenhum teste exige Ollama ou credencial real; o professor usado nos testes é
+  um fake determinístico declarado no próprio teste.
+
+### Limitações e rollback
+
+- Cadastro por pacote, entrevista dinâmica, ingestão JSON, inferência, modo
+  sombra, migração e persistência continuam fora da Fase 3.1.
+- Para rollback, remover `bancos/api_conhecimento.py`,
+  `testes/test_api_conhecimento_fase_3_1.py` e as alterações de contrato,
+  restaurando o estado anterior sem tocar nos bancos legados.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 3.2 — CADASTRO POR PACOTE E ENTRADA ESTRUTURADA
+Status: concluída e validada em 2026-09-26.
+
+### Implementação
+
+- `aplicacao/cadastro.py` recebe contrato Python, dicionário estruturado ou JSON
+  e converge todas as origens para `ContratoCadastro`.
+- O JSON é lido como dados com `json.loads`; não há `eval`, execução de código,
+  SQL embutido ou comando de persistência.
+- Referências a tabela, coluna, cursor, conexão, SQL, Python ou comando são
+  rejeitadas na fronteira do pacote.
+- Pacotes completos e incompletos são aceitos como propostas; pendências não são
+  preenchidas por invenção e impedem autorização.
+- Múltiplos sentidos e objetos relacionados permanecem separados e
+  identificáveis.
+- Idempotência é delegada à API da 3.1. Conflitos com conhecimento existente
+  são expostos na validação, encaminhados à revisão e nunca sobrescrevem dados.
+- Professor e Llama recebem o mesmo contrato por adaptadores distintos; os
+  testes usam somente objetos falsos determinísticos.
+- Revisão e autorização continuam delegadas à `ConhecimentoAPI`; nenhuma entrada
+  persiste diretamente no SQLite.
+
+### Testes e validações
+
+- `python -m unittest -v testes.test_cadastro_pacotes_fase_3_2`
+  — 20 testes aprovados.
+- `python -m unittest -v testes.test_cadastro_pacotes_fase_3_2
+  testes.test_contratos_parte_3 testes.test_api_conhecimento_fase_3_1`
+  — 46 testes aprovados.
+- `python -m unittest discover -s testes -p "test_*.py" -v`
+  — 226 testes executados, 223 aprovados e as mesmas 3 falhas legadas de
+  aprendizagem conversacional; nenhuma falha nova pertence à Fase 3.2.
+- `python -m compileall -q aplicacao/cadastro.py bancos/api_conhecimento.py
+  core/contratos.py testes/test_cadastro_pacotes_fase_3_2.py` — aprovado.
+- `PRAGMA integrity_check` — `ok` em `linguagem.db` e nos cinco bancos legados.
+- `PRAGMA foreign_key_check` — zero registros em todos os bancos verificados.
+- SHA-256 — `data/diagnostico.db`, os demais bancos legados e
+  `professor/professor.py`/`professor_llama.py` permaneceram preservados após
+  a execução da suíte.
+
+### Limitações e rollback
+
+- Entrevista dinâmica completa, ingestão transacional de JSON, inferência, modo
+  sombra, migração e persistência continuam fora desta fase.
+- Para rollback, remover `aplicacao/cadastro.py`,
+  `testes/test_cadastro_pacotes_fase_3_2.py` e a extensão de conflitos da API,
+  restaurando o estado validado da Fase 3.1 sem tocar nos bancos legados.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 3.3 — INGESTÃO CONTROLADA DE JSON
+Status: concluída e validada em 2026-09-25.
+
+### Implementação
+
+- `bancos/ingestao_json.py` lê contrato, dicionário ou JSON como dados e
+  produz relatório de validação sem expor conexão, cursor ou schema físico.
+- A validação combina contrato estrutural, semântica de referências,
+  proveniência, evidências, duplicidades e pendências.
+- `dry_run()` não escreve; `registrar()`, revisão e autorização permanecem
+  separados da aplicação.
+- `bancos/persistencia_conhecimento.py` aplica objetos na ordem necessária,
+  resolve chaves lógicas textuais, preserva relações e evidências e executa
+  tudo em uma transação com rollback completo.
+- A camada transacional exige o token interno emitido pela API autorizadora;
+  chamada direta sem autorização falha com `PermissionError` e não grava.
+- Reaplicações reutilizam fontes, registros, relações e evidências sem
+  duplicar conteúdo.
+
+### Testes e validações
+
+- `python -m unittest -v testes.test_ingestao_json_fase_3_3` — 9 testes
+  aprovados.
+- `python -m unittest -v testes.test_api_conhecimento_fase_3_1
+  testes.test_contratos_parte_3 testes.test_cadastro_pacotes_fase_3_2
+  testes.test_ingestao_json_fase_3_3` — 55 testes aprovados.
+- `python -m unittest discover -s testes -p "test_*.py" -v` — 235 testes
+  executados, 232 aprovados e as mesmas 3 falhas legadas da aprendizagem
+  conversacional; nenhuma falha nova pertence à Parte 3.
+- `python -m compileall -q .` — aprovado.
+- Validação do schema real — 125 colunas, constraints, rollback e
+  recriação aprovados.
+- `PRAGMA integrity_check` — `ok` em `linguagem.db` e nos bancos verificados.
+- `PRAGMA foreign_key_check` — zero registros em todos os bancos verificados.
+
+Os três problemas relatados na retomada foram confirmados por testes:
+relação embutida com chave lógica textual, `PermissionError` quando existe
+somente revisão e contagem de evidências físicas quando a relação possui
+evidência própria. JSON não é executado como código, e a aplicação sem
+autorização não escreve.
+
+### Limitações e rollback
+
+- Inferência simbólica, modo sombra, geração de resposta estruturada, migração
+  e desligamento controlado continuam fora desta fase.
+- O banco linguístico real não recebeu dados durante a auditoria; os testes
+  usaram bancos temporários.
+- Para rollback, remover `bancos/ingestao_json.py`,
+  `bancos/persistencia_conhecimento.py`,
+  `testes/test_ingestao_json_fase_3_3.py` e a chamada de aplicação autorizada
+  da API, restaurando o estado validado da Fase 3.2 sem tocar nos bancos
+  legados.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 3.4 — INFERÊNCIA SIMBÓLICA
+Status: concluída e validada em 2026-09-25.
+
+### Implementação
+
+- `core/inferencia_simbolica.py` fornece um motor determinístico em memória para
+  literais, afirmações, regras, inferências, bloqueios e conflitos.
+- Regras são objetos explícitos e de uma etapa; o encadeamento ocorre somente
+  quando a conclusão anterior é uma premissa sustentada da etapa seguinte.
+- Premissa ausente não produz conclusão. Premissa negativa bloqueia a regra
+  incompatível. Premissa incerta produz no máximo conclusão incerta.
+- P e não-P são preservados e registrados como conflito; nenhuma resolução
+  automática escolhe um lado.
+- Cada conclusão tem origem `inferencia`, referência própria, regra utilizada,
+  premissa(s) e evidências rastreáveis. Ela não é uma confirmação do usuário.
+- A camada não abre SQLite, não executa texto e não modifica o conhecimento
+  original. O modelo atual não contém uma tabela própria para registrar regra,
+  cadeia e conflito; a persistência dessas derivações fica para decisão
+  estrutural futura.
+
+### Testes e validações
+
+- `python -m unittest -v testes.test_inferencia_simbolica_fase_3_4` — 14 testes
+  aprovados.
+- Conjunto das Fases 3.1, contratos, 3.2, 3.3 e 3.4 — 69 testes aprovados.
+- `python -m unittest discover -s testes -p "test_*.py" -v` — 249 testes
+  executados, 246 aprovados e as mesmas 3 falhas legadas da aprendizagem
+  conversacional; nenhuma falha nova pertence à Parte 3.
+- `python -m compileall -q .` — aprovado.
+- `PRAGMA integrity_check` — `ok` nos bancos verificados.
+- `PRAGMA foreign_key_check` — zero registros nos bancos verificados.
+- O banco de diagnóstico foi restaurado ao estado lógico anterior à suíte; não
+  ficaram registros de teste adicionais.
+
+### Limitações e rollback
+
+- Modo sombra, geração de resposta estruturada, migração e desligamento
+  controlado continuam fora desta fase.
+- Inferências não são persistidas como fatos; a API de conhecimento e o
+  aplicador transacional da 3.3 não foram alterados para inventar uma estrutura
+  de proveniência que o schema atual não suporta.
+- Para rollback, remover `core/inferencia_simbolica.py` e
+  `testes/test_inferencia_simbolica_fase_3_4.py`, restaurando o estado validado
+  da Fase 3.3 sem tocar nos bancos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 3.5 — MODO SOMBRA E INTEGRAÇÃO GRADUAL
+Status: concluída e validada em 2026-09-25.
+
+### Implementação
+
+- `aplicacao/modo_sombra.py` fornece `ModoSombra`, `HistoricoSombra`,
+  `ObservacaoFluxo` e registros imutáveis em memória.
+- O modo sombra executa o callback novo e o callback legado na mesma entrada,
+  canonicaliza representações JSON determinísticas e registra resultado novo,
+  resultado legado, representação comparada, diferenças, origem, status,
+  idempotência e indicação de fallback.
+- O adaptador concreto `processar_frase_em_modo_sombra()` executa o
+  analisador simbólico já existente e compara sua projeção lexical com a
+  tokenização usada pelo legado.
+- A função é opt-in e devolve a lista de respostas do legado sem alteração do
+  caminho padrão `processar_frase()`.
+- Falha, ausência de suporte, resultado incompleto e ambiguidade nunca
+  escolhem automaticamente o resultado novo; todos mantêm fallback explícito.
+- O histórico é somente em memória. Não houve alteração de schema, migração,
+  persistência de inferências, escrita de fonte nova no legado ou alteração de
+  `Professor`/`ProfessorLlama`.
+
+### Limite deliberado da comparação
+
+A Fase 3.5 compara somente a fronteira lexical/simbólica comum. O núcleo novo
+produz estruturas de análise, enquanto o legado ainda produz respostas textuais
+e efeitos de sessão. A comparação de respostas finais foi implementada
+separadamente na Fase 3.6, por uma entrada opt-in que exige um plano já
+estruturado e mantém fallback para o legado; ela não foi incorporada
+automaticamente ao modo sombra lexical.
+
+### Testes e validações
+
+- `python -m unittest -v testes.test_modo_sombra_fase_3_5` — 12 testes
+  aprovados.
+- Conjunto das Fases 3.1–3.5 — 81 testes aprovados.
+- `python -m unittest discover -s testes -p "test_*.py" -v` — 261 testes
+  executados, 258 aprovados e as mesmas 3 falhas legadas da aprendizagem
+  conversacional; nenhuma falha nova pertence à Fase 3.5.
+- `python -m compileall -q .` — aprovado.
+- `PRAGMA integrity_check` — `ok` nos bancos verificados.
+- `PRAGMA foreign_key_check` — zero registros nos bancos verificados.
+- O banco de diagnóstico foi restaurado ao estado lógico anterior à suíte; não
+  ficaram registros de teste adicionais.
+
+### Limitações e rollback
+
+- Respostas estruturadas, migração e desligamento controlado continuam fora desta
+  fase.
+- O registro não é persistente e não é usado para selecionar automaticamente
+  entre novo e legado.
+- Para rollback, remover `aplicacao/modo_sombra.py` e
+  `testes/test_modo_sombra_fase_3_5.py`, restaurando a Fase 3.4; o fluxo legado
+  não depende do modo sombra.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 3.6 — RESPOSTA BASEADA EM ESTRUTURA
+Status: concluída e validada em 2026-09-26.
+
+### Implementação
+
+- `core/resposta_estruturada.py` define `PlanoResposta`, etapas, resultados e
+  evidências e gera uma resposta somente com base na estrutura recebida.
+- Intenção, proposições, resultados, evidências, incertezas, conflitos,
+  inferências, proveniência e idempotência permanecem disponíveis na saída.
+- Conclusões inferidas são explicitamente apresentadas como inferidas, com
+  premissas, regra, origem da regra e proveniência; não são convertidas em fatos
+  fornecidos.
+- Conflitos são apresentados sem resolução automática. Informação ausente,
+  estrutura incompleta e falha do gerador não são preenchidas por invenção.
+- `aplicacao/resposta_estruturada.py` mantém o fallback legado e registra o
+  status, a origem, a chave de idempotência e o motivo da decisão.
+- `aplicacao/modo_sombra.py` oferece `processar_frase_com_plano_estruturado()`
+  como entrada opt-in. A frase original é usada somente pelo callback legado;
+  o gerador novo não a recebe nem a interpreta.
+- Não houve alteração de schema, migração, persistência de inferências ou
+  alteração do caminho padrão `processar_frase()`.
+
+### Testes e validações
+
+- `python -m unittest -v testes.test_resposta_estruturada_fase_3_6` — 17
+  testes aprovados.
+- Conjunto direcionado das Fases 3.1–3.6 — 98 testes aprovados.
+- `python -m unittest discover -s testes -p "test_*.py" -v` — 278 testes
+  executados, 275 aprovados e exatamente as três falhas legadas conhecidas:
+  `test_aprende_um_termo_e_depois_responde_sem_repetir_perguntas`,
+  `test_aprendizagem_adaptativa_nao_exige_categoria` e
+  `test_expressoes_de_conversa_sao_aprendidas_como_unidade`.
+- `python -m compileall -q .` — aprovado.
+- `PRAGMA integrity_check` — `ok`; `PRAGMA foreign_key_check` — zero registros
+  em `linguagem.db` e nos bancos legados.
+- A suíte alterou temporariamente somente `data/diagnostico.db`; o banco foi
+  restaurado antes da validação final. Não houve alteração de `linguagem.db`
+  nem dos bancos legados.
+
+### Limitações e rollback
+
+- A integração continua opt-in; o fluxo normal ainda usa o legado.
+- A geração exige um `PlanoResposta` suficiente e não constrói estrutura a
+  partir da frase original.
+- Migração, desligamento controlado e qualquer nova regra de inferência
+  permanecem fora desta fase.
+- Para rollback, remover `core/resposta_estruturada.py`,
+  `aplicacao/resposta_estruturada.py`, o adaptador opt-in correspondente e
+  `testes/test_resposta_estruturada_fase_3_6.py`; o fluxo legado não depende
+  desses módulos.

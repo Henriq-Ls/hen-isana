@@ -1,0 +1,1 @@
+"""Fluxos e sessão de conversa em modo somente leitura."""

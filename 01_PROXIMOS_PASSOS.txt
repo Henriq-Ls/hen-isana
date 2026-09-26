@@ -1,0 +1,247 @@
+# HEN-ISANA — PRÓXIMOS PASSOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Atualizado em: 2026-09-26
+Status: [FASE 3.7 — GERADOR E PREPARAÇÃO DE LOTES VALIDADOS] aplicação,
+migração e desligamento pendentes.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+## COMO ESTE MAPA SERÁ USADO
+
+O arquivo `01` mantém o planejamento geral. O arquivo
+`02_IMPLEMENTAR_ AGORA.txt` recebe a parte atualmente autorizada para
+execução. O arquivo `03_ULTIMOS_IMPLEMENTADOS.txt` mantém o contexto histórico
+consolidado do que já foi feito.
+
+Nenhuma parte está autorizada para execução somente por aparecer neste mapa.
+Fases só podem ser marcadas como concluídas com teste reproduzível e evidência
+da cópia atual.
+
+## HISTÓRICO DAS PARTES 1 E 2
+
+A Parte 1 — fundação, schema, contratos e entradas controladas — foi concluída.
+A Parte 2 — núcleo linguístico simbólico — também foi concluída e validada.
+Os registros consolidados, incluindo decisões, artefatos, testes, limitações e
+preservação do legado, estão em `03_ULTIMOS_IMPLEMENTADOS.txt`.
+
+## LIMITES GERAIS
+
+- Não migrar dados sem autorização específica.
+- Não alterar bancos legados fora da fase autorizada.
+- Não permitir que fontes externas gravem diretamente.
+- Não executar JSON recebido como código.
+- Não permitir acesso de `ferramentas/` ou `aprendizado/gerado/` ao `core/`.
+- Não criar código, banco ou schema fora do escopo da fase transferida.
+
+===============================================================================
+## PARTE 2 — NÚCLEO LINGUÍSTICO SIMBÓLICO (CONCLUÍDA — CONTEXTO)
+===============================================================================
+
+Objetivo: analisar frases novas sem exigir o cadastro da frase inteira.
+
+As quatro fases desta parte já foram executadas e validadas. O detalhamento
+abaixo permanece como referência de escopo; a próxima execução deve tratar a
+Parte 3.
+
+### FASE 2.1 — Léxico e morfologia
+
+Separar forma lexical, lema, lexema e análise morfológica; reconhecer flexões,
+expressões candidatas e palavras desconhecidas.
+
+- **Evidência de conclusão:** comandos, testes, arquivos produzidos, resultados,
+  decisões, pendências, limitações e rollback.
+
+### FASE 2.2 — Gramática e parser
+
+Produzir constituintes, dependências, funções, predicados e argumentos para o
+subconjunto aprovado, preservando ambiguidades.
+
+- **Evidência de conclusão:** comandos, testes, arquivos produzidos, resultados,
+  decisões, pendências, limitações e rollback.
+
+### FASE 2.3 — Representação semântica e proposições
+
+Produzir conceitos, entidades, eventos, estados, propriedades, papéis,
+polaridade, modalidade, escopo e proposições relacionadas.
+
+- **Evidência de conclusão:** comandos, testes, arquivos produzidos, resultados,
+  decisões, pendências, limitações e rollback.
+
+### FASE 2.4 — Contexto e referências
+
+Resolver pronomes, deícticos e entidades discursivas em memória, sem transformar
+contexto de sessão em fato persistente.
+
+- **Evidência de conclusão:** comandos, testes, arquivos produzidos, resultados,
+  decisões, pendências, limitações e rollback.
+
+Dependência geral da Parte 2: contratos da Parte 1 aprovados. Nenhuma fase da
+Parte 2 cria automaticamente fatos ou modifica o legado.
+
+===============================================================================
+## PARTE 3 — CONHECIMENTO, CADASTRO MULTIFONTE, JSON E OPERAÇÃO
+===============================================================================
+
+Objetivo: construir a camada que recebe, valida, revisa e persiste conhecimento
+estruturado, com participação de fontes diferentes e sem cascata implícita.
+
+### DECISÃO ARQUITETURAL — CADASTRO ASSISTIDO
+
+O cadastro novo não usará uma sequência universal de perguntas fixas. Cadastro
+manual, JSON e assistência de IA/professor devem convergir para um contrato
+estruturado comum:
+
+```text
+entrada manual
+      \
+JSON -----> contrato de cadastro -> validação -> API de conhecimento -> linguagem.db
+      /
+IA/professor
+```
+
+O professor não escreve diretamente no SQLite e não decide tabela ou coluna
+física. O mapeamento para `linguagem.db` permanece sob controle do código
+Python e da API de conhecimento.
+
+Os módulos existentes `professor/professor.py` e
+`professor/professor_llama.py` devem ser preservados como infraestrutura. A
+arquitetura futura terá dois papéis conceituais:
+
+- **Professor respondente:** recebe uma pergunta específica e responde.
+- **Professor estruturador:** recebe uma entrada e propõe a estrutura de
+  conhecimento necessária, preservando incerteza e informação ausente.
+
+O cadastro manual poderá funcionar como entrevista dinâmica: identificar o
+objeto, consultar o que já existe, detectar o que falta, gerar a próxima
+pergunta necessária, validar a resposta e somente então propor o cadastro.
+Informações já presentes não devem ser perguntadas novamente por uma lista fixa.
+
+O JSON será formato de entrada/proposta, não cópia direta do schema SQLite:
+
+```text
+texto/entrada -> professor -> proposta JSON -> contrato -> validação
+-> revisão/autorização -> API de conhecimento -> linguagem.db
+```
+
+O sistema deve funcionar sem IA. IA, internet e professor são fontes de
+proposta, nunca aprovadores automáticos. Proveniência, evidência, incerteza,
+autorização explícita e separação entre informação fornecida, proposta e
+confirmada são obrigatórias.
+
+### FASE 3.1 — API estruturada do conhecimento
+
+Consultar e registrar formas, lemas, sentidos, conceitos, expressões,
+proposições, fatos, relações, fontes e evidências por contratos explícitos.
+O contrato comum deve servir às entradas manual, JSON e IA/professor, sem expor
+o schema físico aos adaptadores.
+
+### FASE 3.2 — Novo processo de cadastro por pacote
+
+- **Manual:** funciona como entrevista dinâmica orientada pelo estado do
+  cadastro, com pendências agrupadas e autorização antes da persistência.
+- **Professor:** recebe uma solicitação estruturada e devolve candidato,
+  evidências e incertezas.
+- **Professor Llama:** usa o mesmo contrato do professor, mas com adaptador
+  local separado.
+- **Outras IAs:** entram como fontes/adaptadores, nunca como escritoras diretas.
+- **Internet:** fica fora do fluxo principal de cadastro.
+- **Validação:** normaliza, identifica duplicidade, resolve referências lógicas,
+  preserva proveniência e encaminha para revisão.
+- **Aprovação:** fonte automática não aprova a própria proposta.
+- **Cascata:** não é chamada automaticamente.
+- **Tutoria:** o HEN-ISANA coordena tarefa, resposta, validação, lacunas e
+  próxima pergunta; isso não é uma sequência cega de chamadas ao professor.
+
+### FASE 3.3 — Ingestão controlada de JSON
+
+Implementar, depois da API e do schema, um módulo controlado com leitor,
+validação estrutural e semântica, duplicidade, referências, dry-run, relatório,
+aplicação transacional, auditoria e rollback. Nomes definitivos, diretório de
+entrada, estados JSON e formato do relatório foram definidos e documentados na
+implementação da Fase 3.3.
+Campos fora do contrato, tipos inválidos e estruturas incompatíveis devem ser
+rejeitados. JSON nunca pode ser executado como código.
+
+### FASE 3.4 — Inferência simbólica
+
+Aplicar somente regras explícitas, com premissas, conclusões, conflitos e
+proveniência. Não transformar candidato, hipótese ou ausência de prova em fato.
+
+### FASE 3.5 — Modo sombra e integração gradual
+
+Status: concluída e validada em 2026-09-25.
+
+`aplicacao/modo_sombra.py` executa o analisador simbólico novo de forma
+observacional, adapta a tokenização legada para uma representação lexical comum,
+registra resultados e diferenças em memória e devolve sempre a saída legada.
+Falha, ausência de suporte, incompletude e ambiguidade produzem fallback
+explícito. A entrada é opt-in; o fluxo normal não foi substituído.
+
+O escopo de comparação desta fase termina na fronteira lexical/simbólica. A
+saída do fluxo legado continua preservada quando a estrutura nova falha, está
+incompleta, é insuficiente ou não é suportada.
+
+### FASE 3.6 — Geração de resposta baseada em estrutura
+
+Status: concluída e validada em 2026-09-26.
+
+Receber um `PlanoResposta` com intenção, proposições, resultados, evidências,
+incertezas, conflitos, inferências e proveniência, produzindo texto somente a
+partir da estrutura recebida, sem reinterpretar a frase original.
+
+Implementação opt-in em `core/resposta_estruturada.py`,
+`aplicacao/resposta_estruturada.py` e
+`aplicacao/modo_sombra.py`. Conclusões inferidas são identificadas como
+inferências, conflitos permanecem sem resolução automática, informação ausente
+é declarada sem invenção e o fallback legado registra explicitamente o motivo.
+
+Evidência reproduzível:
+
+- `python -m unittest -v testes.test_resposta_estruturada_fase_3_6` —
+  17 testes aprovados;
+- conjunto direcionado das Fases 3.1–3.6 — 98 testes aprovados;
+- suíte completa — 278 testes, 275 aprovados e somente as três falhas legadas
+  conhecidas de aprendizagem conversacional;
+- `python -m compileall -q .` — aprovado;
+- `PRAGMA integrity_check` e `PRAGMA foreign_key_check` — aprovados em
+  `linguagem.db` e nos bancos legados.
+
+Nenhum schema foi alterado, nenhuma inferência foi persistida como fato e o
+fluxo padrão `processar_frase()` permaneceu intacto.
+
+### FASE 3.7 — Testes, migração e desligamento controlado
+
+Status: gerador e preparação de lotes concluídos e validados; aplicação,
+migração e desligamento permanecem pendentes e não autorizados.
+
+O gerador definitivo de JSON foi implementado e validado em
+`aplicacao/gerador_json.py`. A preparação segura de lotes foi adicionada em
+`aplicacao/lotes_json.py`, com inventário explícito de fontes, diretórios
+determinísticos, manifesto, idempotência, proteção contra sobrescrita e
+validação opcional por `IngestaoJSON.dry_run()`. Nenhum lote real foi aplicado
+ou migrado. Permanecem pendentes, sem autorização nesta execução, aplicação,
+transação de produção e desligamento gradual do legado.
+
+Revalidação da cópia transferida em 2026-09-26:
+
+- 18 testes específicos do gerador definitivo aprovados;
+- 14 testes da ferramenta de teste do gerador aprovados;
+- conjunto direcionado das Fases 3.1–3.6 e dos dois geradores: 130 testes
+  aprovados;
+- `python -m compileall -q core aplicacao bancos testes` aprovado;
+- `integrity_check` aprovado e `foreign_key_check` sem violações nos seis
+  bancos;
+- hashes dos seis bancos inalterados antes e depois da validação.
+
+## ORDEM EXECUTÁVEL
+
+1. Manter o histórico das Partes 1 e 2 em `03_ULTIMOS_IMPLEMENTADOS.txt`.
+2. Transferir a Parte 3 para `02_IMPLEMENTAR_ AGORA.txt`.
+3. Validar primeiro o contrato comum e as fronteiras de segurança.
+4. Manter API, cadastro multifonte, JSON, inferência, modo sombra e resposta
+    estruturada validados. A primeira etapa da Fase 3.7 está validada, sem
+    autorização para geração massiva, aplicação de lotes, migração ou
+    desligamento controlado.
+
+Esta atualização mantém o planejamento alinhado à conclusão da primeira etapa
+da Fase 3.7. A geração massiva, aplicação, migração e desligamento do legado
+continuam fora desta etapa e não foram iniciados.

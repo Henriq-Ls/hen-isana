@@ -1,0 +1,228 @@
+# HEN-ISANA — REGISTRO DO TESTE PRELIMINAR DO GERADOR JSON
+
+Status: teste concluído
+Data: 2026-09-26
+Escopo: ferramenta de teste isolada; não é o gerador de produção
+
+Este documento registra a validação histórica de uma pequena ferramenta
+determinística preliminar. Ela existia somente em `testes/` e não foi conectada
+ao fluxo de produção. A implementação definitiva posterior está documentada em
+`docs/GERADOR_JSON_DEFINITIVO.txt` e usa `aplicacao/gerador_json.py`.
+
+Este registro não marca a Fase 3.7 inteira como concluída.
+
+
+1. ARQUITETURA DO TESTE
+=======================
+
+Arquivos criados:
+
+- `testes/gerador_json_teste.py`
+- `testes/test_gerador_json_futuro.py`
+- `docs/TESTE_GERADOR_JSON.txt`
+
+O módulo de teste:
+
+1. recebe somente uma descrição estruturada em Python;
+2. rejeita chaves desconhecidas e campos não permitidos para o tipo do objeto;
+3. ordena objetos, campos, evidências, relações e listas declarativas de forma
+   canônica;
+4. mantém referências por `objeto_id` e por chave lógica;
+5. chama `contrato_de_dict()` para que a fronteira real rejeite SQL, código e
+   referências físicas;
+6. devolve uma string JSON ou grava essa string em um arquivo temporário.
+
+O módulo não:
+
+- acessa o SQLite;
+- escolhe tabela, coluna, cursor ou conexão;
+- executa conteúdo de campos;
+- autoriza propostas;
+- aplica propostas;
+- chama Professor, ProfessorLlama, OpenRouter, Ollama ou API externa.
+
+O teste carrega os arquivos gerados com `IngestaoJSON.dry_run()`. Quando é
+necessário simular duplicidade ou conflito, usa banco temporário criado a
+partir do schema existente. Nenhum exemplo é aplicado.
+
+
+2. CASOS EXECUTADOS
+===================
+
+| Caso | Situação | Resultado |
+|------|----------|-----------|
+| A | cadastro simples | aceito pelo `dry_run` |
+| B | dois sentidos distintos | aceito; os dois sentidos são preservados |
+| C | relação semântica | aceito; a relação lógica é preservada |
+| D | evidência e proveniência | aceito; fonte, referência e confiança são preservadas |
+| E | proposta incompleta | pendente; não autorizável |
+| F | proposta com incerteza | aceito estruturalmente; incerteza e estado proposto são preservados |
+| G | referência lógica pendente | pendente; nenhum lexema é inventado |
+| H | repetição/idempotência/duplicidade | saída canônica idêntica; proposta em memória reutilizada; duplicidade relatada |
+| I | conflito com conhecimento existente | conflito relatado; encaminhamento para revisão |
+| J | campo físico/tabela/coluna | rejeitado pelo gerador |
+| K | SQL no JSON | rejeitado sem execução |
+| L | código executável no JSON | rejeitado sem execução |
+
+Resumo dos 12 casos:
+
+- aceitos pelo fluxo de validação: 6;
+- pendentes: 2;
+- com conflito: 1;
+- rejeitados corretamente: 3;
+- falhas inesperadas: 0.
+
+Além dos casos A–L, foi executado um teste de uniformidade com múltiplas
+evidências, múltiplos objetos, múltiplos sentidos, relações e referências
+lógicas. A mesma descrição produziu exatamente a mesma string JSON quando a
+ordem dos dados de entrada foi alterada.
+
+
+3. COMPATIBILIDADE COM O FLUXO REAL
+===================================
+
+Cada caso compatível foi:
+
+1. gerado como arquivo JSON temporário;
+2. carregado por `IngestaoJSON`;
+3. validado pelas estruturas reais;
+4. executado em `dry_run`;
+5. conferido quanto a erros, pendências, conflitos, duplicidades e referências.
+
+Não foi criado um validador paralelo para substituir
+`ContratoCadastro`, `ConhecimentoAPI` ou `IngestaoJSON`.
+
+Os casos incompleto e pendente continuam incompletos depois da geração. A
+ferramenta não preenche campos ausentes, não resolve referência desconhecida e
+não converte incerteza em confirmação.
+
+
+4. UNIFORMIDADE E IDEMPOTÊNCIA
+==============================
+
+Foi conferido que:
+
+- a ordem dos campos não altera o JSON canônico;
+- a ordem dos objetos não altera o JSON canônico;
+- a ordem das evidências não altera o JSON canônico;
+- a ordem das relações não altera o JSON canônico;
+- repetir a mesma entrada produz a mesma string;
+- múltiplos sentidos mantêm `objeto_id` e `chave` distintos;
+- relações continuam usando referências lógicas;
+- registrar duas vezes a mesma proposta idêntica reutiliza a proposta em memória;
+- uma identidade lógica já existente é relatada como duplicidade, sem
+  sobrescrita.
+
+
+5. SEGURANÇA VERIFICADA
+=======================
+
+Os testes confirmaram que:
+
+- JSON é carregado como dado por `json.loads`;
+- SQL não é executado;
+- Python não é executado;
+- conteúdo com `__import__` é rejeitado;
+- campo físico como `tabela_sqlite` é rejeitado como campo não suportado;
+- o JSON não escolhe tabela ou coluna física;
+- `dry_run` não grava no SQLite;
+- tentativa de `aplicar()` antes de autorização resulta em `PermissionError`;
+- nenhum banco real foi usado para geração, validação ou aplicação;
+- nenhum marcador de execução foi criado pelo caso de código malicioso.
+
+
+6. TESTES FINAIS
+================
+
+Comando de testes de contrato, Fases 3.1–3.3 e gerador:
+
+```text
+python -m unittest -q \
+  testes.test_contratos_parte_3 \
+  testes.test_api_conhecimento_fase_3_1 \
+  testes.test_cadastro_pacotes_fase_3_2 \
+  testes.test_ingestao_json_fase_3_3 \
+  testes.test_gerador_json_futuro
+```
+
+Resultado:
+
+```text
+69 testes executados
+69 aprovados
+0 falhas
+```
+
+O teste específico do gerador contém 14 testes.
+
+Também foi executado:
+
+```text
+python -m compileall -q core aplicacao bancos testes
+```
+
+Resultado:
+
+```text
+compileall=OK
+```
+
+Durante a suíte continuam aparecendo `ResourceWarning` legados sobre
+conexões SQLite não fechadas em caminhos existentes. Eles não causaram falha,
+não foram corrigidos nesta tarefa e não representam alteração do gerador.
+
+
+7. INTEGRIDADE DOS BANCOS
+=========================
+
+Foram executados `PRAGMA integrity_check` e `PRAGMA foreign_key_check` nos
+bancos atuais:
+
+- `aprendizado/bancos/conhecimento.db`
+- `aprendizado/bancos/indice_codigo.db`
+- `aprendizado/bancos/linguagem.db`
+- `aprendizado/bancos/log_mudancas.db`
+- `aprendizado/bancos/relacoes.db`
+- `data/diagnostico.db`
+
+Resultado para todos:
+
+```text
+integrity_check = ok
+foreign_key_check = nenhuma violação
+hash antes/depois = preservado
+```
+
+
+8. ARQUIVOS E LIMITES
+=====================
+
+Arquivos criados nesta tarefa:
+
+- `testes/gerador_json_teste.py`
+- `testes/test_gerador_json_futuro.py`
+- `docs/TESTE_GERADOR_JSON.txt`
+
+Arquivos existentes modificados:
+
+- nenhum.
+
+Os JSONs temporários dos testes foram criados fora do repositório e removidos
+ao final de cada teste. Os sete exemplos documentais existentes continuam
+somente como documentação.
+
+Esta execução não:
+
+- criou o gerador definitivo;
+- gerou lotes de conhecimento;
+- migrou dados;
+- desligou o legado;
+- alterou schema;
+- alterou `Professor` ou `ProfessorLlama`;
+- adicionou dependência externa;
+- executou a Fase 3.7.
+
+Conclusão: a ferramenta de teste produz JSON determinístico compatível com o
+contrato nos casos apropriados, preserva estados que exigem revisão e rejeita
+conteúdo físico, SQL ou executável sem execução. A execução termina nesta
+validação.

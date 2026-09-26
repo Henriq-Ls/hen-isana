@@ -1,0 +1,15 @@
+# HEN-ISANA — EXEMPLOS DOCUMENTAIS DO CONTRATO JSON
+
+Os sete arquivos desta pasta são exemplos mínimos do contrato real. Eles são
+somente documentação: não foram importados, registrados, autorizados,
+aplicados ou adicionados a qualquer banco.
+
+- `01_cadastro_simples.json` — lexema com evidência.
+- `02_multiplos_sentidos.json` — um lexema com dois sentidos distintos.
+- `03_relacao_semantica.json` — conceito relacionado a um sentido.
+- `04_evidencia.json` — conceito com evidência explicitamente associada.
+- `05_proposta_incompleta.json` — pacote registrável, mas não autorizável.
+- `06_proposta_com_incerteza.json` — incerteza preservada sem confirmação.
+- `07_referencia_pendente.json` — forma lexical sem lexema resolvido.
+
+O contrato completo está em `docs/CONTRATO_JSON_CONHECIMENTO.txt`.

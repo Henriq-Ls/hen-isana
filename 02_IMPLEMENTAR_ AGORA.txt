@@ -1,0 +1,315 @@
+# HEN-ISANA — IMPLEMENTAR AGORA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Atualizado em: 2026-09-26
+Parte ativa: PARTE 3 — CONHECIMENTO, CADASTRO MULTIFONTE, JSON E OPERAÇÃO
+Estado global: [FASE 3.7 — GERADOR E PREPARAÇÃO DE LOTES VALIDADOS; APLICAÇÃO,
+MIGRAÇÃO E DESLIGAMENTO PENDENTES]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+## CONTEXTO
+
+As Partes 1 e 2 estão concluídas e consolidadas em
+`03_ULTIMOS_IMPLEMENTADOS.txt`. As Fases 3.1, 3.2, 3.3, 3.4, 3.5 e 3.6 da
+Parte 3 estão concluídas. O gerador definitivo e a preparação segura de lotes
+da Fase 3.7 foram implementados e validados; nenhum lote real foi aplicado ou
+migrado. Aplicação, migração e desligamento do legado seguem pendentes e sem
+autorização.
+
+## DIREÇÃO ARQUITETURAL OBRIGATÓRIA
+
+O cadastro novo não deve usar uma lista universal de perguntas fixas. Três
+entradas devem convergir para um contrato estruturado comum:
+
+```text
+entrada manual
+      \
+JSON -----> contrato de cadastro -> validação -> API de conhecimento -> linguagem.db
+      /
+IA/professor
+```
+
+Regras:
+
+- o professor não escreve diretamente no SQLite;
+- o professor não escolhe tabela ou coluna física;
+- o mapeamento para `linguagem.db` fica no código Python/API de conhecimento;
+- o JSON é proposta/entrada estruturada, nunca código executável;
+- o sistema funciona sem IA;
+- IA, internet e professor são fontes de proposta, não aprovadores;
+- toda proposta preserva fonte, evidência, incerteza e estado de autorização;
+- informação fornecida, proposta e confirmada permanecem diferenciadas;
+- o mecanismo antigo só será removido depois de substituição testada;
+- não criar microfases para cada detalhe da arquitetura.
+
+Infraestrutura a preservar:
+
+- `professor/professor.py` — abstração, comunicação, histórico, cache e erros;
+- `professor/professor_llama.py` — adaptador local via Ollama.
+
+Papéis futuros do professor:
+
+1. **Respondente:** responde uma pergunta específica.
+2. **Estruturador:** propõe a estrutura necessária para cadastrar uma entrada,
+   sem inventar dados ausentes e registrando incertezas.
+
+O cadastro manual poderá ser uma entrevista dinâmica: identificar o objeto,
+consultar o que já existe, detectar lacunas, fazer a próxima pergunta
+necessária, validar a resposta, atualizar a proposta e pedir autorização antes
+da persistência. A coordenação permanece no HEN-ISANA.
+
+## REGRAS DE EXECUÇÃO
+
+- Primeiro validar o contrato comum e as fronteiras de segurança.
+- Não implementar automaticamente tudo que está descrito no planejamento.
+- Não alterar a Parte 2 apenas para introduzir esta arquitetura.
+- Não migrar dados nesta etapa.
+- Não permitir escrita direta de fontes externas no SQLite.
+- Não iniciar inferência, modo sombra ou desligamento do legado antes das
+  dependências anteriores.
+- Marcar `[x]` somente com implementação, teste, compilação e evidência.
+- Não criar relatórios individuais `FASE_*.txt`.
+
+Estados:
+
+- `[ ]` pendente;
+- `[PRONTO PARA IMPLEMENTAR]` dependências definidas;
+- `[EM EXECUÇÃO]` fase autorizada nesta rodada;
+- `[x] CONCLUÍDA` somente com evidência reproduzível;
+- `[BLOQUEADA — AGUARDA APROVAÇÃO]` não executar.
+
+===============================================================================
+## PARTE 3 — CONHECIMENTO, CADASTRO MULTIFONTE, JSON E OPERAÇÃO
+===============================================================================
+
+### FASE 3.1 — API E CONTRATO ESTRUTURADO DO CONHECIMENTO
+
+Status: [x] CONCLUÍDA — evidência reproduzível registrada no histórico consolidado.
+
+Definir o contrato comum para cadastro manual, JSON e IA/professor. A API deve
+consultar e registrar formas, lemas, sentidos, conceitos, expressões,
+proposições, argumentos, fatos, relações, fontes e evidências sem expor o
+schema físico aos adaptadores.
+
+Checklist:
+
+- [x] mapear entidades e relações do `linguagem.db` para contratos Python;
+- [x] separar proposta, revisão, autorização e persistência;
+- [x] preservar fonte, evidência, incerteza e idempotência;
+- [x] manter professor e adaptadores fora da escrita SQLite;
+- [x] testar sem alterar bancos legados;
+- [x] registrar evidência, limitações e rollback.
+
+Evidência da conclusão: `bancos/api_conhecimento.py`, a extensão do contrato
+em `core/contratos.py` e `testes/test_api_conhecimento_fase_3_1.py`. Os testes
+específicos executaram 26 casos aprovados; a suíte completa executou 206 casos,
+com 203 aprovados e 3 falhas legadas já conhecidas em aprendizagem
+conversacional. `compileall`, `integrity_check` e `foreign_key_check` foram
+aprovados. A API abre `linguagem.db` somente para leitura; propostas ficam em
+memória e `persistir()` permanece explicitamente fora da Fase 3.1.
+
+### FASE 3.2 — CADASTRO POR PACOTE E ENTREVISTA DINÂMICA
+
+Status: [x] CONCLUÍDA — evidência reproduzível registrada no histórico consolidado.
+
+Implementar entradas manual, por JSON e por professor convergindo para o mesmo
+contrato. A próxima pergunta deve depender do estado atual do cadastro, e não de
+uma lista fixa.
+
+Checklist:
+
+- [x] cadastro manual produz pacote estruturado;
+- [x] professor respondente e estruturador usam adaptadores separados;
+- [x] `Professor` e `ProfessorLlama` são preservados;
+- [x] pendências e lacunas geram perguntas necessárias;
+- [x] múltiplos sentidos não são forçados em uma única definição;
+- [x] fontes automáticas não aprovam a própria proposta;
+- [x] sessão de tutoria mantém coordenação no HEN-ISANA;
+- [x] testar sem persistência automática.
+
+Evidência da conclusão: `aplicacao/cadastro.py`, a detecção de conflitos
+adicionada à `bancos/api_conhecimento.py` e
+`testes/test_cadastro_pacotes_fase_3_2.py`. A suíte específica da 3.2 executou
+20 testes aprovados; com os testes da 3.1 e dos contratos, foram 46 testes
+aprovados. A suíte completa executou 226 testes, com 223 aprovados e exatamente
+as 3 falhas legadas já conhecidas em aprendizagem conversacional. `compileall`,
+`integrity_check`, `foreign_key_check` e a comparação SHA-256 foram aprovados.
+
+O pacote Python, o dicionário e o JSON convergem para `ContratoCadastro`. A
+entrada rejeita SQL, código executável e referências físicas; aceita propostas
+incompletas sem confirmá-las; preserva múltiplos sentidos, relações,
+proveniência e idempotência; e encaminha conflitos para revisão sem sobrescrita.
+A persistência continua explicitamente fora desta fase.
+
+### FASE 3.3 — INGESTÃO CONTROLADA DE JSON
+
+Status: [x] CONCLUÍDA — evidência reproduzível registrada no histórico consolidado.
+
+Implementar leitor, validação estrutural e semântica, duplicidade, referências,
+dry-run, relatório, aplicação transacional, auditoria e rollback.
+
+Checklist:
+
+- [x] rejeitar campos fora do contrato;
+- [x] rejeitar tipos inválidos e estruturas incompatíveis;
+- [x] separar JSON de proposta do schema físico;
+- [x] validar proveniência, evidência e autorização;
+- [x] impedir execução de JSON como código;
+- [x] testar aplicação, rejeição atômica, auditoria e rollback.
+
+Evidência da conclusão: `bancos/ingestao_json.py`,
+`bancos/persistencia_conhecimento.py` e
+`testes/test_ingestao_json_fase_3_3.py`. Os testes específicos da 3.3
+executaram 9 casos aprovados. O conjunto das 3.1, contratos, 3.2 e 3.3
+executou 55 casos aprovados. A suíte completa executou 235 testes, com 232
+aprovados e as mesmas 3 falhas legadas de aprendizagem conversacional.
+`compileall`, validação do schema real, `integrity_check` e
+`foreign_key_check` foram aprovados.
+
+Os três problemas encontrados no histórico foram reproduzidos e cobertos:
+chaves textuais em relações embutidas são resolvidas logicamente; revisão sem
+autorização continua bloqueada com `PermissionError`; e relação com evidência
+própria preserva a contagem física esperada. A aplicação direta da camada
+transacional sem o token interno emitido pela API também é rejeitada sem
+escrita.
+
+A suíte legada escreve registros de diagnóstico durante a execução. Esses
+registros foram removidos após a validação, sem alterar os demais bancos
+legados; o banco `aprendizado/bancos/linguagem.db` permaneceu vazio e íntegro.
+
+### FASE 3.4 — INFERÊNCIA SIMBÓLICA
+
+Status: [x] CONCLUÍDA — evidência reproduzível registrada no histórico consolidado.
+
+Aplicar somente regras explícitas, preservando premissas, conclusões, conflitos,
+proveniência e incerteza. Candidato, hipótese ou ausência de prova não vira
+fato automaticamente.
+
+Implementação: `core/inferencia_simbolica.py`.
+
+- [x] representar literal, polaridade, afirmação, regra, inferência e conflito;
+- [x] derivar somente com regras determinísticas explicitamente registradas;
+- [x] bloquear premissa ausente ou negativa;
+- [x] propagar incerteza sem convertê-la em confirmação;
+- [x] permitir encadeamento somente quando cada etapa estiver sustentada;
+- [x] preservar premissas, regra, evidências e proveniência da conclusão;
+- [x] registrar conflitos sem resolução automática;
+- [x] manter execução idempotente e sem escrita no SQLite;
+- [x] cobrir erro sem resultado parcial e conteúdo textual tratado apenas como dado.
+
+Evidência da conclusão: `testes/test_inferencia_simbolica_fase_3_4.py`
+executou 14 testes específicos aprovados. O conjunto das Fases 3.1, contratos,
+3.2, 3.3 e 3.4 executou 69 testes aprovados. A suíte completa executou 249
+testes, com 246 aprovados e as mesmas 3 falhas legadas de aprendizagem
+conversacional. `compileall`, `integrity_check` e `foreign_key_check` foram
+aprovados.
+
+Decisão arquitetural: o schema atual não tem uma representação suficiente para
+regra, premissas, cadeia de derivação e conflito. A 3.4 permanece em memória e
+não persiste conclusões derivadas como fatos; uma representação persistente
+exigirá decisão estrutural própria em fase futura.
+
+### FASE 3.5 — MODO SOMBRA E INTEGRAÇÃO GRADUAL
+
+Status: [x] CONCLUÍDA — evidência reproduzível registrada no histórico consolidado.
+
+Comparar o novo fluxo com o legado, ativar por construção e manter fallback.
+Nenhuma fonte nova escreve diretamente no fluxo legado.
+
+Implementação: `aplicacao/modo_sombra.py`.
+
+- [x] executar o analisador simbólico novo sem substituir o fluxo legado;
+- [x] adaptar o tokenizador legado para uma representação lexical comum;
+- [x] registrar entrada, resultados, representações, diferenças, origem e status;
+- [x] manter fallback explícito para falha, ausência de suporte, incompletude e
+  ambiguidade;
+- [x] manter histórico em memória, determinístico e idempotente;
+- [x] preservar a lista de respostas e o comportamento do legado;
+- [x] não alterar schema, bancos, `Professor` ou `ProfessorLlama`;
+- [x] validar equivalência, divergência, falhas, fallback, idempotência e
+  ausência de escrita.
+
+O adaptador concreto é opt-in por `processar_frase_em_modo_sombra()` e compara
+somente a fronteira lexical/simbólica disponível nesta fase. A comparação de
+respostas estruturadas fica explicitamente para a Fase 3.6.
+
+Evidência: `testes/test_modo_sombra_fase_3_5.py` executou 12 testes aprovados; o
+conjunto direcionado das Fases 3.1–3.5 executou 81 testes aprovados. A suíte
+completa executou 261 testes, com 258 aprovados e as mesmas 3 falhas legadas de
+aprendizagem conversacional. `compileall`, `integrity_check` e
+`foreign_key_check` foram aprovados. O banco de diagnóstico foi restaurado ao
+estado lógico anterior à suíte.
+
+### FASE 3.6 — RESPOSTA BASEADA EM ESTRUTURA
+
+Status: [x] CONCLUÍDA — evidência reproduzível registrada nesta execução.
+
+Receber plano, intenção, proposições, resultados, evidências e incertezas sem
+reinterpretar a frase original.
+
+Implementação:
+
+- [x] `core/resposta_estruturada.py` recebe `PlanoResposta` e renderiza somente
+  os elementos estruturados, preservando intenção, plano, proposições,
+  resultados, evidências, incertezas, conflitos, inferências, proveniência e
+  origem da regra;
+- [x] conclusões inferidas são marcadas como inferidas e não são apresentadas
+  como fatos fornecidos;
+- [x] conflitos são preservados sem escolha automática de um lado;
+- [x] ausência de informação é declarada sem invenção;
+- [x] conteúdo textual é tratado somente como dado;
+- [x] `aplicacao/resposta_estruturada.py` usa a resposta nova somente quando ela
+  é válida e registra fallback explícito para estrutura incompleta ou falha;
+- [x] `aplicacao/modo_sombra.py` fornece o adaptador opt-in sem alterar
+  `processar_frase()` nem o contrato de `processar_frase_em_modo_sombra()`;
+- [x] nenhum schema, banco legado ou persistência de inferência foi alterado.
+
+Evidência:
+
+- `testes.test_resposta_estruturada_fase_3_6` — 17 testes aprovados;
+- conjunto direcionado das Fases 3.1–3.6 — 98 testes aprovados;
+- suíte completa — 278 testes, 275 aprovados e exatamente estas três falhas
+  legadas já conhecidas:
+  `test_aprende_um_termo_e_depois_responde_sem_repetir_perguntas`,
+  `test_aprendizagem_adaptativa_nao_exige_categoria` e
+  `test_expressoes_de_conversa_sao_aprendidas_como_unidade`;
+- `python -m compileall -q .` — aprovado;
+- `PRAGMA integrity_check` e `PRAGMA foreign_key_check` — aprovados;
+- bancos restaurados após a suíte: somente `data/diagnostico.db` sofreu efeito
+  temporário dos testes; `linguagem.db` e os bancos legados permaneceram
+  preservados.
+
+### FASE 3.7 — TESTES, MIGRAÇÃO E DESLIGAMENTO CONTROLADO
+
+Status: [PARCIAL — GERADOR E PREPARAÇÃO DE LOTES CONCLUÍDOS; APLICAÇÃO,
+MIGRAÇÃO E DESLIGAMENTO PENDENTES]
+
+O gerador definitivo de JSON foi implementado e validado em
+`aplicacao/gerador_json.py`, e a preparação segura de lotes foi implementada
+em `aplicacao/lotes_json.py`. A ferramenta não lê bancos legados nem cria
+conhecimento automaticamente a partir de configuração, código ou snapshots.
+Nenhum lote real foi aplicado ou migrado. Permanecem pendentes, sem autorização
+nesta execução, aplicação, migração, transação de produção e desligamento
+gradual do legado.
+
+Revalidação da cópia transferida:
+
+- `testes.test_gerador_json`: 18 testes aprovados;
+- `testes.test_gerador_json_futuro`: 14 testes aprovados;
+- `testes.test_lotes_json_fase_3_7`: 9 testes aprovados;
+- conjunto direcionado das Fases 3.1–3.6 e da Fase 3.7: 130 testes aprovados;
+- `python -m compileall -q core aplicacao bancos testes`: aprovado;
+- seis bancos com `integrity_check=ok` e zero violações de chave estrangeira;
+- hashes dos seis bancos inalterados antes/depois.
+
+## ORDEM DA EXECUÇÃO FUTURA
+
+1. Manter a API e o contrato das Fases 3.1 e 3.2 validados.
+2. Manter a ingestão JSON controlada validada.
+3. Manter o modo sombra, a resposta estruturada e a preparação de lotes
+   validados.
+4. Executar separadamente a aplicação revisada de lotes, a migração e o
+   desligamento controlado, cada qual com autorização e evidência próprias.
+
+Esta atualização registra a conclusão do gerador e da preparação técnica de
+lotes da Fase 3.7. A Fase 3.7 como um todo continua pendente, e aplicação,
+migração ou desligamento não foram executados nem autorizados.

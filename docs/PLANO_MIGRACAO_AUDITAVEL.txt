@@ -1,0 +1,341 @@
+# HEN-ISANA — PLANO TÉCNICO DE MIGRAÇÃO AUDITÁVEL
+
+Status: somente planejamento
+Data: 2026-09-26
+Escopo desta execução: mapear o legado e definir o procedimento futuro.
+
+**Nenhum dado será migrado, copiado, aplicado, atualizado ou apagado nesta
+etapa.** Este documento não autoriza a execução futura. Uma execução posterior
+precisará de autorização própria, manifesto aprovado e validação reproduzível.
+
+O inventário factual que fundamenta este plano está em
+`docs/INVENTARIO_LEGADO_2026-09-26.txt`.
+
+## 1. OBJETIVOS E NÃO OBJETIVOS
+
+### Objetivos
+
+- preservar os bancos legados como fonte imutável durante o processo;
+- produzir uma classificação completa: candidato, pendente, conflitante,
+  rejeitado ou excluído;
+- transformar somente dados semanticamente mapeados em propostas
+  `ContratoCadastro`;
+- preservar proveniência, evidências, incertezas, perdas e decisões;
+- executar dry-run antes de qualquer aplicação;
+- permitir auditoria, idempotência, rollback e validação pós-migração.
+
+### Não objetivos
+
+- não migrar automaticamente todos os textos preenchidos;
+- não interpretar `tipo` livre como categoria canônica sem tabela de mapeamento;
+- não transformar `estado = confirmada` do legado em aprovação do destino;
+- não converter respostas padrão em fatos;
+- não inferir direção, ordem ou tipo semântico ausente nas relações;
+- não importar IDs físicos como IDs do banco novo;
+- não desligar ou alterar o legado;
+- não alterar `Professor`, `ProfessorLlama`, schema ou fluxo de conversa.
+
+## 2. FONTES E POLÍTICA DE INCLUSÃO
+
+| Fonte | Política futura |
+|---|---|
+| `conhecimento.db.conhecimento` | analisar linha a linha; só gerar proposta quando o mapeamento estiver completo |
+| `conhecimento.db.evidencias_conhecimento` | usar como proveniência candidata; conservar `id`, campo, origem, estado e data no manifesto/ledger |
+| `conhecimento.db.fatos_conhecimento` | atualmente vazio; qualquer linha futura exige fluxo separado de proposição e fato |
+| `conhecimento.db.evidencias_fatos` | atualmente vazio; só acompanhar fatos aprovados em etapa própria |
+| `relacoes.db.relacoes` | analisar como candidatos de relação; nunca importar somente por ter IDs válidos |
+| `indice_codigo.db` | excluído: índice de código |
+| `log_mudancas.db` | excluído: histórico operacional |
+| `data/diagnostico.db` | excluído: diagnóstico operacional |
+| `linguagem.db` | destino; nunca fonte da migração |
+
+O plano não usa snapshots, código, testes, documentação, configuração
+linguística ou fontes externas como fonte de conhecimento.
+
+## 3. CORRESPONDÊNCIA PROPOSTA
+
+A correspondência é lógica e deve ser materializada primeiro como lote JSON
+não aplicado. O mapeamento físico continua sob responsabilidade da API e de
+`bancos/persistencia_conhecimento.py`.
+
+| Campo legado | Candidato lógico | Decisão/limite |
+|---|---|---|
+| `conhecimento.id` | origem do `objeto_id` e da idempotência | preservar como referência de auditoria, nunca como ID físico do destino |
+| `termo` / `termo_original` | `lexema`, `expressao` ou `forma_lexical` | classificação exige regra aprovada; não decidir somente por espaço ou comprimento |
+| `termo_chave` | chave normalizada candidata | recalcular com o normalizador atual e comparar; divergência vira pendência |
+| `tipo` | `categoria_lexical`, `tipo` de expressão ou tipo de conceito | valores livres do legado não correspondem diretamente às enumerações atuais |
+| `significado` | campo `definicao` de `sentido` | só depois de resolver o lexema e distinguir sentidos; não criar fato |
+| `contexto_uso` | `sentido.contexto_uso` | pode ser preservado como proposta; contextos diferentes não devem ser unidos |
+| `exemplo_uso` | campo candidato e evidência associada | preservar o texto e a ligação ao registro de origem |
+| `resposta_padrao` | nenhum destino atual | não descartar silenciosamente; manter como campo não migrado no relatório/ledger |
+| `relacionados` | candidatos de relação | texto separado por vírgulas não é referência resolvida; cada item exige correspondência explícita |
+| `evidencias_conhecimento` | `fontes` + `evidencias` | exige alvo lógico resolvido; `campo` não existe fisicamente em `evidencias`, então o ledger é obrigatório |
+| `relacoes.termo_id` e `termo_relacionado_id` | relação semântica ou componente de expressão | IDs são apenas pontes legadas; tipo e direção precisam ser determinados |
+| `relacoes.tipo` | tipo lógico futuro | `componente_de_expressao` não informa ordem; `relacionado_no_tema` não informa tipos semânticos |
+| `criado_em` | metadado de proveniência | preservar no ledger; o contrato atual não deve receber data inventada em outro campo |
+
+### 3.1 Casos com candidato provável, mas não automático
+
+Um registro de palavra isolada pode eventualmente gerar um `lexema` e um
+`sentido`. Um registro composto pode eventualmente gerar uma `expressao` e
+componentes. Porém, a relação entre expressão, sentido e lexema não é
+determinada apenas pelos campos atuais. Cada caso deverá passar por uma regra
+de classificação e revisão.
+
+Os tipos observados, como `saudação coletiva`, `saudação interrogativa` e
+`substantivo em expressão de saudação`, são descrições livres. Eles não devem
+ser convertidos silenciosamente para `tipo_predicado`, `tipo` de expressão ou
+`categoria_lexical`.
+
+### 3.2 Proveniência e estado
+
+O legado registra `origem = curadoria_assistente` e `estado = confirmada`.
+Esses valores não têm correspondência direta completa em
+`EvidenciaCadastro`:
+
+- `fonte_tipo = legado` identifica o banco de origem;
+- o identificador deve incluir banco, tabela e registro;
+- a origem textual `curadoria_assistente` deve ser preservada literalmente no
+  ledger e na referência da proposta;
+- não usar `aprovado` no destino sem revisão independente;
+- se a origem não puder ser representada sem ambiguidade, a proposta fica
+  `pendente`, não é adaptada por conveniência.
+
+O estado de um campo migrado deve começar como `proposta` ou `inferida` somente
+quando a regra aprovada justificar inferência. O dado legado não ganha estado
+`confirmada` por herança.
+
+## 4. CONFLITOS, DUPLICIDADES E PERDAS
+
+### Conflitos a detectar
+
+1. **Identidade:** mesma chave normalizada, termo original diferente ou
+   contextos incompatíveis.
+2. **Conteúdo:** mesmo candidato com significados, tipos ou contextos
+   diferentes.
+3. **Classificação:** tipo legado sem entrada na tabela de mapeamento aprovada.
+4. **Referência:** `relacionados` sem alvo único ou relação com endpoint sem
+   objeto lógico resolvido.
+5. **Relação:** necessidade de direção ou ordem que não está no legado.
+6. **Proveniência:** evidência com origem/estado que não pode ser representada
+   sem alterar seu significado.
+7. **Destino:** colisão com registro já existente em `linguagem.db` ou com
+   proposta anterior de outra fonte.
+8. **Idempotência:** mesma chave de migração associada a bytes ou conteúdo
+   diferente.
+
+### Duplicidades
+
+O inventário atual não encontrou duplicatas em `termo` ou `termo_chave`,
+duplicatas de relação, auto-relações ou pontas órfãs. Isso não elimina
+duplicidades semânticas: `termo_chave` igual em futuras fontes, sentidos
+equivalentes ou expressões compostas podem exigir revisão.
+
+As relações atuais são armazenadas nos dois sentidos. Os 66 registros formam
+33 pares não direcionados. Eles não devem ser duplicados no destino sem uma
+decisão explícita sobre `direcao = simetrica`.
+
+### Perdas de informação
+
+O relatório futuro deve contabilizar, por registro:
+
+- campos sem destino atual, especialmente `resposta_padrao`;
+- `campo` e `criado_em` das evidências se não houver ledger;
+- origem textual não representável pelo contrato;
+- ordem de componentes ausente;
+- direção e tipos semânticos ausentes;
+- valores de `relacionados` não resolvidos;
+- distinções entre termo, forma, expressão e sentido que o legado não
+  explicita.
+
+Nenhum desses itens pode desaparecer apenas para aumentar a contagem de
+aceitos. O estado recomendado é `pendente` ou `excluído_com_motivo`.
+
+## 5. IDENTIDADE E IDEMPOTÊNCIA
+
+Cada candidato futuro deve receber uma identidade determinística baseada em:
+
+```text
+legado:<hash-do-banco>:<tabela>:<chave-primária>:<versao-da-regra>
+```
+
+Para relações, incluir as duas chaves, o tipo legado e a versão da regra. O
+`idempotencia` do pacote deve incluir a mesma identidade lógica. O lote deve
+ser gravado usando `LotesJSONConhecimento`, que já protege uma versão contra
+sobrescrita diferente.
+
+Uma mudança na regra de classificação ou no mapeamento exige nova versão do
+lote. Não editar o manifesto anterior para esconder uma divergência.
+
+## 6. PROCEDIMENTO FUTURO REPRODUZÍVEL
+
+### Etapa 0 — autorização e congelamento lógico
+
+Fora desta execução, registrar a autorização, a versão do plano, o hash dos
+bancos e a versão do schema/contrato. Se qualquer hash mudar durante o
+processo, interromper e gerar novo inventário.
+
+### Etapa 1 — inventário somente leitura
+
+Abrir cada origem com `mode=ro` e produzir um manifesto com:
+
+- arquivo, SHA-256, tamanho e `user_version`;
+- tabelas, colunas, contagens e constraints;
+- contagens de nulos, duplicidades e órfãos;
+- distribuição de tipos, estados, origens e relações;
+- cobertura: cada registro classificado exatamente uma vez.
+
+Não usar as classes `ConhecimentoDB` ou `RelacoesDB` para esta etapa se elas
+criarem tabelas ou fizerem `commit` na inicialização. O leitor futuro deve usar
+SQLite somente leitura.
+
+### Etapa 2 — tabela de mapeamento aprovada
+
+Antes de gerar propostas, manter uma tabela versionada contendo, no mínimo:
+
+```text
+regra_id, versao, origem, campo_origem, tipo_destino,
+normalizacao, tratamento_de_nulo, perda_esperada,
+criterio_de_conflito, revisao_obrigatoria
+```
+
+Nenhum tipo livre do legado pode ser aceito sem uma entrada dessa tabela.
+
+### Etapa 3 — geração de propostas
+
+Gerar JSON em lotes separados por fonte e assunto, usando
+`GeradorJSONConhecimento` e `LotesJSONConhecimento`. Cada proposta deve:
+
+- conter somente objetos lógicos do `ContratoCadastro`;
+- apontar para evidências e referências lógicas;
+- registrar incertezas, pendências e perdas;
+- manter a linha de origem no manifesto/ledger;
+- usar `fonte_tipo = legado` sem declarar aprovação automática;
+- nunca conter SQL, tabela, coluna, cursor, conexão ou ID físico como
+  instrução.
+
+Registros sem mapeamento completo entram no relatório como pendentes ou
+rejeitados e não são forçados para um tipo novo.
+
+### Etapa 4 — dry-run em destino isolado
+
+Validar cada JSON por:
+
+1. `contrato_de_json()` / `contrato_de_dict()`;
+2. regras reais de `ConhecimentoAPI.validar()`;
+3. `IngestaoJSON.dry_run()`;
+4. resolução de referências lógicas;
+5. detecção de duplicidades e conflitos contra o estado do destino de teste.
+
+O dry-run deve produzir relatório sem chamar `registrar`, `autorizar`,
+`aplicar` ou qualquer escrita. O banco canônico real não deve ser usado como
+ambiente de teste.
+
+### Etapa 5 — relatório de decisão
+
+O relatório determinístico deve conter, por origem e por lote:
+
+```text
+total_lido
+aceitos_para_revisao
+pendentes
+conflitos
+rejeitados
+excluidos_com_motivo
+objetos_por_tipo
+evidencias
+relacoes
+perdas_de_informacao
+duplicidades
+hashes
+```
+
+Também deve listar cada registro fonte sem amostragem: status, motivo,
+proposta, regra usada, evidências, destino lógico e decisão de revisão.
+
+### Etapa 6 — revisão e autorização
+
+Somente após o relatório:
+
+- um revisor resolve pendências e conflitos;
+- um autorizador diferente da fonte aprova os pacotes;
+- propostas automáticas não aprovam a si próprias;
+- nenhum lote com perda não aceita, referência desconhecida ou ambiguidade
+  fica autorizável;
+- o manifesto aprovado é imutável.
+
+### Etapa 7 — aplicação controlada futura
+
+Aplicar somente propostas autorizadas através de `IngestaoJSON.aplicar()` e
+da transação existente. Não escrever diretamente por adaptador de migração.
+Aplicar em lotes pequenos, registrar a auditoria retornada e manter o legado
+intocado e consultável.
+
+## 7. ROLLBACK
+
+Antes de uma futura aplicação, registrar:
+
+- hash do destino antes da etapa;
+- manifesto e hashes dos lotes autorizados;
+- relatório de dry-run;
+- checkpoint/backup controlado do destino, criado somente na execução
+  autorizada;
+- correspondência entre cada proposta e os registros físicos criados ou
+  reutilizados.
+
+Cada lote deve ser uma transação atômica: falha em qualquer objeto, relação,
+evidência ou constraint produz rollback do lote inteiro. Se a validação pós-lote
+falhar, interromper os lotes seguintes e restaurar o checkpoint do destino de
+acordo com a autorização de rollback.
+
+Rollback não deve apagar, atualizar ou restaurar os bancos legados. Eles são
+referência preservada e devem continuar com os hashes do manifesto de origem.
+
+## 8. VALIDAÇÃO PÓS-MIGRAÇÃO
+
+Após cada lote e ao final, verificar:
+
+1. `PRAGMA integrity_check = ok`;
+2. zero resultados em `PRAGMA foreign_key_check`;
+3. hash do legado igual ao manifesto de origem;
+4. ausência de objetos órfãos, referências sem resolução ou evidências sem
+   alvo;
+5. unicidade do destino por chave lógica;
+6. contagem de candidatos aceitos igual ao relatório de aplicação, separando
+   objetos novos de registros reutilizados;
+7. cobertura completa do ledger: aceito, pendente, conflito, rejeitado ou
+   excluído, sem fonte sem decisão;
+8. repetição do dry-run sem mudança de classificação;
+9. reexecução do mesmo lote sem duplicar registros;
+10. preservação explícita dos campos sem destino, sem perda silenciosa.
+
+O sucesso não significa que todos os registros foram migrados. Significa que
+cada registro foi decidido, cada perda foi declarada e o destino permanece
+íntegro e auditável.
+
+## 9. CRITÉRIOS DE APROVAÇÃO DA FUTURA MIGRAÇÃO
+
+A migração só poderá sair do dry-run quando todos os itens forem verdadeiros:
+
+- [ ] inventário aprovado e hashes estáveis;
+- [ ] tabela de correspondências versionada e revisada;
+- [ ] todos os conflitos classificados;
+- [ ] todas as perdas aceitas explicitamente ou mantidas como pendência;
+- [ ] propostas válidas pelo contrato real;
+- [ ] `IngestaoJSON.dry_run()` sem erros não tratados;
+- [ ] nenhum pacote ambíguo ou com referência desconhecida autorizado;
+- [ ] relatório completo e imutável disponível;
+- [ ] rollback testado em ambiente isolado;
+- [ ] validação pós-migração definida e reproduzível;
+- [ ] autorização específica para escrever somente no destino;
+- [ ] legado preservado e sem desligamento.
+
+## 10. ARQUIVOS E ESTADO DESTA EXECUÇÃO
+
+Criados somente documentos:
+
+- `docs/INVENTARIO_LEGADO_2026-09-26.txt`;
+- `docs/PLANO_MIGRACAO_AUDITAVEL.txt`.
+
+Nenhum código de migração foi executado ou criado. Nenhum banco foi copiado,
+alterado ou migrado. O plano termina aqui até nova autorização explícita.

@@ -1,0 +1,836 @@
+HEN-ISANA — FUTURO NEURAL E ARQUITETURA COGNITIVA CONTROLADA
+=============================================================
+
+STATUS DESTE DOCUMENTO
+----------------------
+
+Este arquivo substitui o antigo roteiro de integração neural/NLU. O nome
+“Futuro Neural” é histórico: ele não significa que a Isana precise usar uma
+rede neural, machine learning ou um modelo de linguagem. O conteúdo abaixo é
+um registro de direção arquitetural futura, não uma autorização de
+implementação.
+
+A Fase 4 e as etapas dependentes continuam congeladas. Nada neste documento
+deve ser interpretado como trabalho ativo, mudança aprovada, capacidade
+existente ou promessa de que a Isana possui consciência, cérebro, compreensão
+geral ou evolução autônoma.
+
+O projeto atual continua sendo:
+
+- local e escrito em Python padrão;
+- predominantemente determinístico na conversa local;
+- baseado em regras, contratos, SQLite e fluxos explícitos;
+- separado entre conversa somente leitura e aprendizagem autorizada;
+- sem machine learning ou redes neurais nesta fase;
+- sem transformação automática de conhecimento em código;
+- sem carregamento automático de módulos gerados;
+- sem aprendizagem automática durante a conversa normal.
+
+Este documento registra o que poderá ser pesquisado, projetado e eventualmente
+implementado no futuro, sempre depois de decisão humana, testes e revisão de
+segurança.
+
+
+1. CONCLUSÃO ARQUITETURAL
+-------------------------
+
+A analogia com o cérebro pode ser útil somente como uma analogia funcional.
+Ela ajuda a perguntar:
+
+- o que está sendo recebido agora;
+- o que está sendo usado neste turno;
+- o que é conhecimento persistente;
+- o que foi uma experiência anterior;
+- como uma resposta foi escolhida;
+- se o resultado foi avaliado;
+- se existe uma proposta de mudança;
+- como uma mudança seria revisada e autorizada.
+
+Ela não autoriza afirmar que:
+
+- uma função é um neurônio;
+- uma relação SQLite é uma sinapse;
+- um import entre módulos é uma conexão cerebral;
+- um log operacional é uma lembrança;
+- uma consulta é uma lembrança recuperada no sentido humano;
+- a geração de código é evolução;
+- a validação AST é um sandbox completo;
+- a Isana tem consciência, intenção própria ou experiência subjetiva.
+
+VEREDITO:
+
+1. A arquitetura atual presta para um sistema simbólico determinístico.
+2. A separação entre contexto, conhecimento, propostas e código protegido é
+   uma base correta para evoluir com segurança.
+3. O projeto ainda não é uma arquitetura cognitiva completa porque não possui
+   estado integrado do turno, experiência episódica estruturada, avaliação de
+   resultados ou desenvolvimento controlado de capacidades.
+4. Essas lacunas não devem ser preenchidas criando pastas com nomes biológicos.
+5. A primeira melhoria deve organizar os contratos e o ciclo do turno, não
+   introduzir rede neural ou autoevolução.
+
+
+2. BASE EXTERNA DA PESQUISA
+---------------------------
+
+As seguintes fontes foram consultadas para comparar a Isana com conceitos
+existentes de arquiteturas cognitivas. Elas servem como referência de projeto,
+não como especificação que precise ser copiada.
+
+2.1 ACT-R — Carnegie Mellon
+
+Fonte:
+https://act-r.psy.cmu.edu/about/
+
+ACT-R descreve uma arquitetura cognitiva com módulos, buffers, correspondência
+de padrões, memória declarativa e memória procedural. A arquitetura é usada
+para construir modelos testáveis de tarefas, comparando medidas como tempo e
+precisão.
+
+O que pode ser aproveitado:
+
+- distinguir conhecimento declarativo de conhecimento procedural;
+- tratar o estado atual como informação de trabalho, e não como banco
+  persistente;
+- exigir que qualquer afirmação sobre “cognição” resulte em comportamento
+  observável e testável;
+- pensar em módulos com responsabilidades e interfaces, em vez de um único
+  bloco chamado cérebro.
+
+O que não deve ser copiado automaticamente:
+
+- os mecanismos subsimbólicos e equações do ACT-R;
+- sua hipótese de modelar a cognição humana;
+- nomes biológicos ou quantitativos sem utilidade para o código local.
+
+2.2 SOAR
+
+Fontes:
+
+https://soar.eecs.umich.edu/soar_manual/02_TheSoarArchitecture
+https://soar.eecs.umich.edu/soar_manual/04_ProceduralKnowledgeLearning
+https://soar.eecs.umich.edu/soar_manual/06_SemanticMemory
+https://soar.eecs.umich.edu/soar_manual/07_EpisodicMemory
+
+Soar separa memória de trabalho, memória semântica, memória episódica e
+conhecimento procedural. Também possui mecanismos de aprendizagem procedural,
+mas eles são mecanismos próprios da arquitetura e não devem ser confundidos
+com o que a Isana já faz.
+
+O que pode ser aproveitado:
+
+- a distinção explícita entre “o que sei”, “o que está ativo agora”, “o que
+  aconteceu” e “como executo uma ação”;
+- a ideia de que uma experiência pode gerar uma proposta de procedimento,
+  mas isso precisa de um ciclo próprio;
+- a separação entre memória semântica e memória episódica;
+- a existência de estados e subproblemas que podem ser resolvidos sem
+  misturar todos os dados no mesmo banco.
+
+O que não deve ser copiado automaticamente:
+
+- chunking, reinforcement learning ou outros mecanismos de aprendizagem;
+- um ciclo de decisão diferente do ciclo determinístico atual;
+- qualquer ativação automática de código gerado;
+- a afirmação de que registrar uma experiência já significa aprender.
+
+2.3 MEMÓRIA EPISÓDICA E SEMÂNTICA
+
+Fonte:
+https://pubmed.ncbi.nlm.nih.gov/31672430/
+
+A distinção clássica de Tulving separa conhecimento semântico de acontecimentos
+episódicos. A literatura posterior também mostra que essa separação não é uma
+divisão absoluta e que as fronteiras podem se sobrepor.
+
+Para a Isana, a distinção continua útil como separação de responsabilidades:
+
+- semântica: conceitos, significados, fatos, exemplos, relações e evidências;
+- episódica: um evento situado, com entrada, contexto, decisão, resposta,
+  resultado e consequência;
+- contexto de trabalho: dados temporários usados no turno atual.
+
+Isso é uma decisão de modelagem de software, não uma afirmação de que os
+bancos da Isana reproduzem o cérebro humano.
+
+2.4 GLOBAL WORKSPACE
+
+Fonte:
+https://academic.oup.com/nc/article/2023/1/niad020/7272926
+
+A ideia de Global Workspace é útil como metáfora funcional para informações
+relevantes que são selecionadas e disponibilizadas a vários processos. Não é
+necessário criar um módulo chamado consciência, nem afirmar que exista um
+“teatro interno”.
+
+Na Isana, o equivalente mínimo seria um estado confiável do turno contendo
+entrada, interpretação, foco, recuperação, evidências, decisão, resposta e
+incertezas. Esse estado deve ser limitado, explícito e testável.
+
+2.5 PESQUISA SOBRE ARQUITETURAS COGNITIVAS
+
+Fonte:
+https://arxiv.org/html/1610.08602
+
+As pesquisas sobre arquiteturas cognitivas não convergem para uma única
+estrutura universal. Os trabalhos diferem em objetivo, representação,
+modularidade, memória, aprendizagem e avaliação. Portanto, a Isana deve
+adotar somente mecanismos necessários para seus comportamentos verificáveis,
+sem declarar que implementa uma arquitetura cognitiva humana completa.
+
+
+3. MAPA FUNCIONAL DA ISANA
+--------------------------
+
+Os nomes abaixo são conceitos funcionais. Eles não exigem renomear pastas
+existentes e não autorizam criar módulos apenas para acompanhar uma metáfora.
+
+CONCEITO FUNCIONAL       COMPONENTE ATUAL                  STATUS
+-----------------------  --------------------------------  -------------------
+Entrada                  terminal/sessões                  existente
+Normalização             core/normalizador.py              existente
+Interpretação            core/interpretacao.py              parcial e delimitada
+Roteamento               core/roteador.py                  existente
+Contexto de trabalho     core/contexto_conversa.py         existente e curto
+Memória semântica        bancos/conhecimento.py             existente
+Relações conceituais     bancos/relacoes.py                 existente
+Recuperação              ferramentas/busca.py               existente, lexical
+Composição               core/composicao_resposta.py        existente
+Decisão operacional      aplicacao/fluxo.py                 parcialmente explícita
+Resposta                 sessões/composição                 existente
+Evidências               conhecimento/evidências             existente
+Propostas de conteúdo    bancos/propostas_aprendizagem.py   existente
+Procedimentos fixos      regras e módulos Python             existente
+Memória episódica        nenhum registro estruturado         ausente
+Avaliação de resultado   nenhum ciclo sistemático            ausente
+Proposta de capacidade   nenhum registro separado             ausente
+Ativação de capacidade   nenhum carregador seguro             ausente
+
+3.1 ENTRADA E ESTÍMULO
+
+“Estímulo” deve ser entendido apenas como entrada recebida pela aplicação:
+texto do terminal ou uma resposta de fonte externa dentro de um fluxo
+autorizado.
+
+Não se deve chamar o terminal de sistema sensorial completo. A Isana não
+possui percepção geral do mundo. Ela recebe dados delimitados pelas interfaces
+existentes.
+
+3.2 PERCEPÇÃO E NORMALIZAÇÃO
+
+`core/normalizador.py` executa uma transformação determinística de texto:
+acentos, pontuação, abreviações aprovadas e alguns vocativos. Isso é análogo,
+em sentido funcional limitado, a uma preparação da entrada.
+
+Não é compreensão semântica geral e não deve ser chamado de percepção humana.
+
+3.3 INTERPRETAÇÃO
+
+`core/interpretacao.py`, `core/roteador.py` e partes do fluxo reconhecem
+padrões e intenções delimitadas. Isso corresponde a uma camada simbólica de
+interpretação, não a entendimento aberto da linguagem.
+
+3.4 ATENÇÃO OU RELEVÂNCIA
+
+Hoje existem seleção de intenção, contexto, tokenização e busca, mas não há
+uma camada independente e claramente representada de seleção de relevância.
+
+Uma futura seleção de relevância poderá decidir:
+
+- qual intenção tem prioridade;
+- qual tópico continua ativo;
+- qual entidade resolve uma referência;
+- quais registros devem ser consultados;
+- quais palavras são apenas auxiliares;
+- quando a ambiguidade exige esclarecimento.
+
+O nome recomendado é `SelecaoDeRelevancia` ou `FocoDoTurno`, não
+`atencao_neural`.
+
+3.5 MEMÓRIA DE TRABALHO
+
+`core/contexto_conversa.py` é a melhor analogia funcional atual para memória
+de trabalho. Ela mantém poucos turnos, tópico, entidades, posição, menções e
+pendências durante a sessão.
+
+Ela deve continuar:
+
+- limitada;
+- temporária;
+- descartável ao final da sessão;
+- sem acesso direto concedido a código gerado;
+- separada da memória semântica persistente.
+
+O futuro não deve simplesmente transformar todo o contexto em histórico
+permanente.
+
+3.6 MEMÓRIA SEMÂNTICA
+
+`aprendizado/bancos/conhecimento.db`, acessado pelos módulos de `bancos/`,
+é a memória semântica canônica atual. Ele guarda termos, significados,
+contextos, exemplos, fatos, relações, evidências, origens e estados.
+
+Essa memória é persistente, mas não é automaticamente uma rede associativa
+ampla. Relações armazenadas não provam ativação contextual automática ou
+generalização semântica.
+
+3.7 RECUPERAÇÃO E ASSOCIAÇÃO
+
+`ferramentas/busca.py` recupera registros e pode usar aproximações lexicais,
+incluindo `SequenceMatcher`. Isso é associação textual limitada.
+
+Não deve ser apresentado como:
+
+- associação neural;
+- compreensão de categoria;
+- inferência geral;
+- lembrança autobiográfica;
+- generalização semântica aberta.
+
+3.8 DECISÃO E RESPOSTA
+
+O fluxo escolhe ferramentas, recuperação, perguntas ou composição conforme
+regras e estados disponíveis. A decisão deve ser entendida como uma escolha
+operacional verificável, não como intenção própria.
+
+Uma futura decisão estruturada deve registrar:
+
+- alternativas consideradas;
+- regra ou motivo da escolha;
+- evidências utilizadas;
+- incertezas;
+- ação tomada;
+- se foi necessária autorização.
+
+3.9 APRENDIZAGEM E CONSOLIDAÇÃO
+
+Aprendizagem de conteúdo ocorre em um fluxo explícito e autorizado. Ela
+persiste dados no SQLite e não gera código automaticamente.
+
+“Consolidação” pode ser usado no futuro para descrever a passagem de uma
+proposta aprovada para conhecimento canônico. Não deve significar que a
+Isana aprende sozinha durante conversa normal.
+
+3.10 DESENVOLVIMENTO DE CAPACIDADE
+
+Desenvolver uma capacidade significa modificar comportamento executável,
+não cadastrar um termo. Deve ser tratado como processo separado:
+
+experiência ou requisito
+  -> evidência
+  -> proposta de capacidade
+  -> revisão humana
+  -> autorização
+  -> geração ou edição
+  -> validação
+  -> revisão do resultado
+  -> ativação controlada
+
+Enquanto não existir um carregador seguro e uma política de ativação, código
+gerado continua sendo arquivo protegido e não capacidade ativa da conversa.
+
+
+4. DIFERENÇA ENTRE OS TIPOS DE MEMÓRIA
+--------------------------------------
+
+4.1 MEMÓRIA SEMÂNTICA
+
+Local conceitual atual:
+
+- `aprendizado/bancos/conhecimento.db`;
+- `bancos/conhecimento.py`;
+- `bancos/relacoes.py`;
+- `bancos/propostas_aprendizagem.py`, antes da consolidação.
+
+Guarda:
+
+- termos;
+- sentidos;
+- fatos;
+- exemplos;
+- relações;
+- evidências;
+- origem;
+- estado de confirmação.
+
+Não guarda automaticamente:
+
+- o ciclo completo de uma conversa;
+- o resultado de uma resposta;
+- o estado de ativação de um comportamento;
+- uma experiência subjetiva.
+
+4.2 MEMÓRIA DE TRABALHO
+
+Local conceitual atual:
+
+- `core/contexto_conversa.py`;
+- dados transitórios passados pelo fluxo.
+
+Guarda apenas o necessário para resolver a sessão atual. Não deve ser
+confundida com banco persistente, histórico completo ou experiência episódica.
+
+4.3 HISTÓRICO E CACHE EXTERNO
+
+O histórico e o cache do professor em `_APPDATA_` servem à operação do
+professor externo. Não são memória semântica canônica e não são experiência
+episódica da Isana.
+
+4.4 LOG OPERACIONAL
+
+`_LOGS_`, `data/diagnostico.db` e `bancos/log_mudancas.py` registram operação,
+falha ou mudança. Eles devem permanecer úteis para auditoria.
+
+Não devem ser reinterpretados como memória episódica sem um esquema que
+registre episódio, contexto, resultado e consequência.
+
+4.5 MEMÓRIA EPISÓDICA FUTURA
+
+Uma memória episódica só deve ser criada se houver uma necessidade concreta de
+avaliar experiências anteriores. Sua unidade não seria “cada mensagem”, mas
+um episódio delimitado por um objetivo ou por uma ação relevante.
+
+Campos conceituais mínimos:
+
+- identificador do episódio;
+- início, fim ou ordem da experiência;
+- entrada original e forma normalizada;
+- contexto de trabalho usado;
+- interpretação escolhida;
+- interpretações alternativas, se existirem;
+- dados recuperados;
+- evidências utilizadas;
+- decisão operacional;
+- resposta apresentada;
+- resultado observado ou desconhecido;
+- avaliação humana ou regra de avaliação;
+- consequência;
+- candidato a aprendizagem;
+- estado de revisão e autorização.
+
+Esse registro não deve:
+
+- escrever conhecimento canônico sozinho;
+- criar código sozinho;
+- ativar capacidades;
+- substituir logs operacionais;
+- armazenar segredos;
+- transformar toda conversa comum em treinamento automático.
+
+
+5. ESTADO GLOBAL DO TURNO
+--------------------------
+
+Antes de criar uma memória episódica, a melhoria mínima recomendada é tornar
+explícito um estado do turno. O nome pode ser `EstadoDoTurno`,
+`EstadoCognitivoDoTurno` ou outro nome técnico equivalente.
+
+O estado deve ser uma estrutura de dados, não uma nova “mente”. Ele poderá
+transportar:
+
+- entrada original;
+- entrada normalizada;
+- intenção;
+- expressão candidata;
+- entidades;
+- slots;
+- referências a turnos;
+- tópico e foco;
+- resultado de recuperação;
+- evidências;
+- incertezas;
+- alternativas;
+- decisão operacional;
+- resposta;
+- pedido de esclarecimento.
+
+Limites:
+
+- não carregar conexão SQLite;
+- não conceder permissões;
+- não executar código;
+- não importar ferramentas de forma implícita;
+- não acessar `core/` a partir de código gerado;
+- não permanecer automaticamente após o fim da sessão;
+- não substituir o protocolo de segurança.
+
+O estado do turno pode ser formado a partir dos contratos já existentes em
+`core/contratos.py`. Como esses contratos ainda não estão diretamente ligados
+ao fluxo de conversa, essa integração é uma prioridade futura mais segura do
+que criar novos bancos ou mecanismos neurais.
+
+
+6. PROPOSTAS DE CONTEÚDO E PROPOSTAS DE CAPACIDADE
+--------------------------------------------------
+
+6.1 PROPOSTA DE CONTEÚDO
+
+Já existe como conceito em `bancos/propostas_aprendizagem.py`.
+
+Exemplos:
+
+- incluir um termo;
+- corrigir significado;
+- adicionar exemplo;
+- adicionar fato;
+- confirmar uma relação;
+- aceitar uma sugestão da internet ou do professor.
+
+Fluxo:
+
+proposta
+  -> análise
+  -> aprovação ou recusa
+  -> aplicação
+  -> reversão, se autorizada
+
+6.2 PROPOSTA DE CAPACIDADE
+
+Ainda não existe como capacidade separada.
+
+Exemplos futuros:
+
+- oferecer uma nova ferramenta;
+- alterar uma regra de interpretação;
+- adicionar uma operação executável;
+- melhorar uma etapa do fluxo;
+- editar um comportamento existente.
+
+Uma proposta de capacidade deve guardar, conceitualmente:
+
+- problema que motivou a proposta;
+- episódios ou evidências relacionadas;
+- comportamento atual;
+- comportamento pretendido;
+- riscos conhecidos;
+- arquivos ou interfaces afetados;
+- permissões necessárias;
+- plano de validação;
+- estado da revisão;
+- resultado da validação;
+- decisão de ativação;
+- possibilidade de desativação ou reversão.
+
+Não se deve reutilizar a proposta de termo apenas para evitar a criação de
+um conceito adequado. Conteúdo e comportamento têm riscos, revisões e
+critérios de conclusão diferentes.
+
+6.3 ATIVAÇÃO
+
+O índice de código atual registra metadados de arquivos gerados. Ele não é
+um catálogo de capacidades ativas e não carrega módulos no runtime.
+
+Antes de existir ativação futura, será necessário decidir:
+
+- como uma capacidade é identificada;
+- qual versão está ativa;
+- como ela é desativada;
+- como ocorre rollback;
+- como seus acessos são limitados;
+- como se impede acesso a `core/`;
+- como se impede rede, processos, arquivos e recursos não autorizados;
+- como se comprova que a conversa normal não ativa código arbitrário.
+
+
+7. SEGURANÇA E FRONTEIRAS
+-------------------------
+
+`core/` continua sendo o núcleo protegido.
+
+Código em `ferramentas/` e código gerado em `aprendizado/gerado/` não podem
+importar, acessar ou referenciar `core/`.
+
+Essa regra não deve ser enfraquecida para resolver divergências de arquitetura.
+
+7.1 DIREÇÃO ATUAL DOS IMPORTS
+
+O estado observado precisa ser tratado com precisão:
+
+- `core/controlador.py` importa funcionalidades de
+  `ferramentas/criacao.py` e `ferramentas/edicao.py`;
+- essas ferramentas importam o protocolo;
+- as ferramentas não importam `core/`.
+
+A direção `core -> ferramentas` não viola, por si só, a regra de que
+ferramentas não podem importar ou referenciar `core`. Porém, cria acoplamento
+entre o controlador protegido e as implementações de escrita.
+
+Não se deve inverter essa direção automaticamente. Antes de uma refatoração,
+é necessário decidir se:
+
+1. o controlador continuará sendo o orquestrador confiável;
+2. as ferramentas serão primitivas de escrita sem lógica de autorização;
+3. uma interface independente poderá reduzir o acoplamento;
+4. a aplicação passará a coordenar a operação sem expor o núcleo;
+5. o protocolo continuará sendo a única origem de permissões.
+
+Essa decisão deve ser humana e preceder qualquer mudança estrutural.
+
+7.2 O QUE AS VALIDAÇÕES ATUAIS SIGNIFICAM
+
+As proteções existentes devem ser descritas com precisão:
+
+- `ast.parse()` valida sintaxe;
+- o verificador AST bloqueia imports e referências estruturais proibidos;
+- regras e permissões controlam ações e caminhos;
+- subprocesso separa a execução do processo principal;
+- timeout limita alguns travamentos simples;
+- snapshot e restauração protegem a escrita contra falhas conhecidas.
+
+Isso não equivale a um sandbox completo. Ainda é necessário tratar, em uma
+etapa futura e separada:
+
+- limite de CPU;
+- limite de memória;
+- rede;
+- criação de processos;
+- acesso ao sistema de arquivos;
+- descritores e dispositivos;
+- encerramento confiável;
+- isolamento do sistema operacional;
+- capacidade de inspeção e auditoria.
+
+7.3 PRINCÍPIO DE NÃO ATIVAÇÃO AUTOMÁTICA
+
+Nenhum destes eventos pode ativar comportamento executável automaticamente:
+
+- aprender um termo;
+- adicionar um fato;
+- criar uma relação;
+- aceitar uma definição externa;
+- registrar uma experiência;
+- detectar uma falha;
+- gerar uma proposta;
+- criar um arquivo em `aprendizado/gerado/`.
+
+
+8. ORDEM RECOMENDADA DE EVOLUÇÃO
+--------------------------------
+
+Esta ordem é uma proposta para discussão, não um plano de execução aprovado.
+
+ETAPA 0 — DECISÕES E VOCABULÁRIO
+
+- manter a conversa local determinística;
+- manter a separação entre conteúdo e código;
+- definir os termos funcionais deste documento;
+- decidir se o nome histórico “Futuro Neural” continuará sendo usado;
+- registrar limites de segurança e critérios de sucesso.
+
+Critério de conclusão:
+
+- não haver ambiguidade entre memória, log, contexto, proposta e capacidade.
+
+ETAPA 1 — INTEGRAR OS CONTRATOS EXISTENTES
+
+- conectar `core/contratos.py` ao fluxo real;
+- preservar interfaces atuais durante a migração;
+- transportar interpretação, recuperação e resposta sem conexões SQLite;
+- manter permissões fora dos contratos de dados;
+- validar evidências antes de compor ou apresentar uma resposta.
+
+Critério de conclusão:
+
+- o fluxo conseguir representar de forma verificável o que interpretou, buscou,
+  decidiu e respondeu.
+
+ETAPA 2 — ESTADO DO TURNO E FOCO
+
+- explicitar o estado de trabalho do turno;
+- separar seleção de relevância da recuperação;
+- registrar alternativas e incertezas;
+- pedir esclarecimento quando não houver seleção segura;
+- não persistir automaticamente esse estado.
+
+Critério de conclusão:
+
+- uma decisão operacional poder ser explicada pelas entradas, regras,
+  evidências e estado do turno.
+
+ETAPA 3 — AVALIAÇÃO DE RESULTADOS
+
+- definir quais resultados podem ser observados;
+- diferenciar resultado conhecido de resultado desconhecido;
+- permitir avaliação humana ou regra explícita;
+- não tratar silêncio do usuário como sucesso;
+- não gerar aprendizagem automaticamente a partir de uma avaliação.
+
+Critério de conclusão:
+
+- uma resposta poder ser marcada como avaliada, não avaliada, bem-sucedida,
+  falha ou inconclusiva, com motivo.
+
+ETAPA 4 — EXPERIÊNCIA EPISÓDICA MÍNIMA
+
+- implementar somente se a avaliação revelar necessidade real;
+- registrar episódios delimitados, não todas as mensagens;
+- separar episódio de log técnico;
+- aplicar retenção e privacidade;
+- manter o registro sem poder de alteração automática.
+
+Critério de conclusão:
+
+- ser possível reconstruir o episódio e suas consequências sem inferir fatos
+  não registrados.
+
+ETAPA 5 — PROPOSTA DE CAPACIDADE
+
+- definir um ciclo separado de proposta de comportamento;
+- relacionar proposta a evidências e avaliações;
+- incluir risco, autorização e plano de validação;
+- distinguir proposta recusada, aprovada, aplicada, ativa, desativada e
+  revertida;
+- não carregar código automaticamente.
+
+Critério de conclusão:
+
+- uma proposta de capacidade ter revisão, autorização, validação e reversão
+  claramente separadas.
+
+ETAPA 6 — EXECUÇÃO CONTROLADA DE CAPACIDADES
+
+Só deve ser considerada depois de:
+
+- política de recursos;
+- isolamento real adequado;
+- catálogo de capacidades;
+- ativação e desativação;
+- compatibilidade de versões;
+- testes de regressão;
+- auditoria;
+- rollback confiável;
+- decisão humana explícita.
+
+Critério de conclusão:
+
+- uma capacidade poder ser habilitada e desabilitada sem alterar o núcleo,
+  sem contornar o protocolo e sem depender de confiança no código gerado.
+
+ETAPA 7 — POSSÍVEIS MODELOS DE APRENDIZAGEM
+
+Uma futura técnica estatística, modelo externo ou rede neural só poderá ser
+avaliada como componente isolado, opcional e substituível. Ela não deve:
+
+- substituir a memória semântica canônica sem validação;
+- gravar diretamente no SQLite;
+- conceder permissões;
+- escrever em `core/`;
+- ativar código;
+- transformar saída probabilística em verdade confirmada;
+- alterar a conversa determinística sem uma decisão arquitetural.
+
+Esta etapa não está aprovada e não é necessária para executar as etapas
+simbólicas anteriores.
+
+
+9. CRITÉRIOS DE VERIFICAÇÃO FUTUROS
+-----------------------------------
+
+Qualquer futuro componente precisa informar:
+
+1. responsabilidade independente;
+2. entrada;
+3. saída;
+4. estado persistente, se houver;
+5. permissões necessárias;
+6. dependências permitidas;
+7. dependências proibidas;
+8. comportamento em erro;
+9. critério de conclusão;
+10. forma de teste;
+11. forma de auditoria;
+12. forma de desativação ou reversão.
+
+Não é suficiente dizer que uma alteração deixará a Isana mais humana,
+inteligente, consciente, evolutiva ou cerebral. Essas expressões devem ser
+traduzidas para comportamentos observáveis:
+
+- reconhecer mais intenções delimitadas;
+- recuperar evidências melhores;
+- resolver referências com menos ambiguidades;
+- avaliar resultados com critérios claros;
+- propor uma mudança documentada;
+- executar uma capacidade autorizada;
+- reverter uma mudança com segurança.
+
+
+10. O QUE CONTINUA CONGELADO
+----------------------------
+
+Até decisão posterior, continuam congelados:
+
+- integração neural ou NLU como requisito;
+- machine learning na conversa local;
+- redes neurais;
+- compreensão geral da linguagem;
+- aprendizagem automática em conversa normal;
+- geração de classes por palavra ou categoria;
+- transformação automática de termos em código;
+- carregamento automático de snapshots;
+- carregamento automático de módulos gerados;
+- autoevolução;
+- autoativação de capacidades;
+- alteração automática de `core/`;
+- interpretação de logs como experiência completa;
+- chamar AST, subprocesso ou timeout de sandbox completo.
+
+As fontes externas já existentes continuam disponíveis somente nos fluxos de
+aprendizagem que o usuário escolhe explicitamente. Informação externa continua
+sendo sugestão e precisa de confirmação antes de persistir.
+
+
+11. PERGUNTAS QUE DEVEM SER RESPONDIDAS ANTES DE IMPLEMENTAR
+-------------------------------------------------------------
+
+- Qual problema concreto exige memória episódica?
+- Quais episódios serão guardados e quais serão descartados?
+- Quem avalia o resultado: usuário, regra, teste ou combinação?
+- Como tratar resultado desconhecido?
+- Quando uma experiência é evidência suficiente para uma proposta?
+- Qual diferença formal entre proposta de conteúdo e proposta de capacidade?
+- Como uma capacidade é versionada?
+- Como uma capacidade é desativada?
+- Como evitar que uma capacidade acesse `core/`?
+- Que recursos uma capacidade pode utilizar?
+- Como testar recursos, rede, processos e arquivos?
+- Como preservar a conversa determinística?
+- O controlador continuará em `core/`?
+- A direção `core/controlador.py -> ferramentas/` será mantida ou isolada?
+- Quais contratos precisam ser compatíveis durante a evolução?
+- Qual seria o menor comportamento observável que provaria melhoria?
+
+
+12. RESUMO OPERACIONAL
+----------------------
+
+A Isana não precisa de um cérebro artificial para ter uma arquitetura melhor.
+Ela precisa de fronteiras claras entre:
+
+```text
+entrada
+  -> interpretação
+  -> foco e contexto de trabalho
+  -> recuperação de evidências
+  -> decisão
+  -> resposta
+  -> avaliação opcional
+  -> experiência opcional
+  -> proposta revisável
+  -> capacidade autorizada, se algum dia aprovada
+```
+
+O caminho mínimo e seguro é:
+
+```text
+integrar contratos
+  -> explicitar estado do turno
+  -> definir relevância
+  -> avaliar resultados
+  -> estudar experiência episódica
+  -> separar propostas de capacidade
+  -> somente depois discutir ativação controlada
+```
+
+Aprender conteúdo continua significando persistir dados confirmados. Criar ou
+alterar comportamento continua significando uma operação diferente, explícita,
+autorizada, validada, auditada e reversível.

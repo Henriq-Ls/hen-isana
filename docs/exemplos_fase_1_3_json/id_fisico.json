@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "package_id": "id-fisico",
+  "created_at": "2026-09-25T00:00:00Z",
+  "source": {
+    "type": "manual",
+    "identifier": "teste",
+    "origin": "teste",
+    "confidence": 0.5
+  },
+  "purpose": "teste",
+  "requested_action": "propose",
+  "records": [
+    {
+      "record_id": "r1",
+      "unit_type": "concept",
+      "sqlite_id": 7,
+      "data": {},
+      "status": "candidate",
+      "evidence_refs": []
+    }
+  ],
+  "evidence": [],
+  "relations": []
+}

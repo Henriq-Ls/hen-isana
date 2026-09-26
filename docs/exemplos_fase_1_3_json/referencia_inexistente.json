@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "package_id": "referencia-inexistente",
+  "created_at": "2026-09-25T00:00:00Z",
+  "source": {
+    "type": "manual",
+    "identifier": "teste",
+    "origin": "teste",
+    "confidence": 0.5
+  },
+  "purpose": "teste",
+  "requested_action": "propose",
+  "records": [],
+  "evidence": [],
+  "relations": [
+    {
+      "relation_id": "r1",
+      "source_record_id": "ausente-a",
+      "target_record_id": "ausente-b",
+      "type": "related",
+      "evidence_refs": []
+    }
+  ]
+}
