@@ -1,0 +1,698 @@
+# HEN-ISANA — MAPA DE CATEGORIAS LEGADAS DA FASE 3.8
+
+Data: 2026-09-26
+Status: rascunho para revisão humana; nenhuma categoria está aprovada
+Escopo: valores distintos de `conhecimento.tipo` observados no legado
+
+## 1. REGRA DE LEITURA DESTE MAPA
+
+Este documento organiza as exatamente 16 categorias legadas identificadas na
+documentação atual. Ele não decide os 70 registros individualmente, não cria
+objetos canônicos e não autoriza aplicação ou migração.
+
+O tipo canônico candidato usa somente uma das opções previstas no contrato:
+
+- `expressao`
+- `lexema`
+- `forma_lexical`
+- `sentido`
+- `INDEFINIDO`
+
+`INDEFINIDO` significa que as evidências atuais não permitem escolher entre os
+tipos do contrato sem criar uma correspondência não aprovada. Não significa que
+a categoria não tenha conteúdo ou que seus registros devam ser rejeitados.
+
+O inventário registra 37 conhecimentos distribuídos nestas 16 categorias. Os
+dois valores de tipo encontrados em `relacoes.db`,
+`componente_de_expressao` e `relacionado_no_tema`, não são incluídos como
+categorias deste mapa: são tipos de relação legada, não objetos semânticos.
+As relações também não são convertidas em objetos neste rascunho.
+
+## 2. LISTA CONSOLIDADA
+
+| Nº | Categoria legada | Quantidade observada | Tipo canônico candidato | Confiança |
+|---:|---|---:|---|---|
+| 1 | `saudação coletiva` | 7 | `INDEFINIDO` | baixa |
+| 2 | `saudação coletiva informal` | 5 | `INDEFINIDO` | baixa |
+| 3 | `saudação interrogativa` | 3 | `INDEFINIDO` | baixa |
+| 4 | `saudação de período do dia` | 3 | `INDEFINIDO` | baixa |
+| 5 | `substantivo em expressão de saudação` | 3 | `INDEFINIDO` | baixa |
+| 6 | `expressão de reencontro` | 3 | `INDEFINIDO` | baixa |
+| 7 | `expressão de acolhimento` | 2 | `INDEFINIDO` | baixa |
+| 8 | `expressão de apresentação` | 2 | `INDEFINIDO` | baixa |
+| 9 | `saudação informal` | 2 | `INDEFINIDO` | baixa |
+| 10 | `adjetivo em expressões de saudação` | 1 | `INDEFINIDO` | baixa |
+| 11 | `advérbio em expressão de saudação` | 1 | `INDEFINIDO` | baixa |
+| 12 | `expressão de saudação` | 1 | `INDEFINIDO` | baixa |
+| 13 | `expressão geral de cumprimento` | 1 | `INDEFINIDO` | baixa |
+| 14 | `saudação telefônica` | 1 | `INDEFINIDO` | baixa |
+| 15 | `substantivo em expressão de apresentação` | 1 | `INDEFINIDO` | baixa |
+| 16 | `substantivo em saudação coletiva` | 1 | `INDEFINIDO` | baixa |
+
+## 3. MAPA DETALHADO
+
+### 1. `saudação coletiva`
+
+1. **Categoria legada:** `saudação coletiva`.
+
+2. **Descrição observada:** tipo usado para registros descritos como
+   cumprimentos dirigidos simultaneamente a todas as pessoas de um grupo. Os
+   contextos observados mencionam início de fala, mensagem, reunião ou conversa
+   para várias pessoas.
+
+3. **Exemplos existentes nos registros:** `olá a todos`, `bom dia pessoal`,
+   `boa tarde pessoal`, `boa noite pessoal`, `bom dia a todos`,
+   `boa tarde a todos`, `boa noite a todos`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** os textos fornecem termos
+   compostos, significados, contextos e exemplos que descrevem uso coletivo.
+   Isso sustenta a observação de uma função de cumprimento para grupo, mas não
+   existe regra aprovada que diga se cada linha representa uma `expressao`, um
+   `sentido`, uma `forma_lexical` ou outro objeto associado a um lexema. O
+   inventário e a matriz afirmam que os tipos legados são texto livre e não têm
+   correspondência canônica automática.
+
+6. **Dúvidas semânticas:** não está separado o objeto textual da interpretação
+   de cumprimento coletivo; não está resolvido se expressões como `bom dia
+   pessoal` devem ser uma expressão única ou uma composição de objetos; não está
+   resolvido o papel de `pessoal`; não está resolvido o destino de
+   `significado` e `contexto_uso`.
+
+7. **Riscos de perda de significado:** perder o alcance coletivo; transformar
+   composição em sentido único; inventar ordem ou tipo dos componentes;
+   converter `resposta_padrao` em conhecimento ou fato; perder referências
+   textuais de `relacionados`.
+
+8. **Condições para aprovar o mapeamento:** criar e revisar uma regra
+   versionada para distinguir expressão, lexema, forma lexical e sentido;
+   separar, quando necessário, expressão, componentes e sentidos; resolver
+   `relacionados`; preservar evidências, proveniência e perdas; decidir
+   explicitamente o tratamento de `resposta_padrao`; obter revisão humana
+   independente para os registros abrangidos.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico; alto somente para
+   a existência documental da categoria e dos exemplos listados.
+
+### 2. `saudação coletiva informal`
+
+1. **Categoria legada:** `saudação coletiva informal`.
+
+2. **Descrição observada:** tipo usado para cumprimentos dirigidos a um grupo
+   em tom informal, próximo ou descontraído. Os contextos mencionam conversas,
+   mensagens ou falas para várias pessoas.
+
+3. **Exemplos existentes nos registros:** `olá pessoal`, `oi pessoal`,
+   `alô pessoal`, `olá gente`, `oi gente`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** a documentação registra
+   explicitamente o alcance coletivo e o registro informal, mas esses
+   qualificadores pertencem a descrições livres. O contrato não fornece uma
+   regra que transforme essa descrição em `expressao`, `lexema`,
+   `forma_lexical` ou `sentido`. A presença de termos compostos não resolve
+   sozinha a classificação.
+
+6. **Dúvidas semânticas:** não está definido se a informalidade é propriedade
+   da expressão, do sentido ou do contexto; `alô pessoal` pode carregar também
+   contexto telefônico; `pessoal` e `gente` não têm destino canônico resolvido;
+   não está decidido se as formas coletivas são variantes de outras expressões.
+
+7. **Riscos de perda de significado:** apagar a distinção entre coletivo e
+   individual; apagar o registro informal; misturar uso telefônico com uso
+   geral; tratar componentes como objetos sem prova; converter respostas padrão
+   em conteúdo canônico.
+
+8. **Condições para aprovar o mapeamento:** definir, em regra versionada, como
+   o contrato representa expressão, variação de uso e contexto; resolver os
+   alvos de `pessoal`, `gente` e demais referências; preservar o uso informal e
+   o eventual contexto telefônico; manter `resposta_padrao` fora do
+   conhecimento canônico salvo decisão específica; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico; alto para a
+   identificação documental da categoria.
+
+### 3. `saudação interrogativa`
+
+1. **Categoria legada:** `saudação interrogativa`.
+
+2. **Descrição observada:** tipo usado para expressões que, segundo os
+   significados e contextos registrados, cumprem uma saudação e perguntam
+   cordialmente pelo estado de uma pessoa.
+
+3. **Exemplos existentes nos registros:** `como vai`, `tudo bem`, `como você
+   está`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** os registros preservam a descrição
+   interrogativa, os significados e os exemplos. Entretanto, o contrato separa
+   expressão, sentido e proposição, e os documentos não dizem qual desses
+   objetos deve receber a linha legada. A matriz registra que o sentido
+   interrogativo e os destinos canônicos ainda aguardam classificação.
+
+6. **Dúvidas semânticas:** não está decidido se cada termo é expressão ou
+   lexema; não está separado o valor de saudação do conteúdo interrogativo; não
+   há decisão sobre representação do sentido, polaridade, modalidade ou
+   proposição; referências de `relacionados` continuam textuais.
+
+7. **Riscos de perda de significado:** reduzir uma pergunta a uma saudação;
+   reduzir a expressão a um sentido descontextualizado; inventar uma proposição
+   ou fato; perder a distinção entre pergunta e resposta padrão.
+
+8. **Condições para aprovar o mapeamento:** decidir se a categoria descreve
+   expressão, sentido ou uma combinação explicitamente separada; preservar o
+   caráter interrogativo no objeto apropriado; não criar fato a partir do
+   significado ou de `resposta_padrao`; resolver relações e evidências; revisão
+   humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 4. `saudação de período do dia`
+
+1. **Categoria legada:** `saudação de período do dia`.
+
+2. **Descrição observada:** tipo usado para cumprimentos associados a um
+   período do dia. Os registros descrevem uso de manhã, tarde ou noite; `boa
+   noite` também registra possibilidade de despedida noturna.
+
+3. **Exemplos existentes nos registros:** `bom dia`, `boa tarde`, `boa noite`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** há evidência textual de expressões
+   compostas e de contexto temporal, mas a documentação também identifica
+   registros separados para `bom`, `dia`, `tarde` e `noite`. O contrato não
+   fornece uma regra aprovada para separar expressão, componentes lexicais e
+   sentidos. O plano proíbe decidir somente por composição textual ou por
+   comprimento.
+
+6. **Dúvidas semânticas:** `boa noite` reúne cumprimento e despedida; não está
+   resolvido se período do dia é contexto ou parte do sentido; a relação entre
+   expressão e componentes não tem ordem canônica comprovada; não está decidido
+   se `bom`/`boa` são formas do mesmo lexema ou objetos distintos.
+
+7. **Riscos de perda de significado:** perder a diferença entre saudação e
+   despedida; perder o período de uso; converter componentes em expressão sem
+   ordem comprovada; duplicar informação ao tratar registros compostos e
+   componentes como objetos independentes sem regra.
+
+8. **Condições para aprovar o mapeamento:** definir a unidade canônica de cada
+   registro e a relação com seus componentes; decidir como o contexto temporal e
+   o uso de despedida serão preservados; provar a ordem dos componentes; resolver
+   sentidos e referências; manter respostas padrão fora do conhecimento
+   canônico salvo decisão explícita; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 5. `substantivo em expressão de saudação`
+
+1. **Categoria legada:** `substantivo em expressão de saudação`.
+
+2. **Descrição observada:** tipo usado para palavras registradas como
+   substantivos que aparecem nos registros de expressões de saudação ligadas a
+   períodos do dia.
+
+3. **Exemplos existentes nos registros:** `dia`, `tarde`, `noite`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** os tipos e significados fornecem
+   uma descrição lexical e contextual, e os exemplos mostram termos isolados.
+   Isso não resolve se a linha é um `lexema`, uma `forma_lexical` ou um
+   `sentido`; o significado pode exigir um sentido separado do lexema. A
+   documentação determina que tipos livres não sejam convertidos
+   silenciosamente para `categoria_lexical`.
+
+6. **Dúvidas semânticas:** não está aprovada a correspondência entre
+   `substantivo` e `categoria_lexical`; não está resolvido se o contexto de
+   saudação é parte do sentido ou apenas evidência de uso; não está resolvida a
+   relação com `bom dia`, `boa tarde` e `boa noite`; a ordem dos componentes não
+   está registrada na relação legada.
+
+7. **Riscos de perda de significado:** classificar automaticamente o termo como
+   lexema e perder o sentido contextual; transformar referência textual em
+   relação de componente; inventar ordem ou relação semântica; descartar a
+   distinção entre uso temporal geral e uso em saudação.
+
+8. **Condições para aprovar o mapeamento:** aprovar a tabela que liga a
+   descrição livre à categoria lexical, se essa for a decisão; separar lexema,
+   forma e sentido quando necessário; resolver a relação com cada expressão e
+   sua ordem; preservar o contexto e as evidências; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 6. `expressão de reencontro`
+
+1. **Categoria legada:** `expressão de reencontro`.
+
+2. **Descrição observada:** tipo usado para expressões que demonstram
+   satisfação ao encontrar novamente alguém ou destacam o tempo desde o último
+   encontro.
+
+3. **Exemplos existentes nos registros:** `bom te ver`, `quanto tempo`, `bom te
+   encontrar`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** os significados, contextos e
+   exemplos mostram unidades compostas de uso conversacional. Ainda assim, o
+   contrato exige distinguir a unidade de expressão de seus lexemas, formas e
+   sentidos, e a documentação não apresenta regra que faça essa distinção para
+   o tipo legado.
+
+6. **Dúvidas semânticas:** não está definido se cada termo é uma expressão
+   fixa, semifixa ou uma construção produtiva; não está resolvido o papel de
+   `bom`; `quanto tempo` pode combinar reencontro e referência temporal; não há
+   destino canônico para as referências relacionadas.
+
+7. **Riscos de perda de significado:** apagar a condição de reencontro; tratar
+   uma construção produtiva como expressão fixa; converter `bom` em componente
+   sem ordem aprovada; transformar uma resposta padrão em conhecimento.
+
+8. **Condições para aprovar o mapeamento:** definir a classificação de expressão
+   e, se aplicável, seus componentes; separar sentido e forma; resolver ordem e
+   relações; preservar o valor temporal e de reencontro; decidir o tratamento
+   dos campos sem destino; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 7. `expressão de acolhimento`
+
+1. **Categoria legada:** `expressão de acolhimento`.
+
+2. **Descrição observada:** tipo usado para formas que recebem alguém com
+   cordialidade e indicam que sua presença é bem recebida. Há menção a variação
+   de gênero e número.
+
+3. **Exemplos existentes nos registros:** `seja bem-vindo`, `bem-vindo`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** a documentação descreve uso
+   acolhedor e registra variantes textuais relacionadas. Porém, a distinção
+   entre expressão, forma lexical e sentido não está aprovada; a matriz
+   inclusive registra que a variação de gênero e a relação entre as formas
+   exigem decisão semântica.
+
+6. **Dúvidas semânticas:** não está resolvido se `seja bem-vindo` e
+   `bem-vindo` são expressões distintas, variantes ou relação entre forma e
+   sentido; não está definido o tratamento de gênero e número; o papel de
+   `bem` permanece ambíguo.
+
+7. **Riscos de perda de significado:** apagar variações de gênero e número;
+   confundir forma lexical com expressão; inferir equivalência entre os dois
+   registros; converter relação textual em relação morfológica ou semântica.
+
+8. **Condições para aprovar o mapeamento:** especificar a unidade de cada forma;
+   definir como variantes e flexões serão representadas; resolver o sentido de
+   acolhimento e suas relações; preservar as evidências e não usar
+   `resposta_padrao` como conhecimento; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 8. `expressão de apresentação`
+
+1. **Categoria legada:** `expressão de apresentação`.
+
+2. **Descrição observada:** tipo usado em apresentações e primeiros encontros,
+   para demonstrar satisfação ao conhecer alguém ou ser apresentado.
+
+3. **Exemplos existentes nos registros:** `prazer em conhecer você`, `muito
+   prazer`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** os registros são descritos como
+   expressões compostas e possuem exemplos e contexto de primeiro encontro.
+   Isso não resolve o tipo canônico porque a mesma linha também contém
+   significado, contexto e referências, e a documentação não define a
+   separação entre expressão, componentes e sentido.
+
+6. **Dúvidas semânticas:** não está resolvido se as duas formas são expressões
+   distintas ou variantes de um sentido; não está definido o papel de
+   `prazer`; não está resolvida a relação entre o componente textual e o
+   registro de conhecimento `prazer`.
+
+7. **Riscos de perda de significado:** perder o contexto de apresentação;
+   tratar `prazer` como componente, sentido ou conceito sem decisão; inventar
+   ordem; duplicar ou converter relações reversas.
+
+8. **Condições para aprovar o mapeamento:** classificar separadamente expressão,
+   lexema, forma e sentido quando necessário; resolver o papel de `prazer`;
+   provar a ordem e os endpoints das relações; preservar contexto, evidências e
+   perdas; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 9. `saudação informal`
+
+1. **Categoria legada:** `saudação informal`.
+
+2. **Descrição observada:** tipo usado para cumprimentos em tom informal ou
+   descontraído, inclusive para iniciar uma conversa.
+
+3. **Exemplos existentes nos registros:** `oi`, `e aí`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** os registros apresentam termos,
+   significados, contextos e exemplos que sustentam o uso informal. O material
+   não informa se o objeto a cadastrar é um lexema, uma expressão, uma forma
+   lexical ou um sentido. A regra documental impede usar o rótulo livre como
+   correspondência automática.
+
+6. **Dúvidas semânticas:** não está separado o uso informal da unidade lexical;
+   `e aí` pode ser expressão composta ou construção produtiva; não está
+   resolvido se `oi` deve ser relacionado a `olá` como variante, expressão
+   distinta ou apenas referência.
+
+7. **Riscos de perda de significado:** apagar o registro informal; reduzir
+   expressão a lexema sem preservar o uso; transformar `relacionados` em
+   equivalência ou sinonímia; converter resposta padrão em conhecimento.
+
+8. **Condições para aprovar o mapeamento:** definir a unidade canônica de cada
+   exemplo sem usar somente espaço ou comprimento; resolver variação e
+   referência entre formas; preservar o contexto informal e a proveniência;
+   decidir perdas e `resposta_padrao`; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 10. `adjetivo em expressões de saudação`
+
+1. **Categoria legada:** `adjetivo em expressões de saudação`.
+
+2. **Descrição observada:** tipo usado para `bom`, descrito como palavra que
+   indica qualidade positiva e participa de `bom dia`, `bom te ver` e `bom te
+   encontrar`.
+
+3. **Exemplos existentes nos registros:** `bom`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** há um termo isolado e uma
+   descrição morfológica livre, além de exemplos de participação em expressões.
+   O contrato poderia representar unidade lexical, forma e sentido em objetos
+   diferentes, mas não há regra aprovada para decidir qual deles a linha
+   legada pretende representar. As relações existentes também não comprovam
+   ordem nem tipo semântico.
+
+6. **Dúvidas semânticas:** não está aprovada a conversão de `adjetivo` para
+   `categoria_lexical`; não está resolvido se `bom` representa lexema, forma ou
+   sentido; não está decidido como tratar `boa`; não está resolvido o papel de
+   `bom` em cada expressão.
+
+7. **Riscos de perda de significado:** confundir categoria gramatical com tipo
+   canônico; perder variação de forma; generalizar o sentido de `bom` entre
+   expressões; transformar relações legadas em componentes ordenados.
+
+8. **Condições para aprovar o mapeamento:** aprovar uma regra para categoria
+   lexical e variantes; separar lexema, formas e sentidos conforme as
+   evidências; resolver cada relação com as expressões e sua ordem; manter
+   contexto e proveniência; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 11. `advérbio em expressão de saudação`
+
+1. **Categoria legada:** `advérbio em expressão de saudação`.
+
+2. **Descrição observada:** tipo usado para `bem`, descrito como palavra que
+   indica condição positiva e participa de `tudo bem` e `bem-vindo`.
+
+3. **Exemplos existentes nos registros:** `bem`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** o registro fornece uma palavra
+   isolada, uma descrição gramatical livre e usos em mais de uma expressão.
+   Isso mostra que há informação lexical e contextual, mas não determina se a
+   linha deve gerar lexema, forma lexical ou sentido. A própria matriz registra
+   que o alvo semântico de `bem` não é único demonstrado.
+
+6. **Dúvidas semânticas:** não está aprovada a correspondência entre
+   `advérbio` e `categoria_lexical`; não está resolvido se os usos em `tudo bem`
+   e `bem-vindo` compartilham sentido; não está resolvida a relação com
+   `saudação interrogativa` e `expressão de acolhimento`.
+
+7. **Riscos de perda de significado:** unir sentidos diferentes; tratar
+   componente textual como relação temática ou vice-versa; perder o contexto
+   de cada uso; criar um lexema ou sentido sem preservar a ambiguidade.
+
+8. **Condições para aprovar o mapeamento:** distinguir os usos e sentidos
+   comprovados; aprovar a regra lexical aplicável; resolver a relação com as
+   expressões e seus componentes; preservar incertezas e evidências; não
+   transformar respostas padrão em fatos; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 12. `expressão de saudação`
+
+1. **Categoria legada:** `expressão de saudação`.
+
+2. **Descrição observada:** tipo usado para uma expressão de cumprimento
+   empregada para saudar alguém ou iniciar uma conversa, em contexto formal ou
+   informal.
+
+3. **Exemplos existentes nos registros:** `olá`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** o rótulo e o significado
+   descrevem um uso de cumprimento e o registro é uma unidade textual curta.
+   Ainda assim, o contrato não permite concluir, apenas pelo rótulo e pelo
+   termo, se a proposta é uma `expressao`, um `lexema`, uma `forma_lexical` ou
+   um `sentido`. A matriz mantém essa distinção pendente.
+
+6. **Dúvidas semânticas:** não está decidido se `olá` é unidade lexical,
+   expressão conversacional ou forma associada a um sentido; não está
+   resolvido se os usos formal e informal são um mesmo sentido; as referências
+   de `relacionados` não foram resolvidas.
+
+7. **Riscos de perda de significado:** apagar a distinção de registro;
+   converter proximidade textual em sinonímia; perder o uso de início de
+   conversa; transformar `resposta_padrao` em conhecimento canônico.
+
+8. **Condições para aprovar o mapeamento:** estabelecer a regra de
+   classificação; resolver usos e sentido; mapear referências relacionadas;
+   preservar evidências e proveniência; manter a resposta padrão fora do objeto
+   salvo decisão explícita; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 13. `expressão geral de cumprimento`
+
+1. **Categoria legada:** `expressão geral de cumprimento`.
+
+2. **Descrição observada:** tipo usado para `saudações`, descrito como palavra
+   ou expressão de cumprimento em contextos formais, informais, individuais ou
+   coletivos.
+
+3. **Exemplos existentes nos registros:** `saudações`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** o registro declara alcance geral e
+   preserva exemplo de uso. Porém, a própria descrição admite “palavra ou
+   expressão”, sem decidir entre lexema e expressão; significado e contexto
+   continuam campos do registro legado, não uma separação canônica autorizada.
+
+6. **Dúvidas semânticas:** não está definido se o plural é uma forma lexical ou
+   uma expressão; não está resolvido se o sentido geral é um objeto próprio ou
+   uma generalização de outras saudações; as referências a `olá`, `oi` e
+   saudações temporais continuam textuais.
+
+7. **Riscos de perda de significado:** transformar generalização em objeto
+   canônico sem evidência; unir usos formais e informais sem preservar
+   contexto; tratar referências relacionadas como equivalência ou hierarquia.
+
+8. **Condições para aprovar o mapeamento:** decidir se a unidade é lexema,
+   forma lexical, expressão ou sentido; resolver o alcance geral e seus
+   contextos; resolver as referências relacionadas; preservar evidências,
+   proveniência e possíveis perdas; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 14. `saudação telefônica`
+
+1. **Categoria legada:** `saudação telefônica`.
+
+2. **Descrição observada:** tipo usado para `alô`, associado a iniciar ou
+   atender uma conversa por telefone e verificar se a outra pessoa está
+   ouvindo.
+
+3. **Exemplos existentes nos registros:** `alô`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** o contexto telefônico está
+   explicitamente presente no significado, contexto e exemplo. Isso não resolve
+   o tipo do objeto: o contexto pode qualificar um sentido de um lexema, uma
+   expressão conversacional ou uma forma lexical. A matriz registra que o
+   contexto telefônico não resolve sozinho o tipo canônico.
+
+6. **Dúvidas semânticas:** não está decidido se o uso telefônico é um sentido
+   distinto de outros usos de `alô`; não está definida a unidade lexical ou
+   expressiva; referências relacionadas não possuem alvos canônicos.
+
+7. **Riscos de perda de significado:** apagar o contexto telefônico; unir usos
+   diferentes; classificar diretamente pelo rótulo livre; transformar a
+   resposta padrão `Alô! Quem fala?` em conhecimento ou comportamento.
+
+8. **Condições para aprovar o mapeamento:** separar unidade, forma e sentido
+   quando a evidência exigir; preservar o contexto telefônico e as incertezas;
+   resolver referências; manter a resposta padrão fora do objeto canônico
+   salvo decisão explícita; revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 15. `substantivo em expressão de apresentação`
+
+1. **Categoria legada:** `substantivo em expressão de apresentação`.
+
+2. **Descrição observada:** tipo usado para `prazer`, descrito como sentimento
+   de satisfação ou cordialidade que aparece em expressões de apresentação e
+   primeiro encontro.
+
+3. **Exemplos existentes nos registros:** `prazer`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** há um termo isolado, uma
+   classificação gramatical livre, um significado e expressões relacionadas.
+   A documentação não separa o lexema do sentido nem determina se o registro
+   deve ser associado a `prazer em conhecer você` e `muito prazer` como
+   componente, relação ou apenas referência.
+
+6. **Dúvidas semânticas:** não está aprovada a correspondência de
+   `substantivo` com `lexema`; não está resolvido se o significado de
+   satisfação é o sentido canônico; não está definido o papel de `prazer` nas
+   expressões compostas; não está definida a ordem dos componentes.
+
+7. **Riscos de perda de significado:** confundir palavra, sentido e componente;
+   perder o contexto de apresentação; criar relações de composição ou
+   equivalência sem prova; duplicar relações reversas.
+
+8. **Condições para aprovar o mapeamento:** aprovar a classificação lexical;
+   separar lexema e sentido; resolver as relações com as expressões e a ordem;
+   preservar o significado, contexto, evidências e proveniência; revisão humana
+   independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+### 16. `substantivo em saudação coletiva`
+
+1. **Categoria legada:** `substantivo em saudação coletiva`.
+
+2. **Descrição observada:** tipo usado para `pessoal`, descrito como palavra
+   dirigida cordialmente a um grupo e presente em saudações coletivas como
+   `olá pessoal` e `bom dia pessoal`.
+
+3. **Exemplos existentes nos registros:** `pessoal`.
+
+4. **Tipo canônico candidato:** `INDEFINIDO`.
+
+5. **Justificativa baseada nas evidências:** o termo isolado tem descrição
+   lexical livre, contexto coletivo e exemplos compostos. Isso não define se
+   deve ser um lexema, uma forma lexical ou um sentido, nem resolve sua
+   relação com as expressões coletivas. A matriz registra expressamente que o
+   substantivo e as relações de composição coletiva não têm destino canônico
+   resolvido.
+
+6. **Dúvidas semânticas:** não está aprovada a correspondência de `substantivo`
+   com uma categoria lexical; não está resolvido se `pessoal` é componente,
+   alvo discursivo ou parte de um sentido; não está definida a ordem nem a
+   natureza das relações com as saudações coletivas.
+
+7. **Riscos de perda de significado:** confundir o termo que nomeia o grupo
+   com o alcance coletivo da expressão; inventar relação de composição;
+   perder a ordem; transformar associação temática em objeto semântico.
+
+8. **Condições para aprovar o mapeamento:** definir o objeto lexical e seu
+   sentido; decidir o papel de `pessoal` nas expressões; provar tipo, direção e
+   ordem das relações; preservar evidências, proveniência e contexto coletivo;
+   revisão humana independente.
+
+9. **Nível de confiança:** baixo para qualquer tipo canônico.
+
+## 4. EVIDÊNCIAS E LIMITES COMUNS
+
+As evidências documentais usadas neste rascunho são:
+
+- `docs/_DOC_PROJETO.txt`, especialmente o estado da Fase 3.8, o schema
+  conceitual e as regras de não conversão automática;
+- `03_ULTIMOS_IMPLEMENTADOS.txt`, especialmente o contrato de cadastro e a
+  preservação da distinção entre proposta, evidência e conhecimento;
+- `docs/DECISAO_SEMANTICA_FASE_3_8.txt`, que descreve os 37 conhecimentos,
+  seus campos, exemplos, riscos e condições individuais;
+- `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json`, que confirma 37 propostas
+  pendentes, 33 relações conflitantes, 217 evidências, 32
+  `resposta_padrao` presentes e 5 ausentes;
+- `docs/MATRIZ_DECISAO_FASE_3_7.txt`, que confirma a cobertura de 70 propostas
+  sem itens aptos;
+- `docs/INVENTARIO_LEGADO_2026-09-26.txt`, que lista exatamente os 16 valores
+  de `conhecimento.tipo`, suas quantidades e os campos observados;
+- `docs/PLANO_MIGRACAO_AUDITAVEL.txt`, que proíbe interpretar `tipo` livre
+  como categoria canônica sem tabela de mapeamento aprovada;
+- `docs/LOTES_JSON_FASE_3_7.txt` e `docs/GERADOR_JSON_DEFINITIVO.txt`, que
+  confirmam que propostas e lotes são dados declarativos e não autorizam
+  aplicação.
+
+As evidências permitem afirmar que as categorias existem como valores legados,
+mas não permitem aprovar um tipo canônico para nenhuma delas. O preenchimento
+dos campos do banco legado não equivale a correspondência no modelo novo.
+`estado = confirmada` nas evidências legadas também não equivale a
+`aprovado` no destino.
+
+## 5. DÚVIDAS SEMÂNTICAS TRANSVERSAIS
+
+1. Qual é a unidade canônica de cada registro: `lexema`, `expressao`,
+   `forma_lexical` ou `sentido`?
+2. Quando um registro contém termo, significado e contexto, esses dados devem
+   ser separados em objetos distintos? Em caso afirmativo, qual regra os liga?
+3. Como representar variações de forma, gênero, número e registro sem perder a
+   distinção entre forma e sentido?
+4. Como distinguir componente de expressão, relação temática e simples
+   referência textual?
+5. Como resolver `relacionados` como referências lógicas sem inventar
+   equivalência, hierarquia ou sinonímia?
+6. Como preservar `resposta_padrao`, que não possui destino canônico direto,
+   sem convertê-la em conhecimento ou fato?
+7. Como preservar o alcance coletivo, o uso interrogativo, o contexto
+   telefônico e a diferença entre saudação e despedida?
+8. Qual regra versionada e qual revisão humana permitirão sair de
+   `INDEFINIDO`?
+
+## 6. CONDIÇÕES GERAIS PARA QUALQUER FUTURA APROVAÇÃO
+
+Nenhuma categoria deste documento deve ser marcada como definitivamente
+aprovada. Para qualquer futura decisão de mapeamento, será necessário:
+
+- tabela de correspondência versionada para os valores livres do legado;
+- classificação explícita entre `expressao`, `lexema`, `forma_lexical` e
+  `sentido`;
+- resolução dos alvos de significado, contexto e `relacionados`;
+- preservação de evidências, proveniência, incertezas e perdas;
+- tratamento decidido de `resposta_padrao`, sem convertê-la automaticamente em
+  conhecimento canônico ou fato;
+- resolução independente das relações, sem transformar relações em objetos
+  semânticos e sem duplicar pares reversos;
+- revisão humana independente, com justificativa e decisão registradas;
+- dry-run posterior, separado de qualquer aplicação;
+- autorização própria antes de qualquer escrita.
+
+## 7. ENCERRAMENTO DO RASCUNHO
+
+Este mapa termina no nível conceitual solicitado. Ele não contém decisão humana
+final, não altera o contrato semântico e não avança para a revisão individual
+dos 70 itens.
+
+Nenhum código foi alterado nesta etapa.
+
+Nenhum banco canônico ou legado foi alterado.
+
+Nenhum dos 70 registros foi processado, migrado, autorizado ou aplicado.
+
+Nenhuma função `registrar()`, `autorizar()` ou `aplicar()` foi chamada.

@@ -1,7 +1,7 @@
 # docs/_DOC_PROJETO.txt
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   HEN-ISANA — DOCUMENTO MESTRE
-  Última atualização: 2026-09-26 (primeira etapa da Fase 3.7)
+  Última atualização: 2026-09-26 (matriz humana da Fase 3.8)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 HIERARQUIA DOS DOCUMENTOS
@@ -32,8 +32,10 @@ conceitual de cadastro multifonte/JSON (1.3). A Parte 2 — núcleo linguístico
 simbólico — também foi concluída, com léxico, parser, semântica e contexto
 validados em memória. Na Parte 3, as Fases 3.1, 3.2, 3.3, 3.4, 3.5 e 3.6
 foram implementadas e validadas. O modo sombra e a resposta baseada em
-estrutura permanecem opt-in; a Fase 3.7, incluindo migração e desligamento
-controlado, permanece pendente e sem autorização.
+estrutura permanecem opt-in. A preparação segura da Fase 3.7 está tecnicamente
+encerrada, mas sua aplicação, migração física e desligamento controlado
+permanecem pendentes e sem autorização. A Fase 3.8 produziu a matriz de decisão
+semântica humana para os 70 itens, sem escolher ou aplicar decisões.
 
 As interfaces de interpretação, seleção de perguntas, validação, armazenamento,
 recuperação e composição de resposta estão separadas por módulo. Os contratos
@@ -277,12 +279,75 @@ validados na fronteira confiável.
 ROADMAP IMEDIATO
 ────────────────
 Partes 1 e 2 concluídas; as Fases 3.1, 3.2, 3.3, 3.4, 3.5 e 3.6 da Parte 3
-também estão validadas. A Fase 3.7 — migração e desligamento controlado —
-permanece pendente e sem autorização. Sua execução dependerá de autorização
-explícita em uma etapa futura.
+também estão validadas. A preparação segura da Fase 3.7 foi concluída com
+inventário, geração, manifestos, hashes, revisão, resolução conservadora,
+dry-run, idempotência e proteção contra escrita.
 
-Não há migração de dados nem aplicação automática fora do fluxo autorizado.
-Esses itens permanecem pendentes na Parte 3.
+A Fase 3.8 produziu `docs/DECISAO_SEMANTICA_FASE_3_8.txt`, uma matriz humana
+para os 70 itens: 37 conhecimentos pendentes e 33 unidades lógicas de relações
+conflitantes. Cada item aguarda `APROVAR`, `MANTER PENDENTE` ou `REJEITAR`
+por uma pessoa; nenhuma escolha foi aplicada automaticamente.
+
+Permanece pendente e sem autorização a decisão semântica humana, seguida, em
+etapa futura e separada, de eventual aplicação transacional, migração física e
+desligamento controlado. Não há migração de dados nem aplicação automática fora
+do fluxo autorizado.
+
+FECHAMENTO DOCUMENTAL DA FASE 3.7 E MATRIZ DA FASE 3.8
+────────────────────────────────────────────────────────
+Artefatos ativos:
+
+- `docs/MATRIZ_DECISAO_FASE_3_7.txt`: reconcilia o estado técnico dos 70 itens.
+- `docs/REVISAO_LOTES_MIGRACAO.json`: revisão documental dos lotes.
+- `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json`: resolução individual técnica.
+- `docs/DECISAO_SEMANTICA_FASE_3_8.txt`: decisão humana item a item.
+- `docs/INVENTARIO_LEGADO_2026-09-26.txt`: inventário das fontes em somente
+  leitura.
+- `docs/PLANO_MIGRACAO_AUDITAVEL.txt`: procedimento futuro sem autorização.
+
+Reconciliação suportada pelos artefatos:
+
+- 37 propostas de conhecimento pendentes;
+- 33 unidades lógicas de relações conflitantes;
+- 66 linhas físicas de relações reversas;
+- 217 evidências de conhecimento preservadas;
+- 32 `resposta_padrao` presentes e 5 ausentes;
+- 0 propostas aptas;
+- 0 propostas rejeitadas;
+- 0 decisões humanas aplicadas.
+
+A divisão “6 casos do piloto + 16 candidatos + 33 pendentes + 15 conflitantes”
+não é rastreável por `proposta_id` nos documentos ativos, manifestos ou
+relatórios JSON. Os seis casos do piloto aparecem apenas em fixtures/testes,
+sem identificação documental de seis registros legados específicos; por isso
+não foram atribuídos aos 70.
+
+Na matriz da Fase 3.8:
+
+- cada conhecimento contém conteúdo original, tipo legado, candidato canônico,
+  referências, evidências, proveniência, perdas, riscos, justificativa e
+  condição de autorização;
+- cada relação contém endpoints, tipo legado, par reverso, candidato de
+  relação, direção/simetria, ordem, proveniência, riscos e condição de
+  autorização;
+- nenhum tipo legado foi convertido automaticamente para o contrato canônico;
+- nenhuma `resposta_padrao` foi convertida em conhecimento ou fato;
+- nenhuma relação reversa foi tratada como duas relações lógicas;
+- nenhum objeto semântico foi inventado.
+
+Verificações registradas:
+
+- 12 testes específicos de lotes aprovados;
+- `compileall` aprovado;
+- matriz humana com 70 IDs únicos e cobertura exata da resolução técnica;
+- seis bancos com `integrity_check=ok`, zero violações de FK e hashes
+  inalterados na validação registrada;
+- não foram repetidos testes que regeneram ou revisam operacionalmente os 70.
+
+Nenhum banco canônico ou legado foi alterado nesta análise. `registrar()`,
+`autorizar()` e `aplicar()` não foram chamados. A Fase 3.7 está encerrada como
+preparação segura, enquanto a aplicação, a migração física e o desligamento do
+legado continuam bloqueados por decisão semântica e autorização humana.
 
 INFERÊNCIA SIMBÓLICA — FASE 3.4
 ────────────────────────────────

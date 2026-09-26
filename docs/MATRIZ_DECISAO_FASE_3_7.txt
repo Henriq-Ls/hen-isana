@@ -1,0 +1,89 @@
+# HEN-ISANA — MATRIZ DE DECISÃO DA FASE 3.7
+
+Data da auditoria: 2026-09-26
+Modo: somente leitura e auditoria documental
+Escopo: 70 propostas de migração e 33 unidades de relações
+
+## 1. FONTE AUTORITATIVA DA MATRIZ
+
+Esta matriz não reprocessa os bancos nem regenera lotes. Ela consolida os
+artefatos já existentes:
+
+- `docs/INVENTARIO_LEGADO_2026-09-26.txt`;
+- `docs/REVISAO_LOTES_MIGRACAO.json`;
+- `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json`;
+- `docs/PLANO_MIGRACAO_AUDITAVEL.txt`;
+- contrato e regras efetivamente implementados em
+  `aplicacao/migracao_legado_json.py`.
+
+`RESOLUCAO_REVISAO_LOTES_MIGRACAO.json` é a matriz individual completa: cada
+item contém `proposta_id`, origem, classificação, motivo objetivo, condições
+para autorização e evidência ou proveniência preservada. Este documento
+registra a reconciliação dos totais e não substitui os itens individuais.
+
+## 2. RECONCILIAÇÃO DOS TOTAIS
+
+| Categoria suportada pelos artefatos atuais | Quantidade | Escopo | Motivo |
+|---|---:|---|---|
+| Validado pelo piloto dentro dos 70 | 0 | nenhum `proposta_id` dos 70 | o piloto possui casos de teste próprios, mas não há vínculo documental que identifique registros legados específicos como validados por ele |
+| Candidato tecnicamente compatível | 0 | nenhum item | o relatório de resolução não possui classificação `apta`; compatibilidade estrutural isolada não autoriza objeto semântico ou aplicação |
+| Pendente por decisão semântica | 37 | `migracao-legado-conhecimento-1` até `37` | `termo`, `tipo`, significado, contexto, referências e distinção entre lexema, expressão, forma lexical e sentido não têm mapeamento autorizado completo |
+| Conflitante com o contrato atual | 33 | `migracao-legado-relacao-*` | as 66 linhas formam 33 pares reversos; faltam tipo semântico dos endpoints, direção e ordem, e o par reverso não pode ser duplicado automaticamente |
+| **Total** | **70** | 37 registros de conhecimento + 33 unidades de relação | cobertura completa do artefato de resolução |
+
+Os 33 itens de relação representam unidades lógicas, não 33 linhas físicas:
+cada unidade preserva duas linhas reversas do legado. O inventário confirma 66
+linhas e 33 pares não direcionados.
+
+## 3. ORIGEM DA DIVERGÊNCIA 6 + 16 + 33 + 15
+
+A decomposição “6 casos do piloto + 16 candidatos estruturalmente compatíveis +
+33 pendentes + 15 relações conflitantes” não aparece nos documentos ativos,
+nos manifestos ou nos dois relatórios JSON existentes. Também não há uma lista
+de `proposta_id` que associe esses quatro grupos aos 70 itens.
+
+Portanto, essa decomposição não é uma representação suportada pelo estado
+técnico atual. Ela não pode ser convertida em uma classificação final sem
+inventar correspondências. Em particular:
+
+- os seis casos do piloto estão cobertos por fixtures/testes do contrato, não
+  por uma lista de seis registros legados autorizados;
+- os 16 candidatos não aparecem como classificação ou subconjunto rastreável
+  em `REVISAO_LOTES_MIGRACAO.json`;
+- os 15 conflitos não correspondem às 33 unidades de relação preservadas no
+  ledger;
+- os relatórios atuais não têm itens `apta` ou `valida`.
+
+A classificação suportada é, portanto, **37 pendentes + 33 conflitantes**.
+Nenhuma contagem foi alterada apenas para fazer os números coincidirem.
+
+## 4. AUDITORIA DOS 70 ITENS
+
+Verificações realizadas por leitura dos artefatos:
+
+- 70 propostas individuais;
+- 70 `proposta_id` únicos;
+- 37 propostas de `conhecimento`;
+- 33 propostas de `relacao`;
+- todos os 70 possuem motivo de decisão e condição necessária para autorização;
+- todos preservam evidência ou proveniência;
+- nenhum objeto semântico foi gerado;
+- 217 evidências de conhecimento preservadas;
+- 66 linhas de relações preservadas no ledger;
+- 33 unidades de relação sem direção comprovada;
+- 0 propostas aptas para autorização;
+- 0 rejeitadas;
+- `resposta_padrao`: 32 com valor e 5 ausentes; nenhuma convertida em fato.
+
+## 5. ESTADO TÉCNICO
+
+A preparação segura está tecnicamente fechada: inventário, geração,
+manifestos, hashes, revisão, resolução conservadora, dry-run, idempotência e
+proteção contra escrita estão implementados e documentados.
+
+Isso não encerra a Fase 3.7 completa. Continuam fora desta etapa a decisão
+semântica humana, a autorização, a aplicação transacional, a migração física e
+o desligamento do legado.
+
+Nenhum banco canônico foi alterado e nenhum registro foi registrado,
+autorizado, aplicado ou migrado nesta auditoria.

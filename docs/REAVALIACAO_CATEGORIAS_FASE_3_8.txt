@@ -1,0 +1,428 @@
+# HEN-ISANA — REAVALIAÇÃO DAS CATEGORIAS LEGADAS DA FASE 3.8
+
+Data: 2026-09-26
+Status: proposta documental para revisão humana; não é aprovação
+Escopo: classificação no nível das 16 categorias legadas
+
+## 1. OBJETIVO E LIMITE
+
+Esta reavaliação aplica o critério estrutural solicitado à documentação já
+existente. Ela procura identificar onde há evidência suficiente para propor um
+tipo canônico candidato, sem transformar a proposta em decisão semântica final.
+
+O candidato `expressao` é usado somente quando a categoria reúne sequências
+textuais com função comunicativa identificável, estrutura observada como
+unidade de uso e múltiplos exemplos documentados na própria categoria. Isso é
+uma proposta de classificação no nível da categoria; não autoriza a
+classificação ou aplicação de nenhum registro individual.
+
+Termos isolados não foram classificados automaticamente como `lexema`.
+Campos chamados `significado` não foram convertidos automaticamente em
+`sentido`. Não foram atribuídas categorias `forma_lexical` porque a
+documentação não prova, no nível da categoria, variantes da mesma unidade
+lexical de modo suficiente.
+
+Os grupos finais são deliberadamente separados:
+
+- **Grupo A:** categorias com evidência suficiente para um candidato;
+- **Grupo B:** categorias que continuam `INDEFINIDO`, sem uma classificação
+  única sustentada;
+- **Grupo C:** categorias heterogêneas que continuam `INDEFINIDO` e não devem
+  ser forçadas a um único tipo.
+
+Um candidato é uma proposta para revisão humana. Não significa aprovação.
+
+## 2. TABELA CONSOLIDADA
+
+| Categoria legada | Qtd | Candidato | Confiança | Evidência objetiva | Dúvida restante |
+|---|---:|---|---|---|---|
+| `saudação coletiva` | 7 | `expressao` | média | Sete sequências compostas documentadas como cumprimentos dirigidos a grupos: `olá a todos`, saudações temporais com `pessoal` e com `a todos`. | A composição com componentes independentes, o alvo do sentido e a ordem não estão resolvidos. |
+| `saudação coletiva informal` | 5 | `expressao` | média | Cinco sequências compostas documentadas como cumprimentos coletivos informais: `olá pessoal`, `oi pessoal`, `alô pessoal`, `olá gente`, `oi gente`. | O papel de `pessoal`/`gente`, o contexto telefônico de `alô` e as relações com outras formas continuam pendentes. |
+| `saudação interrogativa` | 3 | `expressao` | média | `como vai`, `tudo bem` e `como você está` são descritas como unidades de saudação que perguntam pelo estado da pessoa. | Não está separada a expressão do sentido interrogativo ou de uma eventual proposição. |
+| `saudação de período do dia` | 3 | `expressao` | média | `bom dia`, `boa tarde` e `boa noite` são sequências convencionais documentadas como saudações de manhã, tarde e noite. | `boa noite` também aparece como despedida; os componentes e a ordem não foram formalizados. |
+| `substantivo em expressão de saudação` | 3 | `INDEFINIDO` | baixa | `dia`, `tarde` e `noite` são termos isolados descritos como substantivos e relacionados a expressões de saudação. | Não é possível distinguir objetivamente lexema, forma lexical e sentido. |
+| `expressão de reencontro` | 3 | `expressao` | média | `bom te ver`, `quanto tempo` e `bom te encontrar` são descritas como unidades conversacionais de reencontro. | `quanto tempo` também envolve referência temporal; o papel dos componentes e a fixidez individual precisam de revisão. |
+| `expressão de acolhimento` | 2 | `INDEFINIDO` | baixa | `seja bem-vindo` e `bem-vindo` têm função de acolhimento documentada. | As duas formas têm estruturas diferentes e podem exigir expressão, forma lexical ou sentido distintos. |
+| `expressão de apresentação` | 2 | `expressao` | média | `prazer em conhecer você` e `muito prazer` são sequências compostas documentadas para apresentações e primeiros encontros. | O papel de `prazer`, a relação com o registro isolado e a separação entre expressão e sentido não estão resolvidos. |
+| `saudação informal` | 2 | `INDEFINIDO` | baixa | A categoria reúne `oi` e `e aí`, ambos descritos como cumprimentos informais. | Contém uma palavra isolada e uma sequência composta; não deve receber um único tipo por categoria. |
+| `adjetivo em expressões de saudação` | 1 | `INDEFINIDO` | baixa | `bom` é descrito como adjetivo e aparece relacionado a `bom dia`, `bom te ver` e `bom te encontrar`. | Categoria gramatical não prova lexema; não estão separados lexema, forma, sentido e componente. |
+| `advérbio em expressão de saudação` | 1 | `INDEFINIDO` | baixa | `bem` é descrito como advérbio e aparece em `tudo bem` e `bem-vindo`. | Os usos podem ter sentidos e papéis diferentes; não há distinção objetiva entre lexema, forma e sentido. |
+| `expressão de saudação` | 1 | `INDEFINIDO` | baixa | `olá` é descrito como cumprimento usado para saudar ou iniciar conversa. | É uma unidade isolada; a documentação não distingue expressão conversacional, lexema, forma lexical e sentido. |
+| `expressão geral de cumprimento` | 1 | `INDEFINIDO` | baixa | `saudações` é descrito como palavra ou expressão de cumprimento geral. | A própria descrição admite palavra ou expressão; o significado geral não está separado de uma unidade identificada. |
+| `saudação telefônica` | 1 | `INDEFINIDO` | baixa | `alô` é associado explicitamente a iniciar ou atender conversa por telefone e verificar se há escuta. | O contexto telefônico pode ser um sentido de um lexema, uma expressão ou uma forma; a evidência não escolhe entre eles. |
+| `substantivo em expressão de apresentação` | 1 | `INDEFINIDO` | baixa | `prazer` é descrito como substantivo ligado a expressões de apresentação. | Não está resolvido se é lexema, sentido ou componente de `prazer em conhecer você` e `muito prazer`. |
+| `substantivo em saudação coletiva` | 1 | `INDEFINIDO` | baixa | `pessoal` é descrito como palavra dirigida a grupo e aparece em saudações coletivas. | Não está resolvido se é lexema, sentido, componente ou marcador do alcance coletivo. |
+
+## 3. ANÁLISE POR CATEGORIA
+
+### 1. `saudação coletiva`
+
+- **Por que pode ser `expressao`:** os sete exemplos são sequências textuais
+  compostas documentadas com a mesma função comunicativa: cumprimentar um
+  grupo. A matriz registra exemplos como `olá a todos`, `bom dia pessoal`,
+  `boa tarde pessoal`, `boa noite pessoal`, `bom dia a todos`, `boa tarde a
+  todos` e `boa noite a todos`, todos dentro da mesma categoria.
+- **Por que não é automaticamente `lexema`:** os exemplos são sequências de
+  mais de uma palavra e a categoria não identifica uma unidade lexical
+  abstrata única.
+- **Por que não é automaticamente `forma_lexical`:** não há prova de que as
+  variações `pessoal`/`a todos` ou os períodos do dia sejam formas da mesma
+  unidade lexical.
+- **Por que não é automaticamente `sentido`:** os significados descrevem
+  cumprimento coletivo, mas não há uma unidade-base identificada cujo sentido
+  esteja sendo desambiguado.
+- **Por que `INDEFINIDO` ainda pode ser necessário:** a proposta `expressao`
+  depende de revisão dos componentes, da ordem e do destino dos sentidos. A
+  classificação de cada registro não foi feita nesta etapa.
+
+### 2. `saudação coletiva informal`
+
+- **Por que pode ser `expressao`:** `olá pessoal`, `oi pessoal`, `alô pessoal`,
+  `olá gente` e `oi gente` são sequências compostas documentadas como
+  cumprimentos coletivos em tom informal.
+- **Por que não é automaticamente `lexema`:** os exemplos são compostos e a
+  categoria descreve uma função de uso, não uma unidade lexical abstrata.
+- **Por que não é automaticamente `forma_lexical`:** `pessoal` e `gente` não
+  são demonstrados como variantes formais da mesma unidade; são palavras
+  diferentes nas evidências.
+- **Por que não é automaticamente `sentido`:** o uso informal e coletivo não
+  identifica sozinho uma unidade-base e seu sentido canônico.
+- **Por que `INDEFINIDO` ainda pode ser necessário:** `alô pessoal` pode
+  carregar contexto telefônico, e o papel de `pessoal`/`gente` e das relações
+  legadas ainda precisa de revisão.
+
+### 3. `saudação interrogativa`
+
+- **Por que pode ser `expressao`:** `como vai`, `tudo bem` e `como você está`
+  são documentadas como unidades conversacionais que combinam saudação e
+  pergunta cordial sobre o estado de alguém.
+- **Por que não é automaticamente `lexema`:** os três exemplos são sequências
+  compostas e a função comunicativa excede uma palavra isolada.
+- **Por que não é automaticamente `forma_lexical`:** não há evidência de que
+  as três sequências sejam variantes formais de uma mesma unidade lexical.
+- **Por que não é automaticamente `sentido`:** o campo `significado` descreve
+  a função, mas não separa expressão, interpretação interrogativa e eventual
+  proposição.
+- **Por que `INDEFINIDO` ainda pode ser necessário:** a proposta
+  `expressao` não resolve a preservação do caráter interrogativo nem o alvo
+  canônico do sentido.
+
+### 4. `saudação de período do dia`
+
+- **Por que pode ser `expressao`:** `bom dia`, `boa tarde` e `boa noite` são
+  sequências convencionais documentadas como saudações associadas,
+  respectivamente, à manhã, tarde e noite. A categoria e os exemplos
+  apresentam uma função comunicativa reconhecível.
+- **Por que não é automaticamente `lexema`:** os exemplos são sequências de
+  mais de uma palavra.
+- **Por que não é automaticamente `forma_lexical`:** `bom`/`boa` e
+  `dia`/`tarde`/`noite` não são demonstrados como variantes da mesma unidade
+  lexical.
+- **Por que não é automaticamente `sentido`:** o período do dia pode ser
+  contexto de uso ou parte de um sentido; o legado não resolve essa distinção.
+- **Por que `INDEFINIDO` ainda pode ser necessário:** `boa noite` também é
+  descrita como despedida, e as relações de componentes não informam ordem.
+  Portanto, `expressao` é candidato de categoria, não decisão final dos
+  registros.
+
+### 5. `substantivo em expressão de saudação`
+
+- **Por que pode ser `expressao`:** não há evidência suficiente; `dia`,
+  `tarde` e `noite` são termos isolados, descritos como componentes de outras
+  expressões.
+- **Por que não é automaticamente `lexema`:** o rótulo gramatical
+  `substantivo` é uma descrição livre e não prova que a linha representa a
+  unidade lexical abstrata.
+- **Por que não é automaticamente `forma_lexical`:** não há variantes da
+  mesma unidade lexical demonstradas.
+- **Por que não é automaticamente `sentido`:** o significado contextual de
+  cada termo não está separado de um lexema já identificado.
+- **Por que `INDEFINIDO` é necessário:** a própria evidência deixa abertas as
+  três opções lexema, forma lexical e sentido, além do papel de componente.
+
+### 6. `expressão de reencontro`
+
+- **Por que pode ser `expressao`:** `bom te ver`, `quanto tempo` e `bom te
+  encontrar` são documentadas como unidades usadas ao reencontrar alguém ou
+  destacar o tempo desde o encontro anterior. A categoria tem função
+  conversacional comum e exemplos compostos.
+- **Por que não é automaticamente `lexema`:** os exemplos são sequências
+  compostas; a evidência não aponta para uma palavra-base que represente a
+  categoria.
+- **Por que não é automaticamente `forma_lexical`:** não há prova de que as
+  três construções sejam variantes formais entre si.
+- **Por que não é automaticamente `sentido`:** os significados descrevem a
+  função de reencontro, mas não distinguem uma unidade-base e sua leitura.
+- **Por que `INDEFINIDO` ainda pode ser necessário:** `quanto tempo` pode
+  carregar referência temporal além do reencontro, e o papel de `bom` e a
+  fixidez de cada construção precisam de revisão.
+
+### 7. `expressão de acolhimento`
+
+- **Por que pode ser `expressao`:** a função de acolhimento é documentada para
+  `seja bem-vindo` e `bem-vindo`.
+- **Por que não é automaticamente `lexema`:** `seja bem-vindo` é uma
+  sequência composta e `bem-vindo` tem estrutura diferente; a categoria não
+  representa uma palavra única comum.
+- **Por que não é automaticamente `forma_lexical`:** a documentação menciona
+  variações de gênero e número, mas não estabelece que as duas entradas sejam
+  formas da mesma unidade lexical.
+- **Por que não é automaticamente `sentido`:** o acolhimento pode ser uma
+  função de uso de expressões diferentes; não há unidade-base desambiguada.
+- **Por que `INDEFINIDO` é necessário:** a categoria contém estruturas
+  potencialmente diferentes e não deve ser forçada a `expressao`, forma ou
+  sentido únicos sem revisão. Ela integra o Grupo C.
+
+### 8. `expressão de apresentação`
+
+- **Por que pode ser `expressao`:** `prazer em conhecer você` e `muito prazer`
+  são sequências documentadas para apresentações e primeiros encontros, com
+  função comunicativa identificável.
+- **Por que não é automaticamente `lexema`:** os exemplos são compostos e a
+  categoria não representa uma unidade lexical isolada.
+- **Por que não é automaticamente `forma_lexical`:** as duas sequências não
+  são demonstradas como variantes morfológicas ou formais da mesma unidade.
+- **Por que não é automaticamente `sentido`:** `significado` e contexto
+  descrevem satisfação em apresentação, mas não separam o sentido da
+  expressão e do componente `prazer`.
+- **Por que `INDEFINIDO` ainda pode ser necessário:** o papel de `prazer` e a
+  relação com o registro isolado `prazer` ainda exigem decisão.
+
+### 9. `saudação informal`
+
+- **Por que pode ser `expressao`:** `e aí` é uma sequência documentada como
+  saudação informal.
+- **Por que não é automaticamente `lexema`:** `oi` é isolado, mas `e aí` é
+  composto; a categoria mistura estruturas diferentes.
+- **Por que não é automaticamente `forma_lexical`:** não há prova de que `oi`
+  e `e aí` sejam variantes formais da mesma unidade lexical.
+- **Por que não é automaticamente `sentido`:** o uso informal é comum aos
+  registros, mas não identifica um único sentido compartilhado.
+- **Por que `INDEFINIDO` é necessário:** a categoria é heterogênea entre uma
+  palavra isolada e uma sequência composta. Ela integra o Grupo C e não deve
+  receber um tipo único.
+
+### 10. `adjetivo em expressões de saudação`
+
+- **Por que pode ser `expressao`:** não há evidência de que `bom` isoladamente
+  seja uma expressão; ele é documentado como participante de outras
+  expressões.
+- **Por que não é automaticamente `lexema`:** `adjetivo` é categoria
+  gramatical legada, não prova suficiente de lexema canônico.
+- **Por que não é automaticamente `forma_lexical`:** a relação entre `bom` e
+  `boa` é sugerida pelo uso, mas não foi estabelecida como variante formal no
+  contrato.
+- **Por que não é automaticamente `sentido`:** o texto de qualidade positiva
+  pode ser uma definição, mas não prova um sentido separado de uma unidade
+  lexical aprovada.
+- **Por que `INDEFINIDO` é necessário:** o registro pode exigir separação entre
+  lexema, forma, sentido e componente das expressões.
+
+### 11. `advérbio em expressão de saudação`
+
+- **Por que pode ser `expressao`:** não há evidência de que `bem` isoladamente
+  seja uma expressão; ele aparece em `tudo bem` e `bem-vindo`.
+- **Por que não é automaticamente `lexema`:** `advérbio` é categoria
+  gramatical livre e não resolve a unidade lexical abstrata.
+- **Por que não é automaticamente `forma_lexical`:** não há prova de variação
+  formal entre os usos documentados.
+- **Por que não é automaticamente `sentido`:** `bem` participa de estruturas
+  diferentes e a matriz registra que seu alvo semântico não é único.
+- **Por que `INDEFINIDO` é necessário:** os papéis em `tudo bem` e
+  `bem-vindo` podem exigir sentidos ou relações distintos.
+
+### 12. `expressão de saudação`
+
+- **Por que pode ser `expressao`:** o significado de `olá` descreve uma função
+  de cumprimento e início de conversa.
+- **Por que não é automaticamente `lexema`:** embora o termo seja isolado, o
+  rótulo e o uso conversacional não distinguem lexema de expressão.
+- **Por que não é automaticamente `forma_lexical`:** não há variante formal
+  documentada como pertencente à mesma unidade.
+- **Por que não é automaticamente `sentido`:** o significado descreve o uso,
+  mas não está ligado a uma unidade canônica já identificada.
+- **Por que `INDEFINIDO` é necessário:** a evidência não distingue
+  objetivamente expressão conversacional, lexema, forma lexical e sentido.
+
+### 13. `expressão geral de cumprimento`
+
+- **Por que pode ser `expressao`:** o registro tem função geral de
+  cumprimento, mas o próprio texto o descreve como “palavra ou expressão”.
+- **Por que não é automaticamente `lexema`:** a descrição não resolve se
+  `saudações` é unidade lexical abstrata ou uma forma em uso.
+- **Por que não é automaticamente `forma_lexical`:** não há variante da mesma
+  unidade demonstrada.
+- **Por que não é automaticamente `sentido`:** o alcance geral pode ser
+  significado do termo ou categoria de uso, sem unidade-base separada.
+- **Por que `INDEFINIDO` é necessário:** a própria evidência contém a
+  alternativa palavra/expressão e não permite escolher entre os tipos.
+
+### 14. `saudação telefônica`
+
+- **Por que pode ser `expressao`:** não há evidência suficiente; `alô` é
+  isolado e o uso telefônico é apresentado como contexto.
+- **Por que não é automaticamente `lexema`:** a categoria de uso telefônico
+  não prova se o registro representa a unidade lexical abstrata.
+- **Por que não é automaticamente `forma_lexical`:** não há variante formal
+  documentada.
+- **Por que não é automaticamente `sentido`:** o contexto telefônico pode
+  descrever um sentido específico, mas a documentação não separa esse sentido
+  de lexema ou expressão.
+- **Por que `INDEFINIDO` é necessário:** é preciso resolver se o uso telefônico
+  é sentido de `alô`, forma, lexema ou expressão conversacional.
+
+### 15. `substantivo em expressão de apresentação`
+
+- **Por que pode ser `expressao`:** não há evidência de que `prazer` isolado
+  seja uma expressão; ele aparece relacionado a expressões compostas.
+- **Por que não é automaticamente `lexema`:** `substantivo` é categoria
+  gramatical legada, não prova suficiente de lexema.
+- **Por que não é automaticamente `forma_lexical`:** não há variantes formais
+  demonstradas.
+- **Por que não é automaticamente `sentido`:** a satisfação descrita pode ser
+  sentido, mas não está separada de lexema e componente.
+- **Por que `INDEFINIDO` é necessário:** o papel de `prazer` nas expressões e
+  seu alvo canônico continuam sem resolução.
+
+### 16. `substantivo em saudação coletiva`
+
+- **Por que pode ser `expressao`:** não há evidência de que `pessoal` isolado
+  seja uma expressão; ele aparece como parte ou marcador em expressões
+  coletivas.
+- **Por que não é automaticamente `lexema`:** `substantivo` é descrição
+  gramatical livre e não prova uma unidade lexical abstrata.
+- **Por que não é automaticamente `forma_lexical`:** não há variantes formais
+  de `pessoal` demonstradas.
+- **Por que não é automaticamente `sentido`:** o uso dirigido a um grupo pode
+  ser contexto, sentido ou função discursiva; o destino não está separado.
+- **Por que `INDEFINIDO` é necessário:** não está resolvido se `pessoal` é
+  lexema, sentido, componente ou marcador do alcance coletivo.
+
+## 4. GRUPOS FINAIS
+
+### A) CATEGORIAS COM EVIDÊNCIA SUFICIENTE PARA CANDIDATO
+
+Seis categorias podem sair de `INDEFINIDO` no nível de proposta categorial:
+
+1. `saudação coletiva` → `expressao`;
+2. `saudação coletiva informal` → `expressao`;
+3. `saudação interrogativa` → `expressao`;
+4. `saudação de período do dia` → `expressao`;
+5. `expressão de reencontro` → `expressao`;
+6. `expressão de apresentação` → `expressao`.
+
+O que permite essa proposta é a combinação documentada de:
+
+- sequências textuais compostas;
+- múltiplos exemplos dentro da categoria;
+- função comunicativa reconhecível;
+- contexto de uso estável no conjunto da categoria;
+- descrição explícita como saudação, reencontro ou apresentação;
+- ausência de evidência de que a categoria seja uma palavra isolada ou apenas
+  uma variação formal.
+
+Esse candidato ainda exige revisão humana dos registros, componentes, sentidos,
+relações, ordem e perdas. Nenhum registro individual foi aprovado.
+
+### B) CATEGORIAS QUE CONTINUAM `INDEFINIDO`
+
+Oito categorias permanecem `INDEFINIDO` por falta de distinção objetiva:
+
+1. `substantivo em expressão de saudação`;
+2. `adjetivo em expressões de saudação`;
+3. `advérbio em expressão de saudação`;
+4. `expressão de saudação`;
+5. `expressão geral de cumprimento`;
+6. `saudação telefônica`;
+7. `substantivo em expressão de apresentação`;
+8. `substantivo em saudação coletiva`.
+
+A contagem deste grupo é oito, não seis: a enumeração acima contém as oito
+categorias que não pertencem ao Grupo A nem ao Grupo C.
+
+Os motivos comuns são termo isolado, categoria gramatical livre, contexto sem
+unidade-base resolvida, ou campo `significado` sem separação comprovada entre
+sentido, lexema e forma lexical.
+
+### C) CATEGORIAS HETEROGÊNEAS QUE NÃO DEVEM SER FORÇADAS
+
+Duas categorias permanecem `INDEFINIDO` por heterogeneidade estrutural:
+
+1. `expressão de acolhimento`:
+   `seja bem-vindo` e `bem-vindo` têm função de acolhimento, mas estruturas
+   diferentes e possíveis tratamentos distintos de expressão, forma e sentido;
+2. `saudação informal`:
+   `oi` é termo isolado e `e aí` é sequência composta, portanto a categoria
+   não sustenta um único tipo canônico sem classificar os registros
+   individualmente.
+
+O Grupo C não representa rejeição. Ele indica que a classificação deve ser
+desdobrada em revisão posterior, sem forçar uma única etiqueta à categoria.
+
+## 5. CONCLUSÕES E QUESTÕES REMANESCENTES
+
+Das 16 categorias:
+
+- **6** puderam sair de `INDEFINIDO` como proposta de candidato `expressao`;
+- **10** continuam `INDEFINIDO`;
+- dessas 10, **2** são explicitamente heterogêneas e formam o Grupo C;
+- **0** foram classificadas como `lexema`;
+- **0** foram classificadas como `forma_lexical`;
+- **0** foram classificadas como `sentido`.
+
+As principais questões ainda abertas são:
+
+1. se os candidatos `expressao` devem ser aplicados uniformemente a todos os
+   registros da categoria ou desdobrados por estrutura;
+2. se `boa noite` exige separação entre saudação e despedida;
+3. se as relações de componentes podem ser resolvidas com ordem e endpoints
+   canônicos;
+4. se `quanto tempo` tem função de reencontro, sentido temporal ou ambos;
+5. se `seja bem-vindo` e `bem-vindo` devem ser tratados como expressões,
+   variantes ou objetos diferentes;
+6. como separar lexema, forma lexical e sentido nos termos isolados;
+7. como preservar `resposta_padrao`, `relacionados` e evidências sem convertê-los
+   automaticamente em conhecimento canônico ou fato.
+
+## 6. EVIDÊNCIAS CONSULTADAS
+
+- `docs/MAPA_CATEGORIAS_LEGADAS_FASE_3_8.txt`;
+- `docs/DECISAO_SEMANTICA_FASE_3_8.txt`;
+- `docs/INVENTARIO_LEGADO_2026-09-26.txt`;
+- `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json`;
+- `docs/MATRIZ_DECISAO_FASE_3_7.txt`;
+- `docs/PLANO_MIGRACAO_AUDITAVEL.txt`;
+- `docs/_DOC_PROJETO.txt`;
+- `03_ULTIMOS_IMPLEMENTADOS.txt`.
+
+As evidências confirmam as 16 categorias, suas quantidades e os exemplos
+utilizados. O contrato e o plano continuam exigindo que a proposta categorial
+seja revisada antes de qualquer aplicação.
+
+## 7. VERIFICAÇÕES E PRESERVAÇÃO
+
+Foram consideradas somente as verificações documentais e consultas de leitura
+realizadas na auditoria anterior:
+
+- 16 categorias distintas;
+- 37 registros de conhecimento;
+- contagens por categoria compatíveis;
+- 37 exemplos rastreados;
+- tipos de relação separados das categorias de conhecimento;
+- candidatos limitados a `expressao`, `lexema`, `forma_lexical`, `sentido` e
+  `INDEFINIDO`.
+
+Nenhum teste de migração, geração operacional, aplicação, autorização ou
+registro foi executado nesta reavaliação.
+
+Nenhum código foi alterado.
+
+Nenhum banco foi alterado.
+
+Nenhum dos 70 registros foi processado individualmente.
+
+Nenhuma decisão semântica final foi tomada.
+
+Nenhum objeto canônico foi criado.
+
+Nenhuma função `registrar()`, `autorizar()` ou `aplicar()` foi chamada.

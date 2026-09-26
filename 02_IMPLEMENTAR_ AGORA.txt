@@ -65,7 +65,7 @@ da persistência. A coordenação permanece no HEN-ISANA.
 - Não migrar dados nesta etapa.
 - Não permitir escrita direta de fontes externas no SQLite.
 - Não iniciar inferência, modo sombra ou desligamento do legado antes das
-  dependências anteriores.
+  dependências anteriores.  
 - Marcar `[x]` somente com implementação, teste, compilação e evidência.
 - Não criar relatórios individuais `FASE_*.txt`.
 
@@ -280,7 +280,7 @@ Evidência:
 
 ### FASE 3.7 — TESTES, MIGRAÇÃO E DESLIGAMENTO CONTROLADO
 
-Status: [PARCIAL — GERADOR E PREPARAÇÃO DE LOTES CONCLUÍDOS; APLICAÇÃO,
+Status: [PARCIAL — PREPARAÇÃO SEGURA TECNICAMENTE ENCERRADA; APLICAÇÃO,
 MIGRAÇÃO E DESLIGAMENTO PENDENTES]
 
 O gerador definitivo de JSON foi implementado e validado em
@@ -295,11 +295,29 @@ Revalidação da cópia transferida:
 
 - `testes.test_gerador_json`: 18 testes aprovados;
 - `testes.test_gerador_json_futuro`: 14 testes aprovados;
-- `testes.test_lotes_json_fase_3_7`: 9 testes aprovados;
+- `testes.test_lotes_json_fase_3_7`: 12 testes aprovados;
 - conjunto direcionado das Fases 3.1–3.6 e da Fase 3.7: 130 testes aprovados;
 - `python -m compileall -q core aplicacao bancos testes`: aprovado;
 - seis bancos com `integrity_check=ok` e zero violações de chave estrangeira;
 - hashes dos seis bancos inalterados antes/depois.
+
+### AUDITORIA DOCUMENTAL E MATRIZ DE DECISÃO — 2026-09-26
+
+Os artefatos atuais foram auditados sem regenerar lotes e sem processar os 70
+registros. A matriz individual está em
+`docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json` e a reconciliação dos totais está em
+`docs/MATRIZ_DECISAO_FASE_3_7.txt`.
+
+O estado suportado pelo código, testes e relatórios é:
+
+- 37 propostas de conhecimento pendentes por decisão semântica;
+- 33 unidades de relação conflitantes, correspondentes a 66 linhas reversas;
+- 0 propostas aptas;
+- 0 propostas rejeitadas.
+
+A divisão anterior de 6 casos de piloto, 16 candidatos, 33 pendentes e 15
+conflitantes não possui vínculo rastreável com os 70 `proposta_id` atuais e não
+foi usada para alterar a classificação.
 
 ## ORDEM DA EXECUÇÃO FUTURA
 

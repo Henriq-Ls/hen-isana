@@ -2,8 +2,9 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Partes consolidadas: PARTE 1 — FUNDAÇÃO, SCHEMA, CONTRATOS E ENTRADAS CONTROLADAS
                     PARTE 2 — NÚCLEO LINGUÍSTICO SIMBÓLICO
-                     PARTE 3 — FASES 3.1, 3.2, 3.3, 3.4, 3.5 E 3.6;
+                     PARTE 3 — FASES 3.1, 3.2, 3.3, 3.4, 3.5, 3.6 E 3.8;
                      GERADOR, PREPARAÇÃO E DRY-RUN DE LOTES DA FASE 3.7
+                     E MATRIZ DE DECISÃO SEMÂNTICA
 Data de fechamento: 2026-09-26
 Status: HISTÓRICO CONSOLIDADO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -17,7 +18,7 @@ Status: HISTÓRICO CONSOLIDADO
 - Relatórios explícitos para aceito, pendente, conflito e rejeitado.
 - Validação do fluxo real somente por `IngestaoJSON.dry_run()` injetado.
 - 18 testes específicos aprovados e 14 testes da ferramenta de teste aprovados;
-- preparação segura de lotes em `aplicacao/lotes_json.py`, com 9 testes
+- preparação segura de lotes em `aplicacao/lotes_json.py`, com 12 testes
   específicos aprovados;
 - geração auditável dos lotes legados em
   `aplicacao/migracao_legado_json.py`, com leitura SQLite exclusivamente em
@@ -52,7 +53,7 @@ Status: HISTÓRICO CONSOLIDADO
   rejeita sobrescrita diferente.
 - A validação opcional injeta `IngestaoJSON.dry_run()` e não chama registro,
   revisão, autorização ou aplicação.
-- `testes.test_lotes_json_fase_3_7` executou 9 testes aprovados.
+- `testes.test_lotes_json_fase_3_7` executou 12 testes aprovados.
 - Detalhamento operacional: `docs/LOTES_JSON_FASE_3_7.txt`.
 
 ### GERAÇÃO DOS LOTES LEGADOS — 2026-09-26
@@ -829,3 +830,90 @@ Status: concluída e validada em 2026-09-26.
   `aplicacao/resposta_estruturada.py`, o adaptador opt-in correspondente e
   `testes/test_resposta_estruturada_fase_3_6.py`; o fluxo legado não depende
   desses módulos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## FASE 3.8 — MATRIZ DE DECISÃO SEMÂNTICA HUMANA
+Status: matriz documental produzida; nenhuma decisão aplicada.
+Data: 2026-09-26.
+
+### Auditoria documental e reconciliação dos 70 itens
+
+- A preparação segura da Fase 3.7 foi encerrada sem processar
+  operacionalmente os 70 registros.
+- A representação rastreável pelos artefatos é de 70 propostas únicas:
+  37 propostas de conhecimento pendentes e 33 unidades lógicas de relações
+  conflitantes.
+- As 33 unidades de relação preservam 66 linhas físicas reversas. O inventário
+  registra 8 pares `componente_de_expressao` e 25 pares
+  `relacionado_no_tema`.
+- A decomposição “6 casos do piloto + 16 candidatos + 33 pendentes + 15
+  conflitantes” foi encontrada somente no arquivo de retomada anexado. Ela não
+  possui vínculo por `proposta_id` nos documentos ativos, manifestos ou
+  relatórios JSON e não foi adotada.
+- Não há evidência documental suficiente para identificar seis registros dos 70
+  como validados pelo piloto.
+- Nenhum dos 70 foi classificado como `apta` ou `rejeitada`.
+- Foram preservadas 217 evidências de conhecimento. Há 32 valores de
+  `resposta_padrao` presentes e 5 ausentes; nenhum foi convertido em fato ou
+  conhecimento canônico.
+- Os 37 registros de conhecimento foram analisados com seu conteúdo original,
+  tipo legado, referências textuais, evidências, proveniência, riscos e
+  condições de autorização.
+- As 33 relações foram tratadas como unidades lógicas, sem duplicar os pares
+  reversos. Direção, ordem e tipos semânticos dos endpoints continuam não
+  comprovados.
+
+### Documentos consolidados
+
+- `docs/MATRIZ_DECISAO_FASE_3_7.txt` — reconciliação dos totais e estado
+  técnico da preparação segura.
+- `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json` — matriz individual técnica dos
+  70 itens.
+- `docs/REVISAO_LOTES_MIGRACAO.json` — revisão documental dos lotes.
+- `docs/DECISAO_SEMANTICA_FASE_3_8.txt` — matriz de decisão humana individual.
+- `docs/INVENTARIO_LEGADO_2026-09-26.txt` — inventário somente leitura das
+  fontes.
+- `docs/PLANO_MIGRACAO_AUDITAVEL.txt` — procedimento futuro, sem autorização
+  de escrita.
+
+### Conteúdo da matriz humana
+
+- Cada um dos 70 itens possui `proposta_id` único e opção humana explícita:
+  `APROVAR`, `MANTER PENDENTE` ou `REJEITAR`.
+- Para os 37 conhecimentos, a matriz registra termo, termo original, chave,
+  tipo, significado, contexto, resposta padrão, relacionados e exemplo de uso.
+- Para as 33 relações, a matriz registra os dois endpoints, os tipos legados,
+  as duas linhas reversas, direção/simetria, ordem, proveniência e riscos.
+- A proposta conservadora permanece `MANTER PENDENTE`; ela não é decisão
+  automática e não autoriza aplicação.
+- Principais pendências: classificação entre lexema, expressão, forma lexical
+  e sentido; resolução de significado/contexto; referências de `relacionados`;
+  tratamento de `resposta_padrao`; tipos semânticos dos endpoints; direção;
+  simetria; ordem de componentes.
+- Principais riscos: inventar objeto semântico, transformar evidência legada
+  em aprovação, converter resposta padrão em fato, inferir direção ou ordem e
+  duplicar relações reversas.
+
+### Validações da auditoria e da matriz
+
+- `testes.test_lotes_json_fase_3_7`: 12 testes aprovados.
+- `python -m compileall -q core aplicacao bancos testes`: aprovado.
+- Validação estrutural da matriz: 70 IDs únicos, 37 conhecimentos e 33
+  relações.
+- Comparação da matriz humana com
+  `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json`: cobertura exata, sem IDs
+  ausentes ou extras.
+- Os seis bancos retornaram `integrity_check=ok`, zero violações de FK e
+  hashes inalterados na validação registrada.
+- Nesta etapa não foram repetidos testes que regeneram ou revisam os 70.
+
+### Restrições preservadas
+
+- `registrar()`, `autorizar()` e `aplicar()` não foram chamados.
+- Nenhum registro foi processado operacionalmente, autorizado, aplicado ou
+  migrado.
+- Nenhum banco canônico ou legado foi alterado.
+- Não houve migração física nem desligamento do legado.
+- Não houve alteração do contrato semântico.
+- A Fase 3.7 está encerrada como preparação segura; a aplicação e a migração
+  completa continuam bloqueadas por decisão semântica e autorização humana.

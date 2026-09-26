@@ -1,0 +1,1583 @@
+# HEN-ISANA — MATRIZ DE DECISÃO SEMÂNTICA DA FASE 3.8
+
+Data: 2026-09-26
+Status: proposta para revisão humana; não é autorização de aplicação
+Escopo: os 70 itens já identificados na Fase 3.7
+Modo desta etapa: leitura documental e leitura somente leitura das fontes já inventariadas
+
+## 1. REGRA DE USO
+
+Este documento transforma a resolução técnica da Fase 3.7 em uma pauta de
+decisão humana individual. Ele não executa `registrar()`, `autorizar()` ou
+`aplicar()`, não gera lote, não altera o contrato semântico e não altera banco.
+
+Para cada item, o revisor deve preencher exatamente uma opção:
+
+```text
+[ ] APROVAR
+[ ] MANTER PENDENTE
+[ ] REJEITAR
+```
+
+O campo “proposta conservadora” é uma recomendação documental baseada nas
+lacunas observadas. Não é uma decisão automática e não autoriza aplicação.
+
+As relações reversas são tratadas como uma única unidade lógica. As duas linhas
+físicas são preservadas apenas para rastreabilidade.
+
+## 2. RESUMO DA COBERTURA
+
+| Grupo | Quantidade | Situação técnica atual | Decisão humana aplicada |
+|---|---:|---|---:|
+| Registros de conhecimento | 37 | pendente | nenhuma |
+| Unidades lógicas de relação | 33 | conflitante | nenhuma |
+| Propostas de aprovação automática | 0 | não existem | nenhuma |
+| Rejeitadas | 0 | não classificadas como rejeitadas | nenhuma |
+| **Total** | **70** | cobertura completa | **nenhuma** |
+
+### IDs de conhecimento
+
+`migracao-legado-conhecimento-1` até
+`migracao-legado-conhecimento-37`.
+
+### IDs de relações
+
+```text
+migracao-legado-relacao-componente-de-expressao-12-19
+migracao-legado-relacao-componente-de-expressao-15-23
+migracao-legado-relacao-componente-de-expressao-16-19
+migracao-legado-relacao-componente-de-expressao-3-19
+migracao-legado-relacao-componente-de-expressao-3-20
+migracao-legado-relacao-componente-de-expressao-4-21
+migracao-legado-relacao-componente-de-expressao-5-22
+migracao-legado-relacao-componente-de-expressao-9-23
+migracao-legado-relacao-relacionado-no-tema-1-30
+migracao-legado-relacao-relacionado-no-tema-10-25
+migracao-legado-relacao-relacionado-no-tema-11-24
+migracao-legado-relacao-relacionado-no-tema-17-32
+migracao-legado-relacao-relacionado-no-tema-17-33
+migracao-legado-relacao-relacionado-no-tema-17-34
+migracao-legado-relacao-relacionado-no-tema-19-26
+migracao-legado-relacao-relacionado-no-tema-19-32
+migracao-legado-relacao-relacionado-no-tema-2-31
+migracao-legado-relacao-relacionado-no-tema-20-26
+migracao-legado-relacao-relacionado-no-tema-20-32
+migracao-legado-relacao-relacionado-no-tema-21-27
+migracao-legado-relacao-relacionado-no-tema-21-33
+migracao-legado-relacao-relacionado-no-tema-22-28
+migracao-legado-relacao-relacionado-no-tema-22-34
+migracao-legado-relacao-relacionado-no-tema-26-29
+migracao-legado-relacao-relacionado-no-tema-27-29
+migracao-legado-relacao-relacionado-no-tema-28-29
+migracao-legado-relacao-relacionado-no-tema-29-30
+migracao-legado-relacao-relacionado-no-tema-29-31
+migracao-legado-relacao-relacionado-no-tema-3-26
+migracao-legado-relacao-relacionado-no-tema-4-27
+migracao-legado-relacao-relacionado-no-tema-5-28
+migracao-legado-relacao-relacionado-no-tema-7-8
+migracao-legado-relacao-relacionado-no-tema-8-24
+```
+
+## 3. CRITÉRIOS SEMÂNTICOS COMUNS
+
+### 3.1 Conhecimento
+
+O texto legado pode ser candidato a `lexema`, `expressao`,
+`forma_lexical` ou `sentido`, mas os campos existentes não resolvem essa
+distinção sozinhos. O tipo legado é texto livre e não possui correspondência
+canônica aprovada.
+
+Para eventual aprovação de um registro de conhecimento, o revisor deve:
+
+1. aprovar a classificação entre lexema, expressão, forma lexical e sentido;
+2. resolver o alvo lógico de significado e contexto;
+3. resolver os valores de `relacionados` como referências do destino;
+4. decidir o tratamento de `resposta_padrao`, que não possui correspondência
+   direta no modelo atual;
+5. aceitar explicitamente as perdas e manter a proveniência;
+6. realizar revisão humana independente, sem ambiguidade remanescente.
+
+`resposta_padrao` não pode ser convertida em fato ou conhecimento canônico
+automaticamente. Nos 37 registros, há 32 valores presentes e 5 ausentes.
+
+### 3.2 Relações
+
+Cada item de relação representa duas linhas reversas do legado e uma única
+unidade lógica. Para eventual aprovação, o revisor deve:
+
+1. aprovar o tipo semântico dos dois endpoints;
+2. provar a direção ou decidir explicitamente que a relação é simétrica;
+3. provar a ordem quando o tipo exigir componentes ordenados;
+4. resolver os endpoints no modelo canônico;
+5. decidir como preservar os metadados e o par reverso sem duplicação;
+6. realizar revisão humana independente.
+
+O tipo legado `componente_de_expressao` não informa a ordem dos componentes.
+O tipo legado `relacionado_no_tema` não informa direção nem tipos semânticos.
+
+## 4. MATRIZ INDIVIDUAL — CONHECIMENTO
+
+Em todos os itens desta seção:
+
+- origem: `conhecimento.db:conhecimento:<id>`;
+- evidências: campos `tipo`, `significado`, `contexto_uso`,
+  `resposta_padrao` quando presente, `relacionados` e `exemplo_uso`;
+- proveniência: `aprendizado/bancos/conhecimento.db`, hash
+  `f47f9ae9a293d831ff82805c3e958cadff8a88623455b984a9683a9c150f3697`,
+  `origem_legada=curadoria_assistente`, `estado_legado=confirmada`;
+- tipo canônico candidato: não resolvido entre `lexema`, `expressao`,
+  `forma_lexical` e `sentido`;
+- relação candidata: referências textuais de `relacionados`, ainda não
+  resolvidas como objetos ou relações do destino;
+- direção/simetria e ordem: não aplicáveis ao registro isolado;
+- risco comum: perda ou alteração de distinções entre termo, expressão, forma
+  lexical e sentido; conversão indevida de resposta padrão; referência sem alvo;
+- proposta conservadora: `MANTER PENDENTE`;
+- decisão humana: preencher uma única opção no final de cada item.
+
+### Conhecimento 1
+
+```text
+proposta_id: migracao-legado-conhecimento-1
+conteúdo original:
+  termo=olá
+  termo_original=olá
+  termo_chave=ola
+  tipo=expressão de saudação
+  significado=Expressão usada para cumprimentar alguém ou iniciar uma conversa.
+  contexto_uso=Pode ser usada em situações formais ou informais, no início de uma conversa.
+  resposta_padrao=Olá! Como posso ajudar?
+  relacionados=oi, bom dia, boa tarde, boa noite
+  exemplo_uso=Olá, tudo bem?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o tipo livre não define se o alvo é expressão, lexema ou sentido; referências textuais ainda aguardam resolução.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 2
+
+```text
+proposta_id: migracao-legado-conhecimento-2
+conteúdo original:
+  termo=oi
+  termo_original=oi
+  termo_chave=oi
+  tipo=saudação informal
+  significado=Expressão curta usada para cumprimentar alguém ou iniciar uma conversa de modo informal.
+  contexto_uso=Usada principalmente em conversas informais entre pessoas conhecidas ou em situações descontraídas.
+  resposta_padrao=Oi! Tudo bem?
+  relacionados=olá, bom dia, boa tarde, boa noite
+  exemplo_uso=Oi, você pode me ajudar?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: classificação lexical e destino do significado ainda não foram aprovados.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 3
+
+```text
+proposta_id: migracao-legado-conhecimento-3
+conteúdo original:
+  termo=bom dia
+  termo_original=bom dia
+  termo_chave=bom dia
+  tipo=saudação de período do dia
+  significado=Expressão usada para cumprimentar alguém durante a manhã.
+  contexto_uso=Usada pela manhã, em situações formais ou informais, ao iniciar uma conversa ou encontrar alguém.
+  resposta_padrao=Bom dia! Como posso ajudar?
+  relacionados=olá, oi, boa tarde, boa noite
+  exemplo_uso=Bom dia, como você está?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o registro pode ser expressão composta, mas a relação entre expressão, sentido e componentes não está autorizada.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 4
+
+```text
+proposta_id: migracao-legado-conhecimento-4
+conteúdo original:
+  termo=boa tarde
+  termo_original=boa tarde
+  termo_chave=boa tarde
+  tipo=saudação de período do dia
+  significado=Expressão usada para cumprimentar alguém durante a tarde.
+  contexto_uso=Usada à tarde, em situações formais ou informais, ao iniciar uma conversa ou encontrar alguém.
+  resposta_padrao=Boa tarde! Como posso ajudar?
+  relacionados=olá, oi, bom dia, boa noite
+  exemplo_uso=Boa tarde, gostaria de fazer uma pergunta.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: expressão, sentido e seus componentes ainda não têm mapeamento canônico aprovado.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 5
+
+```text
+proposta_id: migracao-legado-conhecimento-5
+conteúdo original:
+  termo=boa noite
+  termo_original=boa noite
+  termo_chave=boa noite
+  tipo=saudação de período do dia
+  significado=Expressão usada para cumprimentar alguém durante a noite ou ao iniciar uma despedida noturna.
+  contexto_uso=Usada à noite, em situações formais ou informais, ao encontrar alguém ou encerrar uma conversa nesse período.
+  resposta_padrao=Boa noite! Como posso ajudar?
+  relacionados=olá, oi, bom dia, boa tarde
+  exemplo_uso=Boa noite, nos vemos amanhã.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o texto mistura cumprimento e despedida, e o destino lógico do significado ainda não foi decidido.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 6
+
+```text
+proposta_id: migracao-legado-conhecimento-6
+conteúdo original:
+  termo=alô
+  termo_original=alô
+  termo_chave=alo
+  tipo=saudação telefônica
+  significado=Expressão usada para iniciar ou atender uma conversa por telefone.
+  contexto_uso=Usada principalmente ao atender uma chamada ou verificar se a outra pessoa está ouvindo.
+  resposta_padrao=Alô! Quem fala?
+  relacionados=olá, oi, bom dia
+  exemplo_uso=Alô, você consegue me ouvir?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o contexto telefônico não resolve sozinho o tipo canônico nem o destino do texto.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 7
+
+```text
+proposta_id: migracao-legado-conhecimento-7
+conteúdo original:
+  termo=seja bem-vindo
+  termo_original=seja bem-vindo
+  termo_chave=seja bem vindo
+  tipo=expressão de acolhimento
+  significado=Expressão usada para receber alguém com cordialidade e indicar que sua presença é bem recebida.
+  contexto_uso=Usada ao receber uma pessoa em um lugar, grupo, evento ou conversa; pode variar para seja bem-vinda conforme a pessoa acolhida.
+  resposta_padrao=Obrigado! É bom estar aqui.
+  relacionados=bem-vindo, olá, prazer em conhecer você
+  exemplo_uso=Seja bem-vindo à nossa equipe.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a variação de gênero e a distinção entre expressão e sentido exigem decisão semântica.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 8
+
+```text
+proposta_id: migracao-legado-conhecimento-8
+conteúdo original:
+  termo=bem-vindo
+  termo_original=bem-vindo
+  termo_chave=bem vindo
+  tipo=expressão de acolhimento
+  significado=Expressão usada para acolher alguém e indicar que sua chegada ou presença é bem recebida.
+  contexto_uso=Usada ao receber uma pessoa em um lugar, grupo, evento ou conversa; a forma pode variar conforme o gênero e o número.
+  resposta_padrao=Obrigado! Fico feliz em estar aqui.
+  relacionados=seja bem-vindo, olá, prazer em conhecer você
+  exemplo_uso=Você é bem-vindo em nossa casa.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: há relação textual com outro item e variação morfológica, mas nenhum alvo canônico foi resolvido.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 9
+
+```text
+proposta_id: migracao-legado-conhecimento-9
+conteúdo original:
+  termo=prazer em conhecer você
+  termo_original=prazer em conhecer você
+  termo_chave=prazer em conhecer voce
+  tipo=expressão de apresentação
+  significado=Expressão usada para demonstrar satisfação ao conhecer alguém pela primeira vez.
+  contexto_uso=Usada em apresentações e primeiros encontros, em situações formais ou informais.
+  resposta_padrao=O prazer é meu!
+  relacionados=olá, seja bem-vindo, como vai
+  exemplo_uso=Prazer em conhecer você, meu nome é Ana.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o registro é composto e depende de resolução de componentes, sentido e referências relacionadas.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 10
+
+```text
+proposta_id: migracao-legado-conhecimento-10
+conteúdo original:
+  termo=como vai
+  termo_original=como vai
+  termo_chave=como vai
+  tipo=saudação interrogativa
+  significado=Expressão usada para cumprimentar alguém e perguntar de forma cordial como essa pessoa está.
+  contexto_uso=Usada em conversas formais ou informais, geralmente depois de uma saudação inicial ou ao reencontrar alguém.
+  resposta_padrao=Vou bem, obrigado. E você?
+  relacionados=tudo bem, como você está, olá
+  exemplo_uso=Olá, como vai?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: não há classificação aprovada para o tipo de expressão nem alvo canônico para significado e contexto.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 11
+
+```text
+proposta_id: migracao-legado-conhecimento-11
+conteúdo original:
+  termo=tudo bem
+  termo_original=tudo bem
+  termo_chave=tudo bem
+  tipo=saudação interrogativa
+  significado=Expressão usada para cumprimentar alguém e perguntar de maneira breve se está bem.
+  contexto_uso=Usada principalmente em conversas informais, mas também pode aparecer em situações cordiais e neutras.
+  resposta_padrao=Tudo bem, obrigado. E com você?
+  relacionados=como vai, como você está, olá
+  exemplo_uso=Oi, tudo bem?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o sentido interrogativo e a referência ao item “bem” não foram mapeados no destino.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 12
+
+```text
+proposta_id: migracao-legado-conhecimento-12
+conteúdo original:
+  termo=bom te ver
+  termo_original=bom te ver
+  termo_chave=bom te ver
+  tipo=expressão de reencontro
+  significado=Expressão usada para demonstrar satisfação ao encontrar novamente uma pessoa.
+  contexto_uso=Usada em situações informais ou cordiais quando duas pessoas se reencontram depois de algum tempo.
+  resposta_padrao=Também fico feliz em te ver!
+  relacionados=olá, como vai, quanto tempo
+  exemplo_uso=Bom te ver por aqui novamente.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a relação com o componente “bom” e o significado de reencontro exigem alvos canônicos resolvidos.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 13
+
+```text
+proposta_id: migracao-legado-conhecimento-13
+conteúdo original:
+  termo=quanto tempo
+  termo_original=quanto tempo
+  termo_chave=quanto tempo
+  tipo=expressão de reencontro
+  significado=Expressão usada ao reencontrar alguém depois de um período sem vê-la, destacando o tempo decorrido.
+  contexto_uso=Usada principalmente em conversas informais ou cordiais entre pessoas que não se encontram há algum tempo.
+  resposta_padrao=Pois é, faz bastante tempo!
+  relacionados=bom te ver, olá, como vai
+  exemplo_uso=Quanto tempo! Como você está?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a expressão e o sentido temporal não têm regra canônica aprovada no contrato atual.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 14
+
+```text
+proposta_id: migracao-legado-conhecimento-14
+conteúdo original:
+  termo=e aí
+  termo_original=e aí
+  termo_chave=e ai
+  tipo=saudação informal
+  significado=Expressão informal usada para cumprimentar alguém ou iniciar uma conversa de modo descontraído.
+  contexto_uso=Usada principalmente entre pessoas com proximidade ou em ambientes informais.
+  resposta_padrao=E aí! Tudo bem?
+  relacionados=oi, olá, tudo bem
+  exemplo_uso=E aí, como foi seu dia?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a classificação informal não corresponde automaticamente a uma categoria do destino.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 15
+
+```text
+proposta_id: migracao-legado-conhecimento-15
+conteúdo original:
+  termo=muito prazer
+  termo_original=muito prazer
+  termo_chave=muito prazer
+  tipo=expressão de apresentação
+  significado=Expressão usada para demonstrar satisfação ao ser apresentado a alguém ou ao conhecê-lo.
+  contexto_uso=Usada em apresentações e primeiros encontros, em situações formais ou informais.
+  resposta_padrao=Muito prazer! O prazer é meu.
+  relacionados=prazer em conhecer você, olá, seja bem-vindo
+  exemplo_uso=Muito prazer, meu nome é Carlos.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a relação com “prazer” pode ser componente, referência ou sentido, mas isso não está resolvido.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 16
+
+```text
+proposta_id: migracao-legado-conhecimento-16
+conteúdo original:
+  termo=bom te encontrar
+  termo_original=bom te encontrar
+  termo_chave=bom te encontrar
+  tipo=expressão de reencontro
+  significado=Expressão usada para demonstrar satisfação ao encontrar uma pessoa novamente.
+  contexto_uso=Usada em conversas informais ou cordiais quando duas pessoas se reencontram.
+  resposta_padrao=Também foi bom te encontrar!
+  relacionados=bom te ver, quanto tempo, olá
+  exemplo_uso=Foi bom te encontrar depois de tanto tempo.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a estrutura composta e a ligação com “bom” ainda não têm classificação canônica aprovada.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 17
+
+```text
+proposta_id: migracao-legado-conhecimento-17
+conteúdo original:
+  termo=olá a todos
+  termo_original=olá a todos
+  termo_chave=ola a todos
+  tipo=saudação coletiva
+  significado=Expressão usada para cumprimentar simultaneamente todas as pessoas de um grupo.
+  contexto_uso=Usada ao iniciar uma fala, mensagem, reunião ou conversa dirigida a várias pessoas.
+  resposta_padrao=Olá! Seja bem-vindo ao grupo.
+  relacionados=olá, bom dia, sejam bem-vindos
+  exemplo_uso=Olá a todos, agradeço a presença de vocês.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o alcance coletivo e a composição com referentes pessoais exigem decisão semântica explícita.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 18
+
+```text
+proposta_id: migracao-legado-conhecimento-18
+conteúdo original:
+  termo=saudações
+  termo_original=saudações
+  termo_chave=saudacoes
+  tipo=expressão geral de cumprimento
+  significado=Palavra ou expressão usada para cumprimentar alguém, iniciar uma conversa ou demonstrar cordialidade.
+  contexto_uso=Usada para designar cumprimentos em geral, em contextos formais, informais, individuais ou coletivos.
+  resposta_padrao=Saudações! Como posso ajudar?
+  relacionados=olá, oi, bom dia, boa tarde, boa noite
+  exemplo_uso=Envio minhas saudações a todos os participantes.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o registro é uma generalização de saudações e não possui destino lógico aprovado.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 19
+
+```text
+proposta_id: migracao-legado-conhecimento-19
+conteúdo original:
+  termo=bom
+  termo_original=bom
+  termo_chave=bom
+  tipo=adjetivo em expressões de saudação
+  significado=Palavra que indica uma qualidade positiva e que, em saudações, ajuda a formar cumprimentos como bom dia e expressões de reencontro.
+  contexto_uso=Usada como componente de cumprimentos e expressões cordiais, como bom dia, bom te ver e bom te encontrar.
+  resposta_padrao=(ausente)
+  relacionados=bom dia, bom te ver, bom te encontrar
+  exemplo_uso=Bom dia, pessoal.
+evidência usada: 5 campos de evidência; resposta_padrao ausente
+justificativa: o tipo morfológico livre, as relações de componente e o alvo do significado ainda não foram resolvidos.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 20
+
+```text
+proposta_id: migracao-legado-conhecimento-20
+conteúdo original:
+  termo=dia
+  termo_original=dia
+  termo_chave=dia
+  tipo=substantivo em expressão de saudação
+  significado=Período de tempo que, nas saudações, identifica a parte clara do dia em que se usa bom dia.
+  contexto_uso=Aparece como componente da saudação bom dia, usada principalmente pela manhã.
+  resposta_padrao=(ausente)
+  relacionados=bom, bom dia, manhã
+  exemplo_uso=Bom dia, professora.
+evidência usada: 5 campos de evidência; resposta_padrao ausente
+justificativa: o papel de componente de expressão e o sentido temporal não têm objeto canônico aprovado.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 21
+
+```text
+proposta_id: migracao-legado-conhecimento-21
+conteúdo original:
+  termo=tarde
+  termo_original=tarde
+  termo_chave=tarde
+  tipo=substantivo em expressão de saudação
+  significado=Período do dia posterior ao meio-dia que, nas saudações, aparece em boa tarde.
+  contexto_uso=Aparece como componente da saudação boa tarde, usada durante a tarde.
+  resposta_padrao=(ausente)
+  relacionados=boa, boa tarde, dia
+  exemplo_uso=Boa tarde, seja bem-vindo.
+evidência usada: 5 campos de evidência; resposta_padrao ausente
+justificativa: o papel de componente e o sentido temporal dependem de relação ordenada ainda não comprovada.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 22
+
+```text
+proposta_id: migracao-legado-conhecimento-22
+conteúdo original:
+  termo=noite
+  termo_original=noite
+  termo_chave=noite
+  tipo=substantivo em expressão de saudação
+  significado=Período do dia posterior à tarde que, nas saudações, aparece em boa noite.
+  contexto_uso=Aparece como componente da saudação boa noite, usada ao cumprimentar alguém à noite ou ao encerrar uma conversa nesse período.
+  resposta_padrao=(ausente)
+  relacionados=boa, boa noite, tarde
+  exemplo_uso=Boa noite, até amanhã.
+evidência usada: 5 campos de evidência; resposta_padrao ausente
+justificativa: o componente e o sentido podem ser preservados, mas não há regra aprovada para sua representação.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 23
+
+```text
+proposta_id: migracao-legado-conhecimento-23
+conteúdo original:
+  termo=prazer
+  termo_original=prazer
+  termo_chave=prazer
+  tipo=substantivo em expressão de apresentação
+  significado=Sentimento de satisfação ou cordialidade que, em saudações, aparece ao conhecer alguém ou ser apresentado.
+  contexto_uso=Usada em expressões de apresentação e primeiro encontro, como prazer em conhecer você e muito prazer.
+  resposta_padrao=O prazer é meu!
+  relacionados=prazer em conhecer você, muito prazer, apresentação
+  exemplo_uso=Prazer em conhecer você.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o substantivo, o sentido e sua participação em expressões não estão separados no modelo canônico.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 24
+
+```text
+proposta_id: migracao-legado-conhecimento-24
+conteúdo original:
+  termo=bem
+  termo_original=bem
+  termo_chave=bem
+  tipo=advérbio em expressão de saudação
+  significado=Palavra que indica uma condição positiva e que, em saudações, participa de expressões como tudo bem e bem-vindo.
+  contexto_uso=Usada em cumprimentos para perguntar ou indicar que alguém está bem e em expressões de acolhimento.
+  resposta_padrao=Tudo bem, obrigado. E com você?
+  relacionados=tudo bem, bem-vindo, seja bem-vindo
+  exemplo_uso=Tudo bem com você?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: “bem” participa de estruturas diferentes e não possui alvo semântico único demonstrado.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 25
+
+```text
+proposta_id: migracao-legado-conhecimento-25
+conteúdo original:
+  termo=como você está
+  termo_original=como você está
+  termo_chave=como voce está
+  tipo=saudação interrogativa
+  significado=Expressão usada para cumprimentar alguém e perguntar cordialmente sobre seu estado.
+  contexto_uso=Usada em conversas formais ou informais, ao iniciar uma conversa ou reencontrar alguém.
+  resposta_padrao=Estou bem, obrigado. E você?
+  relacionados=como vai, tudo bem, olá
+  exemplo_uso=Olá, como você está?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o sentido interrogativo e a relação com outros cumprimentos ainda aguardam classificação.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 26
+
+```text
+proposta_id: migracao-legado-conhecimento-26
+conteúdo original:
+  termo=bom dia pessoal
+  termo_original=bom dia pessoal
+  termo_chave=bom dia pessoal
+  tipo=saudação coletiva
+  significado=Expressão usada para cumprimentar um grupo de pessoas durante a manhã.
+  contexto_uso=Usada ao iniciar uma fala, mensagem, reunião ou conversa dirigida a várias pessoas pela manhã.
+  resposta_padrao=Bom dia! Tudo bem com vocês?
+  relacionados=bom dia, olá a todos, boa tarde pessoal
+  exemplo_uso=Bom dia pessoal, agradeço a presença de vocês.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a expressão composta e o componente “pessoal” dependem de ordem e tipos canônicos não aprovados.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 27
+
+```text
+proposta_id: migracao-legado-conhecimento-27
+conteúdo original:
+  termo=boa tarde pessoal
+  termo_original=boa tarde pessoal
+  termo_chave=boa tarde pessoal
+  tipo=saudação coletiva
+  significado=Expressão usada para cumprimentar um grupo de pessoas durante a tarde.
+  contexto_uso=Usada ao iniciar uma fala, mensagem, reunião ou conversa dirigida a várias pessoas durante a tarde.
+  resposta_padrao=Boa tarde! Tudo bem com vocês?
+  relacionados=boa tarde, olá a todos, bom dia pessoal
+  exemplo_uso=Boa tarde pessoal, vamos começar a reunião.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o agrupamento coletivo e a composição temporal ainda não foram mapeados ao contrato.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 28
+
+```text
+proposta_id: migracao-legado-conhecimento-28
+conteúdo original:
+  termo=boa noite pessoal
+  termo_original=boa noite pessoal
+  termo_chave=boa noite pessoal
+  tipo=saudação coletiva
+  significado=Expressão usada para cumprimentar um grupo de pessoas durante a noite.
+  contexto_uso=Usada ao iniciar uma fala, mensagem, reunião ou conversa dirigida a várias pessoas à noite.
+  resposta_padrao=Boa noite! Tudo bem com vocês?
+  relacionados=boa noite, olá a todos, boa tarde pessoal
+  exemplo_uso=Boa noite pessoal, obrigado por terem vindo.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: composição, alcance coletivo e destino do sentido ainda exigem decisão humana.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 29
+
+```text
+proposta_id: migracao-legado-conhecimento-29
+conteúdo original:
+  termo=pessoal
+  termo_original=pessoal
+  termo_chave=pessoal
+  tipo=substantivo em saudação coletiva
+  significado=Palavra usada para se dirigir cordialmente a um grupo de pessoas em uma conversa ou cumprimento.
+  contexto_uso=Aparece em saudações coletivas, como olá pessoal e bom dia pessoal.
+  resposta_padrao=(ausente)
+  relacionados=olá pessoal, bom dia pessoal, olá a todos
+  exemplo_uso=Bom dia pessoal, como vocês estão?
+evidência usada: 5 campos de evidência; resposta_padrao ausente
+justificativa: o substantivo e as relações de composição coletiva não têm destino canônico resolvido.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 30
+
+```text
+proposta_id: migracao-legado-conhecimento-30
+conteúdo original:
+  termo=olá pessoal
+  termo_original=olá pessoal
+  termo_chave=ola pessoal
+  tipo=saudação coletiva informal
+  significado=Expressão usada para cumprimentar cordialmente um grupo de pessoas.
+  contexto_uso=Usada no início de uma conversa, mensagem, reunião ou fala dirigida a um grupo em tom informal ou cordial.
+  resposta_padrao=Olá! Tudo bem com vocês?
+  relacionados=olá, pessoal, olá a todos
+  exemplo_uso=Olá pessoal, sejam bem-vindos.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: expressão composta, variação informal e componente “pessoal” aguardam mapeamento.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 31
+
+```text
+proposta_id: migracao-legado-conhecimento-31
+conteúdo original:
+  termo=oi pessoal
+  termo_original=oi pessoal
+  termo_chave=oi pessoal
+  tipo=saudação coletiva informal
+  significado=Expressão curta usada para cumprimentar informalmente um grupo de pessoas.
+  contexto_uso=Usada no início de conversas, mensagens ou falas dirigidas a um grupo em ambiente descontraído.
+  resposta_padrao=Oi! Tudo bem com vocês?
+  relacionados=oi, pessoal, olá pessoal
+  exemplo_uso=Oi pessoal, tudo bem?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o tipo livre não define o objeto canônico nem a relação entre os componentes.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 32
+
+```text
+proposta_id: migracao-legado-conhecimento-32
+conteúdo original:
+  termo=bom dia a todos
+  termo_original=bom dia a todos
+  termo_chave=bom dia a todos
+  tipo=saudação coletiva
+  significado=Expressão usada para cumprimentar todas as pessoas de um grupo durante a manhã.
+  contexto_uso=Usada ao iniciar uma fala, mensagem, reunião ou conversa dirigida a várias pessoas pela manhã.
+  resposta_padrao=Bom dia! Tudo bem com todos?
+  relacionados=bom dia, olá a todos, bom dia pessoal
+  exemplo_uso=Bom dia a todos, agradeço a presença.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a composição temporal e o alvo coletivo dependem de ordem e tipos não aprovados.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 33
+
+```text
+proposta_id: migracao-legado-conhecimento-33
+conteúdo original:
+  termo=boa tarde a todos
+  termo_original=boa tarde a todos
+  termo_chave=boa tarde a todos
+  tipo=saudação coletiva
+  significado=Expressão usada para cumprimentar todas as pessoas de um grupo durante a tarde.
+  contexto_uso=Usada ao iniciar uma fala, mensagem, reunião ou conversa dirigida a várias pessoas durante a tarde.
+  resposta_padrao=Boa tarde! Tudo bem com todos?
+  relacionados=boa tarde, olá a todos, boa tarde pessoal
+  exemplo_uso=Boa tarde a todos, vamos começar.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a expressão coletiva e sua composição ainda não têm correspondência aprovada.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 34
+
+```text
+proposta_id: migracao-legado-conhecimento-34
+conteúdo original:
+  termo=boa noite a todos
+  termo_original=boa noite a todos
+  termo_chave=boa noite a todos
+  tipo=saudação coletiva
+  significado=Expressão usada para cumprimentar todas as pessoas de um grupo durante a noite.
+  contexto_uso=Usada ao iniciar uma fala, mensagem, reunião ou conversa dirigida a várias pessoas à noite.
+  resposta_padrao=Boa noite! Tudo bem com todos?
+  relacionados=boa noite, olá a todos, boa noite pessoal
+  exemplo_uso=Boa noite a todos, obrigado pela presença.
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o alcance coletivo, a composição e o destino do significado não estão resolvidos.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 35
+
+```text
+proposta_id: migracao-legado-conhecimento-35
+conteúdo original:
+  termo=alô pessoal
+  termo_original=alô pessoal
+  termo_chave=alo pessoal
+  tipo=saudação coletiva informal
+  significado=Expressão usada para iniciar uma conversa por telefone ou chamar cordialmente a atenção de um grupo.
+  contexto_uso=Usada em chamadas, mensagens ou falas dirigidas a várias pessoas em tom informal ou cordial.
+  resposta_padrao=Alô! Tudo bem com vocês?
+  relacionados=alô, pessoal, olá pessoal
+  exemplo_uso=Alô pessoal, vocês conseguem me ouvir?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o uso telefônico e o uso coletivo podem exigir sentidos distintos, ainda não separados no destino.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 36
+
+```text
+proposta_id: migracao-legado-conhecimento-36
+conteúdo original:
+  termo=olá gente
+  termo_original=olá gente
+  termo_chave=ola gente
+  tipo=saudação coletiva informal
+  significado=Expressão usada para cumprimentar informalmente um grupo de pessoas.
+  contexto_uso=Usada no início de conversas, mensagens ou falas dirigidas a várias pessoas em tom próximo e descontraído.
+  resposta_padrao=Olá! Tudo bem com vocês?
+  relacionados=olá, gente, olá pessoal
+  exemplo_uso=Olá gente, vamos começar?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: a forma composta e o substantivo coletivo “gente” não foram mapeados a objetos canônicos.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Conhecimento 37
+
+```text
+proposta_id: migracao-legado-conhecimento-37
+conteúdo original:
+  termo=oi gente
+  termo_original=oi gente
+  termo_chave=oi gente
+  tipo=saudação coletiva informal
+  significado=Expressão curta usada para cumprimentar informalmente um grupo de pessoas.
+  contexto_uso=Usada em conversas, mensagens ou falas dirigidas a várias pessoas em ambiente descontraído.
+  resposta_padrao=Oi! Tudo bem com vocês?
+  relacionados=oi, gente, oi pessoal
+  exemplo_uso=Oi gente, como vocês estão?
+evidência usada: 6 campos de evidência; resposta_padrao presente
+justificativa: o tipo livre e a composição coletiva não têm correspondência canônica aprovada.
+condição para eventual autorização: aplicar todos os critérios de 3.1.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+## 5. MATRIZ INDIVIDUAL — RELAÇÕES
+
+Em cada item abaixo:
+
+- as duas linhas físicas do legado são exibidas como um único par lógico;
+- origem: `relacoes.db:relacoes:<linha direta>,<linha reversa>`;
+- evidência semântica: não há evidência de direção, ordem ou tipo canônico;
+- proveniência: `aprendizado/bancos/relacoes.db`, hash
+  `d278c4eee7a98fb95929032211c69699b799f32f019df7ed5fe867d8167b0296`;
+- tipo canônico candidato: `relacao_semantica` ou componente de expressão,
+  ainda não resolvido;
+- risco comum: transformar IDs legados em tipos semânticos sem prova,
+  inverter a relação, inventar ordem ou duplicar o par reverso;
+- proposta conservadora: `MANTER PENDENTE`;
+- situação técnica atual: `CONFLITANTE`;
+- decisão humana: preencher uma única opção no final de cada item.
+
+### Relação 1
+
+```text
+proposta_id: migracao-legado-relacao-componente-de-expressao-12-19
+conteúdo original:
+  linha 12:19:componente_de_expressao | 12=bom te ver [expressão de reencontro] | 19=bom [adjetivo em expressões de saudação]
+  linha 19:12:componente_de_expressao | reversa
+tipo legado: componente_de_expressao
+relação candidata: componente de expressão; ainda sem direção e ordem canônicas
+direção/simetria: não comprovada; par reverso presente
+ordem: não informada
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:30:25
+riscos: atribuir papel de expressão/componente sem regra; escolher direção ou duplicar o reverso
+justificativa: endpoints e tipo legado são conhecidos, mas o contrato exige tipos semânticos e ordem resolvidos.
+condição para eventual autorização: aprovar endpoints, direção/simetria, ordem quando aplicável e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 2
+
+```text
+proposta_id: migracao-legado-relacao-componente-de-expressao-15-23
+conteúdo original:
+  linha 15:23:componente_de_expressao | 15=muito prazer [expressão de apresentação] | 23=prazer [substantivo em expressão de apresentação]
+  linha 23:15:componente_de_expressao | reversa
+tipo legado: componente_de_expressao
+relação candidata: componente de expressão; ainda sem direção e ordem canônicas
+direção/simetria: não comprovada; par reverso presente
+ordem: não informada
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:30:25
+riscos: tratar “prazer” como objeto semântico resolvido ou escolher ordem sem prova
+justificativa: o endpoint 23 também pode participar de outra expressão e não basta para autorizar a relação.
+condição para eventual autorização: aprovar endpoints, direção/simetria, ordem quando aplicável e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 3
+
+```text
+proposta_id: migracao-legado-relacao-componente-de-expressao-16-19
+conteúdo original:
+  linha 16:19:componente_de_expressao | 16=bom te encontrar [expressão de reencontro] | 19=bom [adjetivo em expressões de saudação]
+  linha 19:16:componente_de_expressao | reversa
+tipo legado: componente_de_expressao
+relação candidata: componente de expressão; ainda sem direção e ordem canônicas
+direção/simetria: não comprovada; par reverso presente
+ordem: não informada
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:30:26
+riscos: inventar a posição de “bom” na expressão ou promover o endpoint a tipo canônico.
+justificativa: o legado registra apenas IDs e tipo livre, sem direção ou ordem.
+condição para eventual autorização: aprovar endpoints, direção/simetria, ordem quando aplicável e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 4
+
+```text
+proposta_id: migracao-legado-relacao-componente-de-expressao-3-19
+conteúdo original:
+  linha 3:19:componente_de_expressao | 3=bom dia [saudação de período do dia] | 19=bom [adjetivo em expressões de saudação]
+  linha 19:3:componente_de_expressao | reversa
+tipo legado: componente_de_expressao
+relação candidata: componente de expressão; ainda sem direção e ordem canônicas
+direção/simetria: não comprovada; par reverso presente
+ordem: não informada
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:30:25
+riscos: converter o par em composição ordenada sem comprovar qual endpoint é a expressão.
+justificativa: a descrição textual sugere composição, mas sugestão não substitui regra aprovada.
+condição para eventual autorização: aprovar endpoints, direção/simetria, ordem quando aplicável e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 5
+
+```text
+proposta_id: migracao-legado-relacao-componente-de-expressao-3-20
+conteúdo original:
+  linha 3:20:componente_de_expressao | 3=bom dia [saudação de período do dia] | 20=dia [substantivo em expressão de saudação]
+  linha 20:3:componente_de_expressao | reversa
+tipo legado: componente_de_expressao
+relação candidata: componente de expressão; ainda sem direção e ordem canônicas
+direção/simetria: não comprovada; par reverso presente
+ordem: não informada
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:30:25
+riscos: inventar a ordem “bom” antes de “dia” ou duplicar as duas linhas.
+justificativa: o texto dos endpoints sugere uma expressão, mas o schema não registra a ordem.
+condição para eventual autorização: aprovar endpoints, direção/simetria, ordem quando aplicável e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 6
+
+```text
+proposta_id: migracao-legado-relacao-componente-de-expressao-4-21
+conteúdo original:
+  linha 4:21:componente_de_expressao | 4=boa tarde [saudação de período do dia] | 21=tarde [substantivo em expressão de saudação]
+  linha 21:4:componente_de_expressao | reversa
+tipo legado: componente_de_expressao
+relação candidata: componente de expressão; ainda sem direção e ordem canônicas
+direção/simetria: não comprovada; par reverso presente
+ordem: não informada
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:30:25
+riscos: inferir ordem e tipo de endpoint somente pelos textos.
+justificativa: não há campo de ordem nem tipo semântico no legado.
+condição para eventual autorização: aprovar endpoints, direção/simetria, ordem quando aplicável e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 7
+
+```text
+proposta_id: migracao-legado-relacao-componente-de-expressao-5-22
+conteúdo original:
+  linha 5:22:componente_de_expressao | 5=boa noite [saudação de período do dia] | 22=noite [substantivo em expressão de saudação]
+  linha 22:5:componente_de_expressao | reversa
+tipo legado: componente_de_expressao
+relação candidata: componente de expressão; ainda sem direção e ordem canônicas
+direção/simetria: não comprovada; par reverso presente
+ordem: não informada
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:30:25
+riscos: inferir ordem, sentido temporal ou tipo canônico sem evidência específica.
+justificativa: o tipo legado não carrega a ordem necessária para uma relação de componentes.
+condição para eventual autorização: aprovar endpoints, direção/simetria, ordem quando aplicável e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 8
+
+```text
+proposta_id: migracao-legado-relacao-componente-de-expressao-9-23
+conteúdo original:
+  linha 9:23:componente_de_expressao | 9=prazer em conhecer você [expressão de apresentação] | 23=prazer [substantivo em expressão de apresentação]
+  linha 23:9:componente_de_expressao | reversa
+tipo legado: componente_de_expressao
+relação candidata: componente de expressão; ainda sem direção e ordem canônicas
+direção/simetria: não comprovada; par reverso presente
+ordem: não informada
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:30:25
+riscos: presumir que “prazer” é componente, sentido ou conceito sem resolver o tipo lógico.
+justificativa: a relação depende da classificação dos dois registros de conhecimento.
+condição para eventual autorização: aprovar endpoints, direção/simetria, ordem quando aplicável e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 9
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-1-30
+conteúdo original:
+  linha 1:30:relacionado_no_tema | 1=olá [expressão de saudação] | 30=olá pessoal [saudação coletiva informal]
+  linha 30:1:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado, mas não há semântica de direção
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: converter proximidade textual em relação semântica ou tratar o reverso como duplicata independente.
+justificativa: “relacionado_no_tema” não define o predicado canônico.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 10
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-10-25
+conteúdo original:
+  linha 10:25:relacionado_no_tema | 10=como vai [saudação interrogativa] | 25=como você está [saudação interrogativa]
+  linha 25:10:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: assumir equivalência de sentidos ou relação direcional sem evidência.
+justificativa: os dois endpoints são expressões interrogativas, mas isso não define uma relação canônica.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 11
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-11-24
+conteúdo original:
+  linha 11:24:relacionado_no_tema | 11=tudo bem [saudação interrogativa] | 24=bem [advérbio em expressão de saudação]
+  linha 24:11:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir relação temática com composição ou referência lexical.
+justificativa: o par não informa se “bem” é parte, sentido ou apenas termo relacionado.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 12
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-17-32
+conteúdo original:
+  linha 17:32:relacionado_no_tema | 17=olá a todos [saudação coletiva] | 32=bom dia a todos [saudação coletiva]
+  linha 32:17:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: assumir equivalência entre saudações coletivas ou inventar um predicado de tema.
+justificativa: o tipo legado apenas registra associação, não sua natureza canônica.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 13
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-17-33
+conteúdo original:
+  linha 17:33:relacionado_no_tema | 17=olá a todos [saudação coletiva] | 33=boa tarde a todos [saudação coletiva]
+  linha 33:17:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: tratar associação temática como equivalência ou hierarquia.
+justificativa: não há informação sobre o predicado ou a direção.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 14
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-17-34
+conteúdo original:
+  linha 17:34:relacionado_no_tema | 17=olá a todos [saudação coletiva] | 34=boa noite a todos [saudação coletiva]
+  linha 34:17:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: inferir equivalência, oposição temporal ou hierarquia.
+justificativa: a associação não identifica a relação semântica canônica.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 15
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-19-26
+conteúdo original:
+  linha 19:26:relacionado_no_tema | 19=bom [adjetivo em expressões de saudação] | 26=bom dia pessoal [saudação coletiva]
+  linha 26:19:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir relação temática com componente de expressão.
+justificativa: há também relações de componente envolvendo “bom”, mas o legado não define a natureza desta associação.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 16
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-19-32
+conteúdo original:
+  linha 19:32:relacionado_no_tema | 19=bom [adjetivo em expressões de saudação] | 32=bom dia a todos [saudação coletiva]
+  linha 32:19:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir associação temática com componente de expressão.
+justificativa: o endpoint “bom” aparece em relações de natureza legada diferente.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 17
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-2-31
+conteúdo original:
+  linha 2:31:relacionado_no_tema | 2=oi [saudação informal] | 31=oi pessoal [saudação coletiva informal]
+  linha 31:2:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: inferir que a relação é generalização, composição ou equivalência.
+justificativa: a associação não informa o predicado canônico.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 18
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-20-26
+conteúdo original:
+  linha 20:26:relacionado_no_tema | 20=dia [substantivo em expressão de saudação] | 26=bom dia pessoal [saudação coletiva]
+  linha 26:20:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir associação temática com componente de “bom dia”.
+justificativa: existe relação de componente separada para “bom dia”, mas esta associação não tem semântica definida.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 19
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-20-32
+conteúdo original:
+  linha 20:32:relacionado_no_tema | 20=dia [substantivo em expressão de saudação] | 32=bom dia a todos [saudação coletiva]
+  linha 32:20:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: duplicar ou confundir com a relação de componente entre “bom dia” e “dia”.
+justificativa: o tipo legado não diferencia relação temática de composição.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 20
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-21-27
+conteúdo original:
+  linha 21:27:relacionado_no_tema | 21=tarde [substantivo em expressão de saudação] | 27=boa tarde pessoal [saudação coletiva]
+  linha 27:21:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir associação temática com componente de “boa tarde”.
+justificativa: a associação não esclarece se “tarde” é parte, conceito ou termo relacionado.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 21
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-21-33
+conteúdo original:
+  linha 21:33:relacionado_no_tema | 21=tarde [substantivo em expressão de saudação] | 33=boa tarde a todos [saudação coletiva]
+  linha 33:21:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir associação temática com componente ordenado.
+justificativa: o tipo legado não informa a relação lógica entre o período e a saudação coletiva.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 22
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-22-28
+conteúdo original:
+  linha 22:28:relacionado_no_tema | 22=noite [substantivo em expressão de saudação] | 28=boa noite pessoal [saudação coletiva]
+  linha 28:22:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir associação temática com componente de “boa noite”.
+justificativa: o legado não informa o predicado nem o papel do endpoint temporal.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 23
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-22-34
+conteúdo original:
+  linha 22:34:relacionado_no_tema | 22=noite [substantivo em expressão de saudação] | 34=boa noite a todos [saudação coletiva]
+  linha 34:22:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: inferir composição ou direção a partir da proximidade textual.
+justificativa: o tipo legado não define relação de componente, tema ou equivalência.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 24
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-26-29
+conteúdo original:
+  linha 26:29:relacionado_no_tema | 26=bom dia pessoal [saudação coletiva] | 29=pessoal [substantivo em saudação coletiva]
+  linha 29:26:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir relação temática com composição ordenada.
+justificativa: o endpoint “pessoal” sugere composição, mas a tabela registra outro tipo livre.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 25
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-27-29
+conteúdo original:
+  linha 27:29:relacionado_no_tema | 27=boa tarde pessoal [saudação coletiva] | 29=pessoal [substantivo em saudação coletiva]
+  linha 29:27:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: inventar a função de “pessoal” e a ordem dos componentes.
+justificativa: a relação textual pode ser de composição, mas isso não é o que o tipo legado prova.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 26
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-28-29
+conteúdo original:
+  linha 28:29:relacionado_no_tema | 28=boa noite pessoal [saudação coletiva] | 29=pessoal [substantivo em saudação coletiva]
+  linha 29:28:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir composição com relação temática e duplicar o par.
+justificativa: o tipo livre não informa o papel de cada endpoint.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 27
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-29-30
+conteúdo original:
+  linha 29:30:relacionado_no_tema | 29=pessoal [substantivo em saudação coletiva] | 30=olá pessoal [saudação coletiva informal]
+  linha 30:29:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: tratar “pessoal” como componente sem que a tabela o declare.
+justificativa: a possível composição não é suficiente para superar o tipo legado conflitante.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 28
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-29-31
+conteúdo original:
+  linha 29:31:relacionado_no_tema | 29=pessoal [substantivo em saudação coletiva] | 31=oi pessoal [saudação coletiva informal]
+  linha 31:29:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: inferir componente ou direção da relação por aparência textual.
+justificativa: o modelo legado não diferencia associação temática de composição.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 29
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-3-26
+conteúdo original:
+  linha 3:26:relacionado_no_tema | 3=bom dia [saudação de período do dia] | 26=bom dia pessoal [saudação coletiva]
+  linha 26:3:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: atribuir generalização, especialização ou composição sem prova.
+justificativa: o relacionamento entre a saudação simples e a coletiva não possui predicado canônico definido.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 30
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-4-27
+conteúdo original:
+  linha 4:27:relacionado_no_tema | 4=boa tarde [saudação de período do dia] | 27=boa tarde pessoal [saudação coletiva]
+  linha 27:4:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: assumir que a expressão curta é parte, supertipo ou equivalente da coletiva.
+justificativa: a tabela não registra o significado da associação.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 31
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-5-28
+conteúdo original:
+  linha 5:28:relacionado_no_tema | 5=boa noite [saudação de período do dia] | 28=boa noite pessoal [saudação coletiva]
+  linha 28:5:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: assumir relação de composição, equivalência ou especialização.
+justificativa: o tipo legado não informa o predicado lógico nem sua direção.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 32
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-7-8
+conteúdo original:
+  linha 7:8:relacionado_no_tema | 7=seja bem-vindo [expressão de acolhimento] | 8=bem-vindo [expressão de acolhimento]
+  linha 8:7:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: inferir equivalência entre formas de acolhimento ou relação morfológica.
+justificativa: a variação textual pode ter mais de uma interpretação canônica.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+### Relação 33
+
+```text
+proposta_id: migracao-legado-relacao-relacionado-no-tema-8-24
+conteúdo original:
+  linha 8:24:relacionado_no_tema | 8=bem-vindo [expressão de acolhimento] | 24=bem [advérbio em expressão de saudação]
+  linha 24:8:relacionado_no_tema | reversa
+tipo legado: relacionado_no_tema
+relação candidata: relação semântica temática; ainda sem direção e tipos canônicos
+direção/simetria: não comprovada; par reverso presente
+ordem: não aplicável ao tipo legado
+evidências utilizadas: duas linhas legadas e seus timestamps; nenhuma evidência semântica adicional
+proveniência: relacoes.db, tabela relacoes, criado_em=2026-09-25 16:33:50
+riscos: confundir relação temática com composição ou derivação.
+justificativa: o endpoint “bem” participa de outros registros e seu papel não está formalizado.
+condição para eventual autorização: aprovar tipos dos endpoints, direção/simetria e revisão independente.
+decisão humana: [ ] APROVAR  [ ] MANTER PENDENTE  [ ] REJEITAR
+```
+
+## 6. PRINCIPAIS MOTIVOS DE PENDÊNCIA E CONFLITO
+
+### Conhecimento
+
+- tipos legados livres sem tabela de correspondência aprovada;
+- distinção não resolvida entre lexema, expressão, forma lexical e sentido;
+- significado e contexto sem alvo canônico resolvido;
+- referências de `relacionados` ainda textuais, não referências lógicas;
+- `resposta_padrao` sem correspondência direta no modelo atual;
+- risco de converter evidência legada confirmada em aprovação canônica;
+- perda semântica possível em expressões compostas e variações coletivas.
+
+### Relações
+
+- endpoints legados identificados por IDs convencionais, mas sem tipo semântico
+  canônico resolvido;
+- direção ausente;
+- ordem de componentes ausente;
+- par reverso presente e não duplicável;
+- `relacionado_no_tema` não define o predicado semântico;
+- mistura potencial entre relação temática e composição de expressão;
+- nenhuma evidência adicional permite escolher automaticamente a interpretação.
+
+## 7. ARQUIVOS DE ORIGEM
+
+Esta matriz foi construída exclusivamente a partir de:
+
+- `docs/MATRIZ_DECISAO_FASE_3_7.txt`;
+- `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json`;
+- `docs/REVISAO_LOTES_MIGRACAO.json`;
+- `docs/INVENTARIO_LEGADO_2026-09-26.txt`;
+- `docs/PLANO_MIGRACAO_AUDITAVEL.txt`;
+- leitura somente leitura dos conteúdos já inventariados em
+  `aprendizado/bancos/conhecimento.db` e
+  `aprendizado/bancos/relacoes.db`.
+
+## 8. TESTES E OPERAÇÕES
+
+Testes executados nesta etapa: nenhum. A etapa consistiu em leitura dos
+artefatos já produzidos, leitura `mode=ro` das fontes inventariadas e produção
+deste documento. Não foram repetidas auditorias, não foram regenerados lotes e
+não foi executado processamento operacional dos 70 itens.
+
+Confirmações:
+
+- nenhum banco canônico foi alterado;
+- nenhum banco legado foi alterado;
+- `registrar()` não foi chamado;
+- `autorizar()` não foi chamado;
+- `aplicar()` não foi chamado;
+- não houve migração física;
+- não houve alteração do contrato semântico;
+- não houve desligamento do legado;
+- nenhuma das opções de decisão humana foi marcada automaticamente.
+
+## 9. ESTADO DE ENCERRAMENTO DA FASE 3.8
+
+Esta etapa termina com a produção da matriz de decisão humana. A etapa seguinte,
+caso autorizada separadamente, deve receber as escolhas humanas item a item,
+registrar o revisor e a justificativa, versionar a decisão e somente então
+avaliar uma preparação futura. Este documento, por si só, não autoriza
+qualquer aplicação.

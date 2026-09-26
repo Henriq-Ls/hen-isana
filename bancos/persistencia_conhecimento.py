@@ -560,6 +560,63 @@ class _Aplicador:
                             (origem_id, relacao.ordem, lexema_id),
                         )
                     continue
+                if relacao.tipo == "sentido_conceito":
+                    if origem_tipo != "sentido":
+                        raise ValueError(
+                            "sentido_conceito precisa ter origem sentido"
+                        )
+                    if relacao.destino_tipo != "conceito":
+                        raise ValueError(
+                            "sentido_conceito precisa ter destino conceito"
+                        )
+                    if relacao.tipo_ligacao is None:
+                        raise ValueError(
+                            "sentido_conceito precisa informar tipo_ligacao"
+                        )
+                    if relacao.evidencia_ids:
+                        raise ValueError(
+                            "o modelo atual de evidências não suporta "
+                            "alvo sentidos_conceitos"
+                        )
+                    conceito_id = self._resolver_tipo_chave(
+                        "conceito",
+                        relacao.destino_chave,
+                    )
+                    existente = self.conn.execute(
+                        "SELECT tipo_ligacao, confianca, estado "
+                        "FROM sentidos_conceitos "
+                        "WHERE sentido_id = ? AND conceito_id = ?",
+                        (origem_id, conceito_id),
+                    ).fetchone()
+                    if existente is not None:
+                        if (
+                            existente["tipo_ligacao"] != relacao.tipo_ligacao
+                            or float(existente["confianca"])
+                            != float(relacao.confianca)
+                        ):
+                            raise ValueError(
+                                "sentido_conceito existente possui atributos "
+                                "incompatíveis"
+                            )
+                        self.reutilizados.append(
+                            f"sentido_conceito:{objeto.objeto_id}:{relacao.ordem}"
+                        )
+                    else:
+                        self.conn.execute(
+                            """
+                            INSERT INTO sentidos_conceitos (
+                                sentido_id, conceito_id, tipo_ligacao,
+                                confianca, estado
+                            ) VALUES (?, ?, ?, ?, 'aprovado')
+                            """,
+                            (
+                                origem_id,
+                                conceito_id,
+                                relacao.tipo_ligacao,
+                                relacao.confianca,
+                            ),
+                        )
+                    continue
                 if origem_tipo not in _TIPOS_SEMANTICOS:
                     raise ValueError(
                         "relação física exige origem semântica resolvível"
@@ -761,13 +818,9 @@ class _Aplicador:
                 (chave,),
             ).fetchone()
         elif tipo in {"sentido", "proposicao", "fato"}:
-            try:
-                linha = self.conn.execute(
-                    f"SELECT id FROM {self._tabela_tipo(tipo)} WHERE id = ?",
-                    (int(chave),),
-                ).fetchone()
-            except ValueError:
-                linha = None
+            # Esses tipos não possuem uma chave lógica externa no schema atual.
+            # Nunca interpretar um inteiro legado como ID canônico.
+            linha = None
         else:
             linha = None
         if linha is None:
@@ -783,25 +836,24 @@ class _Aplicador:
         }[tipo]
 
     def _resolver_fonte(self, campo: Optional[CampoCadastro]) -> int:
-        if campo is not None:
-            valor = str(campo.valor)
-            for evidencia_id, fonte_id in self.fontes.items():
-                evidencia = next(
-                    evidencia
-                    for evidencia in self.contrato.evidencias
-                    if evidencia.evidencia_id == evidencia_id
-                )
-                if valor in {evidencia_id, evidencia.fonte_identificador}:
-                    return fonte_id
-            linha = self.conn.execute(
-                "SELECT id FROM fontes WHERE identificador = ? ORDER BY id LIMIT 1",
-                (valor,),
-            ).fetchone()
-            if linha is not None:
-                return int(linha["id"])
-        if self.fontes:
-            return next(iter(self.fontes.values()))
-        raise ValueError("fonte obrigatória não resolvida")
+        if campo is None:
+            raise ValueError("fonte obrigatória e explícita não resolvida")
+        valor = str(campo.valor)
+        for evidencia_id, fonte_id in self.fontes.items():
+            evidencia = next(
+                evidencia
+                for evidencia in self.contrato.evidencias
+                if evidencia.evidencia_id == evidencia_id
+            )
+            if valor in {evidencia_id, evidencia.fonte_identificador}:
+                return fonte_id
+        linha = self.conn.execute(
+            "SELECT id FROM fontes WHERE identificador = ? ORDER BY id LIMIT 1",
+            (valor,),
+        ).fetchone()
+        if linha is not None:
+            return int(linha["id"])
+        raise ValueError(f"fonte explícita não resolvida: {valor}")
 
     @staticmethod
     def _valor(

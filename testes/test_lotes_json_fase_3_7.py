@@ -257,6 +257,66 @@ class TestLotesJSONFase37(unittest.TestCase):
         self.assertFalse(relatorio.manifesto_integro)
         self.assertIn("hash divergente", relatorio.motivos[0])
 
+    def test_validacao_detecta_arquivo_extra_nao_declarado(self):
+        lote = self.lotes.preparar(
+            {"correr": pacote_lexema()},
+            fonte="manual",
+            assunto="lexico",
+            lote_id="base",
+        )
+        caminho = self.lotes.gravar(lote)
+        (caminho / "propostas" / "extra.json").write_text(
+            "arquivo não declarado",
+            encoding="utf-8",
+        )
+        banco = Path(self.tmp.name) / "linguagem.db"
+        with sqlite3.connect(banco) as conn:
+            conn.executescript(SCHEMA.read_text(encoding="utf-8"))
+        api = ConhecimentoAPI(banco)
+        try:
+            relatorio = self.lotes.validar_lote(caminho, IngestaoJSON(api))
+        finally:
+            api.fechar()
+        self.assertFalse(relatorio.manifesto_integro)
+        self.assertIn(
+            "arquivo não declarado: propostas/extra.json",
+            relatorio.motivos,
+        )
+
+    def test_validacao_rejeita_versao_ou_contrato_desconhecido(self):
+        lote = self.lotes.preparar(
+            {"correr": pacote_lexema()},
+            fonte="manual",
+            assunto="lexico",
+            lote_id="base",
+        )
+        caminho = self.lotes.gravar(lote)
+        manifesto_path = caminho / "manifesto.json"
+        manifesto = json.loads(manifesto_path.read_text(encoding="utf-8"))
+        banco = Path(self.tmp.name) / "linguagem.db"
+        with sqlite3.connect(banco) as conn:
+            conn.executescript(SCHEMA.read_text(encoding="utf-8"))
+        api = ConhecimentoAPI(banco)
+        try:
+            manifesto["formato_versao"] = "desconhecida"
+            manifesto_path.write_text(
+                json.dumps(manifesto),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "versão de formato"):
+                self.lotes.validar_lote(caminho, IngestaoJSON(api))
+
+            manifesto["formato_versao"] = "1"
+            manifesto["contrato"] = "ContratoDesconhecido"
+            manifesto_path.write_text(
+                json.dumps(manifesto),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "contrato de lote"):
+                self.lotes.validar_lote(caminho, IngestaoJSON(api))
+        finally:
+            api.fechar()
+
     def test_referencias_e_estados_do_gerador_sao_preservados(self):
         descricoes = carregar_descricoes_json(
             ROOT / "docs" / "exemplos_json_conhecimento"

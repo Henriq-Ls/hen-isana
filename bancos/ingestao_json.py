@@ -76,12 +76,23 @@ class IngestaoJSON:
     def registrar(
         self,
         entrada: ContratoCadastro | Mapping[str, Any] | str,
+        *,
+        versao_contrato: str = "1",
+        versao_mapeamento: str = "1",
+        lote: str | None = None,
+        origem: str | None = None,
     ) -> PropostaConhecimento:
         relatorio = self.validar(entrada)
         if not relatorio.validacao.valido:
             detalhes = "; ".join(relatorio.validacao.erros)
             raise ValueError(f"pacote inválido: {detalhes}")
-        return self.api.registrar_proposta(relatorio.contrato)
+        return self.api.registrar_proposta(
+            relatorio.contrato,
+            versao_contrato=versao_contrato,
+            versao_mapeamento=versao_mapeamento,
+            lote=lote,
+            origem=origem,
+        )
 
     def iniciar_revisao(
         self,
@@ -100,9 +111,9 @@ class IngestaoJSON:
     def aplicar(self, proposta_id: str) -> RelatorioIngestao:
         proposta = self.api.obter_proposta(proposta_id)
         relatorio = self.validar(proposta.contrato)
-        if proposta.estado != "autorizada":
+        if proposta.estado not in {"autorizada", "aplicada"}:
             raise PermissionError(
-                "a ingestão física exige uma proposta autorizada"
+                "a ingestão física exige uma proposta autorizada ou aplicada"
             )
         if not relatorio.validacao.pode_autorizar:
             raise ValueError(

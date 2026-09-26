@@ -20,6 +20,11 @@ from typing import Any, Optional
 from core.contratos import (
     ContratoCadastro,
     TIPOS_OBJETO_CADASTRO,
+    TIPOS_LIGACAO_SENTIDO_CONCEITO,
+)
+from bancos.persistencia_migracao import (
+    MigracaoAuditavelDB,
+    PropostaPersistida,
 )
 
 
@@ -27,7 +32,14 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DB = ROOT / "aprendizado" / "bancos" / "linguagem.db"
 
 TIPOS_CONSULTA = TIPOS_OBJETO_CADASTRO + ("fonte", "evidencia")
-ESTADOS_PROPOSTA = ("proposta", "em_revisao", "autorizada")
+ESTADOS_PROPOSTA = (
+    "proposta",
+    "em_revisao",
+    "autorizada",
+    "aplicada",
+    "recusada",
+    "erro",
+)
 _TIPOS_SEMANTICOS = {"conceito", "sentido", "proposicao", "fato"}
 _TIPOS_RELACAO_TEMATICA = {"expressao"}
 
@@ -257,7 +269,12 @@ _CAMPOS_OBRIGATORIOS: dict[str, tuple[str, ...]] = {
 class ConhecimentoAPI:
     """Consulta o banco novo e controla propostas somente em memória."""
 
-    def __init__(self, caminho_db: Path | str = DEFAULT_DB):
+    def __init__(
+        self,
+        caminho_db: Path | str = DEFAULT_DB,
+        *,
+        persistencia: MigracaoAuditavelDB | None = None,
+    ):
         self.caminho_db = Path(caminho_db)
         if not self.caminho_db.exists():
             raise FileNotFoundError(f"banco linguístico não encontrado: {self.caminho_db}")
@@ -267,6 +284,7 @@ class ConhecimentoAPI:
         self._conn.execute("PRAGMA foreign_keys = ON")
         self._propostas: dict[str, PropostaConhecimento] = {}
         self._idempotencias: dict[str, str] = {}
+        self.persistencia = persistencia
 
     def consultar(
         self,
@@ -411,6 +429,28 @@ class ConhecimentoAPI:
                             "da posição lexical determinística"
                         )
                     continue
+                if relacao.tipo == "sentido_conceito":
+                    if objeto.tipo != "sentido":
+                        erros.append(
+                            "sentido_conceito precisa ter origem sentido"
+                        )
+                    if relacao.destino_tipo != "conceito":
+                        erros.append(
+                            "sentido_conceito precisa ter destino conceito"
+                        )
+                    if relacao.tipo_ligacao not in (
+                        TIPOS_LIGACAO_SENTIDO_CONCEITO
+                    ):
+                        erros.append(
+                            "sentido_conceito precisa informar um "
+                            "tipo_ligacao válido"
+                        )
+                    if relacao.evidencia_ids:
+                        erros.append(
+                            "o modelo atual de evidências não suporta "
+                            "sentidos_conceitos"
+                        )
+                    continue
                 if objeto.tipo not in _TIPOS_SEMANTICOS:
                     erros.append(
                         "relação embutida precisa de origem semântica persistível"
@@ -530,12 +570,29 @@ class ConhecimentoAPI:
             return None
         return ocorrencias[0]
 
-    def registrar_proposta(self, contrato: ContratoCadastro) -> PropostaConhecimento:
+    def registrar_proposta(
+        self,
+        contrato: ContratoCadastro,
+        *,
+        versao_contrato: str = "1",
+        versao_mapeamento: str = "1",
+        lote: Optional[str] = None,
+        origem: Optional[str] = None,
+    ) -> PropostaConhecimento:
         """Registra a proposta em memória, com idempotência lógica."""
         resultado = self.validar(contrato)
         if not resultado.valido:
             detalhes = "; ".join(resultado.erros)
             raise ValueError(f"contrato inválido: {detalhes}")
+        persistida: PropostaPersistida | None = None
+        if self.persistencia is not None:
+            persistida = self.persistencia.registrar_proposta(
+                contrato,
+                versao_contrato=versao_contrato,
+                versao_mapeamento=versao_mapeamento,
+                lote=lote,
+                origem=origem,
+            )
         anterior = self._propostas.get(contrato.proposta_id)
         if anterior is not None:
             if anterior.contrato != contrato:
@@ -544,16 +601,37 @@ class ConhecimentoAPI:
         outro_id = self._idempotencias.get(contrato.idempotencia)
         if outro_id is not None and outro_id != contrato.proposta_id:
             raise ValueError("idempotência já está associada a outra proposta")
-        proposta = PropostaConhecimento(contrato=contrato, validacao=resultado)
+        proposta = PropostaConhecimento(
+            contrato=contrato,
+            validacao=resultado,
+            estado=persistida.estado if persistida is not None else "proposta",
+            revisado_por=persistida.revisor if persistida is not None else None,
+            autorizador=(
+                persistida.autorizador if persistida is not None else None
+            ),
+        )
         self._propostas[contrato.proposta_id] = proposta
         self._idempotencias[contrato.idempotencia] = contrato.proposta_id
         return proposta
 
     def obter_proposta(self, proposta_id: str) -> PropostaConhecimento:
-        try:
-            return self._propostas[proposta_id]
-        except KeyError as erro:
-            raise LookupError(f"proposta não encontrada: {proposta_id}") from erro
+        proposta = self._propostas.get(proposta_id)
+        if proposta is not None:
+            return proposta
+        if self.persistencia is None:
+            raise LookupError(f"proposta não encontrada: {proposta_id}")
+        persistida = self.persistencia.obter(proposta_id)
+        contrato = persistida.contrato()
+        proposta = PropostaConhecimento(
+            contrato=contrato,
+            validacao=self.validar(contrato),
+            estado=persistida.estado,
+            revisado_por=persistida.revisor,
+            autorizador=persistida.autorizador,
+        )
+        self._propostas[proposta_id] = proposta
+        self._idempotencias[contrato.idempotencia] = proposta_id
+        return proposta
 
     def iniciar_revisao(self, proposta_id: str, revisor: str) -> PropostaConhecimento:
         revisor = self._texto_identidade(revisor, "revisor")
@@ -567,6 +645,8 @@ class ConhecimentoAPI:
             revisado_por=revisor,
         )
         self._propostas[proposta_id] = atualizada
+        if self.persistencia is not None:
+            self.persistencia.iniciar_revisao(proposta_id, revisor)
         return atualizada
 
     def autorizar(self, proposta_id: str, autorizador: str) -> PropostaConhecimento:
@@ -593,7 +673,28 @@ class ConhecimentoAPI:
             autorizador=autorizador,
         )
         self._propostas[proposta_id] = autorizada
+        if self.persistencia is not None:
+            self.persistencia.autorizar(proposta_id, autorizador)
         return autorizada
+
+    def recusar(self, proposta_id: str, motivo: str) -> PropostaConhecimento:
+        proposta = self.obter_proposta(proposta_id)
+        if proposta.estado not in {"proposta", "em_revisao", "autorizada"}:
+            raise ValueError("estado atual não pode ser recusado")
+        if self.persistencia is not None:
+            persistida = self.persistencia.recusar(proposta_id, motivo)
+            estado = persistida.estado
+        else:
+            estado = "recusada"
+        recusada = PropostaConhecimento(
+            contrato=proposta.contrato,
+            validacao=proposta.validacao,
+            estado=estado,
+            revisado_por=proposta.revisado_por,
+            autorizador=proposta.autorizador,
+        )
+        self._propostas[proposta_id] = recusada
+        return recusada
 
     def persistir(self, *_args: object, **_kwargs: object) -> None:
         """A aplicação transacional pertence a fase posterior."""
@@ -604,6 +705,34 @@ class ConhecimentoAPI:
     def aplicar_autorizada(self, proposta_id: str) -> Any:
         """Aplica uma proposta autorizada pela ingestão controlada da 3.3."""
         proposta = self.obter_proposta(proposta_id)
+        if proposta.estado == "aplicada" and self.persistencia is not None:
+            persistida = self.persistencia.obter(proposta_id)
+            if persistida.resultado_aplicacao is None:
+                raise RuntimeError(
+                    "proposta aplicada sem resultado de aplicação persistido"
+                )
+            from bancos.persistencia_conhecimento import ResultadoAplicacao
+
+            return ResultadoAplicacao(
+                ids_por_objeto=tuple(
+                    (str(item[0]), int(item[1]))
+                    for item in persistida.resultado_aplicacao[
+                        "ids_por_objeto"
+                    ]
+                ),
+                evidencias_criadas=tuple(
+                    int(item)
+                    for item in persistida.resultado_aplicacao[
+                        "evidencias_criadas"
+                    ]
+                ),
+                registros_reutilizados=tuple(
+                    str(item)
+                    for item in persistida.resultado_aplicacao[
+                        "registros_reutilizados"
+                    ]
+                ),
+            )
         if proposta.estado != "autorizada":
             raise PermissionError(
                 "somente uma proposta autorizada pode ser aplicada"
@@ -613,11 +742,49 @@ class ConhecimentoAPI:
             aplicar_contrato,
         )
 
-        return aplicar_contrato(
+        resultado = aplicar_contrato(
             self.caminho_db,
             proposta.contrato,
             _token_autorizacao=_TOKEN_AUTORIZACAO,
         )
+        if self.persistencia is not None:
+            payload = {
+                "ids_por_objeto": list(resultado.ids_por_objeto),
+                "evidencias_criadas": list(resultado.evidencias_criadas),
+                "registros_reutilizados": list(
+                    resultado.registros_reutilizados
+                ),
+            }
+            try:
+                persistida = self.persistencia.registrar_aplicacao(
+                    proposta_id,
+                    proposta.contrato,
+                    payload,
+                    lote=self.persistencia.obter(proposta_id).lote,
+                )
+            except Exception as erro:
+                self.persistencia.registrar_erro(
+                    proposta_id,
+                    f"aplicação física concluída, auditoria falhou: {erro}",
+                    resultado=payload,
+                )
+                raise
+            self._propostas[proposta_id] = PropostaConhecimento(
+                contrato=proposta.contrato,
+                validacao=proposta.validacao,
+                estado=persistida.estado,
+                revisado_por=proposta.revisado_por,
+                autorizador=proposta.autorizador,
+            )
+        else:
+            self._propostas[proposta_id] = PropostaConhecimento(
+                contrato=proposta.contrato,
+                validacao=proposta.validacao,
+                estado="aplicada",
+                revisado_por=proposta.revisado_por,
+                autorizador=proposta.autorizador,
+            )
+        return resultado
 
     def fechar(self) -> None:
         self._conn.close()

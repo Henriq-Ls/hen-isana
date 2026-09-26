@@ -1,0 +1,231 @@
+# HEN-ISANA — REAVALIAÇÃO FINAL DO CRITÉRIO `expressao`
+
+Data: 2026-09-26
+Status: proposta documental para revisão humana; não é aprovação
+Escopo: classificação no nível das 16 categorias legadas
+
+## 1. CRITÉRIO RIGOROSO APLICADO
+
+Uma categoria só recebe candidato `expressao` quando a documentação fornece,
+em conjunto:
+
+1. sequência textual composta ou construção convencional;
+2. recorrência observável dentro da categoria;
+3. estrutura relativamente estável;
+4. função comunicativa identificável como unidade de uso;
+5. evidência suficiente para distingui-la de uma combinação produtiva ou
+   ocasional de palavras.
+
+A existência de duas ou mais palavras não foi tratada como suficiente. Também
+não foram usados automaticamente como prova:
+
+- o rótulo legado da categoria;
+- o campo `significado`;
+- a categoria gramatical livre;
+- a presença de relações entre IDs;
+- o fato de uma sequência ser compreensível.
+
+Quando a documentação não separa adequadamente `expressao`, `lexema`,
+`forma_lexical` e `sentido`, o resultado permanece `INDEFINIDO`. Quando uma
+categoria mistura estruturas diferentes, ela não recebe um único candidato.
+
+Um candidato é uma proposta para revisão humana. Nenhum candidato abaixo
+representa aprovação ou aplicação a registro individual.
+
+## 2. TABELA CONSOLIDADA
+
+| Categoria legada | Qtd | Candidato | Confiança | Evidência objetiva | Contraevidência | Dúvida restante |
+|---|---:|---|---|---|---|---|
+| `saudação coletiva` | 7 | `INDEFINIDO` | baixa | Sete saudações dirigidas a grupos, com padrões `saudação + destinatário` e `saudação temporal + destinatário`. | `olá a todos`, `bom dia pessoal` e formas equivalentes parecem combinações produtivas; não há prova de unidade fixa por sequência. | A categoria deve ser desdobrada entre saudações temporais e formas de endereçamento coletivo? |
+| `saudação coletiva informal` | 5 | `INDEFINIDO` | baixa | Cinco sequências com função de cumprimento coletivo informal. | `olá/oi/alô + pessoal/gente` varia por substituição de componentes independentes; não há prova de lexicalização da construção inteira. | É uma construção convencional única ou um padrão produtivo de saudação mais vocativo? |
+| `saudação interrogativa` | 3 | `INDEFINIDO` | baixa | `como vai`, `tudo bem` e `como você está` compartilham função conversacional. | As estruturas são diferentes e a categoria pode agrupar funções semelhantes, não uma construção comum. | Deve ser dividida por estrutura e por separação entre saudação, pergunta e sentido? |
+| `saudação de período do dia` | 3 | `expressao` | média | `bom dia`, `boa tarde` e `boa noite` são fórmulas convencionais recorrentes de saudação, com padrão temporal reconhecível e função unitária documentada. | `boa noite` também pode ser despedida; componentes e ordem ainda não foram formalizados. | O uso de despedida exige sentidos distintos? A proposta vale uniformemente para os três registros? |
+| `substantivo em expressão de saudação` | 3 | `INDEFINIDO` | baixa | `dia`, `tarde` e `noite` aparecem como termos isolados ligados a saudações. | São palavras isoladas, não construções; o rótulo gramatical não escolhe lexema, forma ou sentido. | Qual é a unidade canônica e qual é o papel de cada termo nas expressões? |
+| `expressão de reencontro` | 3 | `INDEFINIDO` | baixa | `bom te ver`, `quanto tempo` e `bom te encontrar` têm função documentada de reencontro. | Há dois padrões distintos (`bom te + verbo` e `quanto tempo`); `quanto tempo` pode ter leitura temporal independente. | A categoria precisa ser desdobrada antes de decidir se há expressões fixas? |
+| `expressão de acolhimento` | 2 | `INDEFINIDO` | baixa | `seja bem-vindo` e `bem-vindo` têm função de acolhimento documentada. | As formas têm estruturas diferentes e podem corresponder a expressão, forma lexical ou sentido distintos. | Devem ser separadas por estrutura, gênero, número e papel de `bem`? |
+| `expressão de apresentação` | 2 | `expressao` | média | `prazer em conhecer você` e `muito prazer` são fórmulas documentadas de apresentação e primeiro encontro, com função comunicativa reconhecível e padrão convencional de uso. | As duas sequências não são formalmente idênticas; `prazer` também existe como registro isolado e seu papel não está resolvido. | A categoria pode ser mantida como expressão enquanto seus componentes e sentidos são resolvidos? |
+| `saudação informal` | 2 | `INDEFINIDO` | baixa | `oi` e `e aí` são documentados como cumprimentos informais. | Mistura palavra isolada e sequência composta; não há unidade estrutural comum demonstrada. | A categoria deve ser separada antes de qualquer classificação canônica? |
+| `adjetivo em expressões de saudação` | 1 | `INDEFINIDO` | baixa | `bom` é descrito como adjetivo e relacionado a expressões. | Termo isolado; categoria gramatical não prova lexema, forma lexical ou sentido. | Como separar `bom`, `boa`, seus sentidos e sua função de componente? |
+| `advérbio em expressão de saudação` | 1 | `INDEFINIDO` | baixa | `bem` aparece em `tudo bem` e `bem-vindo`. | Termo isolado com usos em construções diferentes; não há unidade estrutural ou sentido único demonstrado. | Os usos compartilham sentido? `bem` é lexema, forma, sentido ou componente em cada caso? |
+| `expressão de saudação` | 1 | `INDEFINIDO` | baixa | `olá` tem função documentada de cumprimento e início de conversa. | É termo isolado; o rótulo “expressão” não prova o tipo canônico. | A evidência distingue expressão conversacional, lexema, forma lexical e sentido? |
+| `expressão geral de cumprimento` | 1 | `INDEFINIDO` | baixa | `saudações` é descrito como palavra ou expressão de cumprimento geral. | A própria descrição admite duas naturezas; não há construção composta nem unidade canônica resolvida. | Deve representar palavra, expressão ou sentido geral de outras saudações? |
+| `saudação telefônica` | 1 | `INDEFINIDO` | baixa | `alô` tem contexto telefônico e função de iniciar ou atender conversa. | É termo isolado; contexto telefônico pode qualificar sentido de lexema ou uso de expressão, mas não distingue os tipos. | O uso telefônico é sentido específico, forma, lexema ou expressão conversacional? |
+| `substantivo em expressão de apresentação` | 1 | `INDEFINIDO` | baixa | `prazer` é descrito como substantivo relacionado a expressões de apresentação. | Termo isolado; categoria gramatical e campo `significado` não resolvem lexema, forma ou sentido. | Qual é o papel de `prazer` em `muito prazer` e `prazer em conhecer você`? |
+| `substantivo em saudação coletiva` | 1 | `INDEFINIDO` | baixa | `pessoal` é descrito como palavra usada para dirigir-se a um grupo e aparece em saudações coletivas. | Termo isolado; pode ser componente, alvo discursivo ou parte de um sentido, sem evidência para escolher um tipo. | A função coletiva pertence ao termo, à expressão ou ao contexto? |
+
+## 3. ANÁLISE DOS SEIS CANDIDATOS ANTERIORES
+
+### 3.1 `saudação coletiva` — candidato retirado
+
+Os sete registros compartilham uma função de cumprimento dirigido a grupo, mas
+isso não comprova uma expressão fixa comum. Os exemplos combinam elementos
+independentes:
+
+- `olá`, `bom dia`, `boa tarde` ou `boa noite`;
+- `pessoal`, `a todos`.
+
+Há recorrência do padrão comunicativo, mas não há evidência suficiente de que
+cada sequência seja uma unidade convencionalizada distinta, em vez de uma
+combinação produtiva. O candidato `expressao` é retirado e a categoria fica
+`INDEFINIDO`.
+
+### 3.2 `saudação coletiva informal` — candidato retirado
+
+Os cinco exemplos repetem uma estrutura aproximada de saudação mais
+destinatário coletivo:
+
+- `olá pessoal`;
+- `oi pessoal`;
+- `alô pessoal`;
+- `olá gente`;
+- `oi gente`.
+
+Essa regularidade demonstra uma construção funcional, mas também evidencia a
+substituição produtiva dos componentes. A documentação não prova que a
+sequência inteira seja uma unidade lexicalizada ou fixa. `alô pessoal` ainda
+pode carregar contexto telefônico. O candidato `expressao` é retirado e a
+categoria fica `INDEFINIDO`.
+
+### 3.3 `saudação interrogativa` — candidato retirado
+
+Os exemplos `como vai`, `tudo bem` e `como você está` têm função semelhante,
+mas não formam uma estrutura textual comum demonstrada. A categoria pode estar
+agrupando atos conversacionais parecidos, não uma construção convencional única.
+
+Não há base suficiente para escolher `expressao` em nível categorial sem
+separar as estruturas e distinguir saudação, pergunta, sentido e eventual
+proposição. O candidato é retirado e a categoria fica `INDEFINIDO`.
+
+### 3.4 `saudação de período do dia` — candidato mantido
+
+`bom dia`, `boa tarde` e `boa noite` constituem o caso mais forte de expressão
+no conjunto analisado. A documentação registra três fórmulas convencionais de
+saudação, com padrão temporal estável e função comunicativa unitária.
+
+O candidato `expressao` é mantido com confiança média, não alta, porque:
+
+- `boa noite` também pode funcionar como despedida;
+- os componentes ainda não têm ordem canônica comprovada nas relações legadas;
+- a aplicação do candidato aos registros individuais continua fora desta etapa.
+
+### 3.5 `expressão de reencontro` — candidato retirado
+
+`bom te ver` e `bom te encontrar` compartilham uma construção parcial, mas
+`quanto tempo` possui estrutura diferente e pode destacar uma referência
+temporal. A documentação sustenta uma função geral de reencontro, não uma
+unidade estrutural comum a todos os registros.
+
+O candidato `expressao` é retirado por heterogeneidade interna e falta de prova
+de que `quanto tempo` tenha o mesmo tipo estrutural. A categoria fica
+`INDEFINIDO` e deve ser desdobrada antes de uma classificação canônica.
+
+### 3.6 `expressão de apresentação` — candidato mantido
+
+`prazer em conhecer você` e `muito prazer` são documentadas como fórmulas de
+apresentação e primeiro encontro. As duas têm função comunicativa reconhecível,
+uso convencional e estrutura de expressão composta, embora não sejam
+formalmente idênticas.
+
+O candidato `expressao` é mantido com confiança média. A proposta não resolve
+o papel de `prazer`, nem sua relação com o registro isolado
+`substantivo em expressão de apresentação`; esses pontos continuam sujeitos à
+revisão humana.
+
+## 4. CATEGORIAS QUE NÃO ERAM CANDIDATAS `expressao`
+
+As categorias abaixo permanecem `INDEFINIDO` porque a evidência não permite
+escolher entre expressão, lexema, forma lexical e sentido:
+
+- `substantivo em expressão de saudação`;
+- `expressão de acolhimento`;
+- `saudação informal`;
+- `adjetivo em expressões de saudação`;
+- `advérbio em expressão de saudação`;
+- `expressão de saudação`;
+- `expressão geral de cumprimento`;
+- `saudação telefônica`;
+- `substantivo em expressão de apresentação`;
+- `substantivo em saudação coletiva`.
+
+As categorias `expressão de acolhimento` e `saudação informal` são
+especialmente heterogêneas:
+
+- `seja bem-vindo` e `bem-vindo` não têm a mesma estrutura;
+- `oi` é termo isolado e `e aí` é sequência composta.
+
+Os rótulos “expressão”, “substantivo”, “adjetivo” e “advérbio” são descrições
+legadas livres. Nenhum deles substitui a classificação canônica do contrato.
+
+## 5. CATEGORIAS QUE DEVEM SER DESDOBRADAS
+
+Antes de qualquer classificação canônica, as seguintes categorias exigem
+desdobramento ou análise estrutural adicional:
+
+1. **`saudação coletiva`:** separar saudações temporais de formas gerais de
+   endereçamento coletivo e verificar se a composição é produtiva.
+2. **`saudação coletiva informal`:** separar o padrão de saudação mais
+   destinatário e avaliar o contexto telefônico de `alô`.
+3. **`saudação interrogativa`:** separar as construções e distinguir função de
+   saudação, pergunta e sentido.
+4. **`expressão de reencontro`:** separar `bom te ver`/`bom te encontrar` de
+   `quanto tempo`.
+5. **`expressão de acolhimento`:** separar `seja bem-vindo` de `bem-vindo` e
+   documentar variações de gênero e número.
+6. **`saudação informal`:** separar o termo isolado `oi` da sequência `e aí`.
+
+O desdobramento é uma condição documental para revisão futura. Ele não deve ser
+feito nesta etapa por alteração de registros ou criação de objetos.
+
+## 6. CONCLUSÃO CONSOLIDADA
+
+Das 16 categorias:
+
+- **2** permanecem candidatas a `expressao`;
+- **14** permanecem `INDEFINIDO`;
+- candidatos mantidos:
+  - `saudação de período do dia`;
+  - `expressão de apresentação`;
+- candidatos retirados da proposta anterior:
+  - `saudação coletiva`, por falta de prova de convencionalização e por
+    possível combinação produtiva;
+  - `saudação coletiva informal`, pelo mesmo motivo e pela substituição de
+    componentes;
+  - `saudação interrogativa`, porque agrupa estruturas diferentes por função;
+  - `expressão de reencontro`, porque `quanto tempo` é estruturalmente
+    diferente de `bom te ver` e `bom te encontrar`.
+
+Nenhuma categoria recebeu candidato `lexema`, `forma_lexical` ou `sentido`.
+Nenhum candidato foi aplicado a registro individual.
+
+## 7. EVIDÊNCIAS CONSULTADAS
+
+- `docs/MAPA_CATEGORIAS_LEGADAS_FASE_3_8.txt`;
+- `docs/REAVALIACAO_CATEGORIAS_FASE_3_8.txt`;
+- `docs/DECISAO_SEMANTICA_FASE_3_8.txt`;
+- `docs/INVENTARIO_LEGADO_2026-09-26.txt`;
+- `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json`;
+- `docs/MATRIZ_DECISAO_FASE_3_7.txt`;
+- `docs/PLANO_MIGRACAO_AUDITAVEL.txt`;
+- `docs/_DOC_PROJETO.txt`;
+- `03_ULTIMOS_IMPLEMENTADOS.txt`.
+
+As evidências usadas são somente documentais: termos, tipos legados,
+significados, contextos, exemplos, quantidades, relações registradas e regras
+do contrato. Tipos de relação não foram tratados como objetos semânticos.
+
+## 8. PRESERVAÇÃO E RESTRIÇÕES
+
+Este documento não altera `REAVALIACAO_CATEGORIAS_FASE_3_8.txt` nem o mapa
+original `MAPA_CATEGORIAS_LEGADAS_FASE_3_8.txt`.
+
+Nenhum código foi alterado.
+
+Nenhum banco foi alterado.
+
+Nenhum dos 70 registros foi processado.
+
+Nenhuma decisão semântica final foi tomada.
+
+Nenhum objeto canônico foi criado.
+
+Nenhuma função `registrar()`, `autorizar()` ou `aplicar()` foi chamada.

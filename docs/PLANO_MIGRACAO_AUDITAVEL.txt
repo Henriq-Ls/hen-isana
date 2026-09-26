@@ -339,3 +339,18 @@ Criados somente documentos:
 
 Nenhum código de migração foi executado ou criado. Nenhum banco foi copiado,
 alterado ou migrado. O plano termina aqui até nova autorização explícita.
+
+## 11. ADENDO DE ESTADO — AUDITORIA DE 2026-09-26
+
+O texto da seção anterior registra o estado da etapa original de planejamento.
+No estado atual do checkout, a infraestrutura de preparação segura e os
+artefatos de auditoria já existem:
+
+- `aplicacao/migracao_legado_json.py`;
+- `docs/REVISAO_LOTES_MIGRACAO.json`;
+- `docs/RESOLUCAO_REVISAO_LOTES_MIGRACAO.json`;
+- `docs/MATRIZ_DECISAO_FASE_3_7.txt`.
+
+Esses artefatos permanecem em modo de preparação/dry-run. A existência do
+código e dos relatórios não autoriza `registrar`, `autorizar`, `aplicar`,
+migração física ou alteração do legado.

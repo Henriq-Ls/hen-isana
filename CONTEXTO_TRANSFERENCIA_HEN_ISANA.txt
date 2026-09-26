@@ -1,0 +1,419 @@
+HEN-ISANA — CONTEXTO DE TRANSFERÊNCIA PARA A PRÓXIMA REPLIT
+================================================================
+
+Data do contexto: 2026-09-23
+
+LEIA ESTE ARQUIVO ANTES DE ALTERAR O PROJETO.
+
+
+1. OBJETIVO DO PROJETO
+----------------------
+
+Hen-isana é uma IA simbólica local, executada no terminal, escrita em Python
+puro e usando apenas a biblioteca padrão.
+
+Restrições importantes:
+
+- NÃO criar app web.
+- NÃO criar interface gráfica.
+- NÃO adicionar dependências externas sem necessidade.
+- O sistema deve continuar rodando localmente pelo terminal.
+- O diretório core/ é protegido e não deve ser importado por ferramentas ou
+  módulos gerados.
+- Código criado em aprendizado/gerado/ deve passar por protocolo, validação, snapshot e
+  controlador antes de ser gravado.
+- O banco de conhecimento é SQLite local.
+
+
+2. MODOS DO PROGRAMA
+--------------------
+
+Ao executar:
+
+    python hen-isana/main.py
+
+existem dois modos:
+
+1 - Conversar pessoalmente
+2 - Modo professor
+
+O modo 1 já foi testado e funciona com os termos salvos no banco. Exemplos
+confirmados:
+
+    ola
+    O que significa ola?
+    Qual é o tipo ou categoria de ola?
+    Em que contexto ola é usado?
+
+Respostas confirmadas:
+
+    ola → Olá! Como posso ajudar?
+    significado de ola → É uma saudação informal usada para iniciar uma
+    conversa ou chamar a atenção de alguém.
+    tipo de ola → cumprimento
+
+O modo 2 usa um provedor compatível com a API de chat, configurado fora do
+código do projeto em professor/config.json. Nunca compartilhar token ou chave
+desse arquivo.
+
+
+3. O QUE JÁ FOI IMPLEMENTADO
+-----------------------------
+
+Arquivos principais:
+
+- hen-isana/main.py
+  - terminal;
+  - aprendizagem dos quatro campos;
+  - consulta direta de significado, tipo, contexto e resposta;
+  - tokenização do assunto antes das perguntas no modo professor;
+  - geração automática das quatro perguntas para cada termo incompleto;
+  - fila de termos descobertos durante o modo professor;
+  - limite de quatro candidatos por resposta e 64 termos por cadeia;
+  - geração de módulo por categoria depois que o termo termina.
+
+- hen-isana/professor/professor.py
+  - cliente HTTP compatível com chat;
+  - contexto recente limitado;
+  - histórico persistente curto em AppData;
+  - cache persistente por versão, modelo e pergunta;
+  - instrução para responder em português;
+  - controle de raciocínio mínimo para OpenRouter;
+  - retry controlado para resposta sem texto;
+  - rejeição de metadados como User Safety e Response Safety;
+  - validação de categoria curta;
+  - normalização de pontuação final em categorias;
+  - rejeição de raciocínio interno exposto;
+  - uma nova tentativa para resposta inválida;
+  - erro explícito se a segunda resposta também for inválida;
+  - HTTP 429 interrompe novas chamadas na sessão atual.
+
+- hen-isana/core/controlador.py
+  - validação do código;
+  - snapshot antes da escrita;
+  - restauração após falha;
+  - registro de alterações;
+  - tentativa de commit Git.
+
+- hen-isana/bancos/
+  - conhecimento;
+  - relações;
+  - índice de código;
+  - log de mudanças.
+
+- hen-isana/aprendizado/gerado/
+  - módulos por categoria, e não um arquivo por palavra.
+
+
+4. TESTES JÁ CONFIRMADOS
+------------------------
+
+Última suíte executada no workspace:
+
+    python -m unittest discover -s hen-isana/testes -p 'test_*.py' -v
+
+Resultado:
+
+    35 testes aprovados.
+
+Também foi confirmado que:
+
+- respostas como "User Safety: safe" são rejeitadas;
+- o professor tenta novamente uma vez;
+- categoria com explicação longa é rejeitada;
+- termos descobertos só entram na fila depois que o termo atual termina;
+- termo completo gera aprendizado/gerado/<categoria>.py;
+- código gerado inválido não permanece gravado;
+- core/ continua isolado.
+- uma frase terminada em `?` é tokenizada e não é enviada inteira ao professor;
+- o modo professor gera a pergunta de tipo para o primeiro termo incompleto;
+- categoria curta com ponto final é normalizada e aceita;
+- cache repetido evita uma chamada externa.
+
+
+5. INCIDENTE DA COTA GRATUITA DO PROFESSOR
+-------------------------------------------
+
+Arquivo analisado:
+
+    attached_assets/Pasted-hen-isana-iniciado-Escolha-o-modo-de-execu-o-1-Conversa_1790130283352.txt
+
+Trecho importante da execução:
+
+    assunto> ola tudo bem?
+    professor: Olá, tudo bem sim. Em que posso ajudar?
+
+Depois disso, o sistema descobriu:
+
+    olá
+    sim
+    posso
+    ajudar
+
+Aprendeu olá como sinônimo de ola e começou o termo sim. Durante o termo sim,
+descobriu mais palavras:
+
+    advérbio
+    significa
+    afirmação
+    concordância
+    afirmar
+    concordar
+    diálogos
+
+Quando chegou à pergunta da resposta padrão de sim, o provedor respondeu HTTP
+429:
+
+    Rate limit exceeded: free-models-per-day
+    X-RateLimit-Limit: 50
+    X-RateLimit-Remaining: 0
+    limit_source: openrouter_free_tier_daily
+
+O próprio provedor informou:
+
+    Add 10 credits to unlock 1000 free model requests per day
+
+Conclusão:
+
+- não foi apenas a velocidade de uso;
+- a cota gratuita diária de 50 requisições foi esgotada;
+- a aprendizagem em cascata aumentou muito o número de chamadas;
+- respostas vazias ou inválidas podem consumir uma chamada e o retry pode
+  consumir outra;
+- o código já para novas chamadas depois do primeiro HTTP 429, evitando
+  continuar martelando o provedor na mesma sessão;
+- o erro 429 é externo ao projeto, mas o projeto ainda precisa reduzir o
+  número de chamadas que gera.
+
+O timestamp de reset informado pelo provedor foi:
+
+    1790208000000
+
+Isso corresponde a 2026-09-24 00:00:00 UTC. Não assumir que créditos pagos
+ou nova cota existem sem verificar o provedor.
+
+
+6. CASCATA CONTROLADA E PROBLEMAS AINDA ABERTOS
+--------------------------------------------------
+
+Termos desconhecidos encontrados nas respostas do professor podem ser colocados
+na fila, mas a seleção agora é limitada. A lista de palavras ignoradas existe em
+`PALAVRAS_IGNORADAS_AO_APRENDER_RESPOSTA`.
+
+Isso faz o sistema tentar aprender palavras funcionais e palavras de apoio,
+por exemplo:
+
+    sim
+    posso
+    ajudar
+    significa
+    afirmação
+    concordância
+    diálogos
+
+O sistema agora limita a quatro candidatos por resposta e 64 termos por entrada.
+Isso reduz a cascata e evita o consumo descontrolado da cota, mas ainda não é
+uma análise semântica completa: a seleção continua heurística.
+
+Estado atual:
+
+- o assunto inicial é tokenizado antes de qualquer chamada;
+- somente perguntas geradas por `aprender_termo()` chegam ao professor;
+- o termo atual termina antes dos termos da fila;
+- respostas inválidas continuam gerando retry controlado;
+- HTTP 429 interrompe novas chamadas na sessão;
+- respostas repetidas podem vir do cache local;
+- a pontuação final de uma categoria é normalizada.
+
+Não remover os limites de quatro candidatos por resposta e 64 por cadeia sem
+uma substituição segura para a seleção de termos.
+
+
+7. PONTUAÇÃO, PERGUNTAS E RESPOSTAS
+------------------------------------
+
+O sistema ainda NÃO aprende sozinho a estrutura básica da linguagem.
+
+Atualmente:
+
+- interpretar_pergunta() em main.py reconhece alguns formatos fixos;
+- as ideias de pergunta, resposta, significado e contexto estão em regras do
+  código e nas mensagens de aprendizagem;
+- tokenizar() usa palavras e descarta pontuação;
+- ?, :, ^, ! e . não entram no banco como símbolos aprendíveis;
+- não existe ainda uma etapa de alfabetização ou conhecimento inicial de
+  pontuação;
+- o sistema não vai começar sozinho a perguntar "o que é um ponto de
+  interrogação?" sem implementação específica.
+- o sinal `?` no fim de um assunto não causa mais o envio do assunto inteiro ao
+  professor; ele é descartado durante a tokenização e os termos são estudados.
+
+A expressão "tudo bem" também não é conhecida automaticamente. Em uma entrada:
+
+    ola tudo bem!
+
+o tokenizador pode produzir:
+
+    ola
+    tudo
+    bem
+
+Como ola é conhecido e tudo não é, o programa começa a aprender tudo. A
+resposta conhecida de ola pode só ser exibida depois que a frase inteira
+terminar de ser processada.
+
+Decisão ainda necessária:
+
+1. Criar conhecimento inicial de linguagem/pontuação no SQLite; ou
+2. Criar um parser estrutural que preserve símbolos e expressões; ou
+3. Manter pergunta, resposta e pontuação como fundamentos fixos no código.
+
+Não fingir que isso já foi aprendido: hoje ainda não foi.
+
+
+8. MÓDULOS GERADOS E BANCOS CONFIRMADOS
+----------------------------------------
+
+Em uma execução enviada pelo usuário, foram confirmados estes arquivos:
+
+    aprendizado/gerado/cumprimento.py
+    aprendizado/gerado/saudacao.py
+    aprendizado/gerado/cortesia.py
+    aprendizado/gerado/substantivo.py
+    aprendizado/gerado/verbo.py
+
+As classes correspondentes foram:
+
+    CategoriaCumprimento
+    CategoriaSaudacao
+    CategoriaCortesia
+    CategoriaSubstantivo
+    CategoriaVerbo
+
+Essas classes são pontes para o banco. Exemplo:
+
+    def buscar(self, termo):
+        return self.banco.buscar_termo(termo)
+
+Elas NÃO contêm ainda todos os termos da categoria dentro do código Python.
+O conhecimento permanece no conhecimento.db.
+
+Banco enviado pelo usuário:
+
+- conhecimento.db: 5 termos completos;
+- indice_codigo.db: 5 categorias ativas;
+- log_mudancas.db: 5 escritas bem-sucedidas;
+- relacoes.db: 0 relações, o que é esperado se nenhum sinônimo foi
+  confirmado;
+- diagnostico.db: 32 registros antigos de testes de bloqueio do protocolo,
+  não são evidência de que a aprendizagem atual falhou.
+
+Os arquivos enviados com nomes terminados em timestamp são cópias para
+análise, não devem ser tratados como novos nomes obrigatórios do projeto.
+
+
+9. VERSIONAMENTO E AMBIENTE WINDOWS
+------------------------------------
+
+Na execução do usuário em:
+
+    D:\Hein_Projetos\hen-isana
+
+os módulos foram criados e validados, mas o log registrou:
+
+    commit não criado: o diretório não é um repositório Git
+
+Isso significa que a escrita funcionou, mas o caminho usado na execução não
+foi reconhecido como um repositório Git. Não confundir com falha de geração.
+
+No workspace da Replit, o controlador já foi testado com commit Git real.
+
+
+10. REGRAS PARA A PRÓXIMA REPLIT
+--------------------------------
+
+- Ler este arquivo e os documentos em hen-isana/docs/ antes de alterar código.
+- Reproduzir o problema com testes locais/fakes antes de chamar o provedor real.
+- Confirmar neste documento o fluxo do modo professor antes de alterar
+  `processar_frase()` ou a cascata.
+- Nunca expor ou pedir tokens do professor.
+- Não aceitar User Safety, Response Safety, raciocínio ou resposta longa como
+  categoria.
+- Não reintroduzir recursão imediata no aprendizado.
+- Não remover o bloqueio de HTTP 429.
+- Não gerar arquivo por palavra se a regra continuar sendo um arquivo por
+  categoria.
+- Não colocar imports de core/ em ferramentas/ ou aprendizado/gerado/.
+- Preservar snapshot e restauração antes de escrever código gerado.
+- Confirmar a suíte completa depois de qualquer alteração.
+- Se for implementado um conhecimento básico de linguagem, adicionar testes
+  específicos para ?, :, ^, pergunta, resposta e expressões compostas.
+
+
+11. PRÓXIMOS PASSOS SUGERIDOS
+-----------------------------
+
+Prioridade 1 — concluída nesta sessão:
+
+- reduzir a cascata para não mandar palavras auxiliares ao professor;
+- testar que uma frase como "ola tudo bem" não consome dezenas de chamadas;
+- manter a conclusão do termo principal e a geração da categoria.
+
+Prioridade 2 — ainda pendente:
+
+- definir e implementar a base de conceitos de linguagem:
+  pergunta, resposta, palavra, frase, símbolo e pontuação;
+- preservar expressões compostas como "tudo bem";
+- adicionar testes de pontuação sem quebrar o parser existente.
+
+Prioridade 3:
+
+- decidir se classes geradas continuarão sendo adaptadores do SQLite ou se
+  passarão a carregar conhecimento próprio;
+- tratar o caso em que a execução ocorre fora de um repositório Git.
+
+
+ESTADO FINAL CONHECIDO
+======================
+
+O modo pessoal já consulta e responde conhecimento salvo.
+
+O modo professor tokeniza o assunto, gera perguntas automaticamente, aprende
+termos e gera categorias. A cascata está limitada, mas ainda usa heurísticas.
+O provedor gratuito pode atingir a cota diária por ser uma limitação externa.
+Pontuação e conceitos básicos de linguagem ainda não são conhecimento aprendido.
+
+O sistema bloqueia respostas inválidas e HTTP 429 corretamente. A seleção de
+candidatos da cascata ainda pode ser melhorada sem remover os limites atuais.
+
+12. REGISTRO DA SESSÃO 3
+========================
+
+Nesta sessão foi corrigido o desvio em que uma frase como:
+
+    ola mano como vc esta?
+
+era enviada inteira ao professor. O log corrigido confirmou:
+
+    tokens: ola, mano, como, vc, esta
+    Qual é o tipo ou categoria de 'ola'?
+
+Também foram implementados ou confirmados:
+
+- histórico curto persistente em `AppData/professor/historico.json`;
+- cache persistente em `AppData/professor/cache_respostas.json`;
+- chave do cache por versão, modelo e pergunta;
+- escrita atômica e sem persistência de token;
+- rejeição de User Safety, Response Safety e raciocínio interno;
+- retry controlado para resposta inválida;
+- normalização de ponto final em categoria curta;
+- máximo de quatro candidatos por resposta;
+- manutenção da fila após concluir o termo atual;
+- testes de frase com interrogação;
+- teste de cache sem chamada externa.
+
+Validação final da sessão:
+
+    35 testes aprovados
+    py_compile aprovado
+    git diff --check aprovado

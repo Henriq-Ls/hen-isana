@@ -88,8 +88,9 @@ versão explícita.
 `validar_lote(caminho, ingestao)` lê o manifesto, confere os hashes e chama
 somente `ingestao.dry_run()` para cada proposta. Ele não chama `registrar`,
 `autorizar`, `aplicar`, migração ou qualquer operação de escrita. Alteração de
-arquivo, arquivo ausente, total divergente ou rejeição pelo contrato deixa o
-relatório inválido.
+arquivo, arquivo extra não declarado, arquivo ausente, versão/contrato
+desconhecidos, total divergente ou rejeição pelo contrato deixa o relatório
+inválido. O manifesto também não pode declarar o mesmo arquivo duas vezes.
 
 O módulo não cria uma segunda regra de contrato. Contagens são apenas
 metadados do payload já aceito; regras estruturais e semânticas continuam nas
@@ -103,7 +104,7 @@ Implementação:
 - `testes/test_lotes_json_fase_3_7.py`;
 - `docs/LOTES_JSON_FASE_3_7.txt`.
 
-Os 9 testes específicos aprovados cobrem:
+Os 12 testes específicos aprovados cobrem:
 
 - inventário e separação de fontes;
 - leitura somente de JSONs diretos;
@@ -115,6 +116,8 @@ Os 9 testes específicos aprovados cobrem:
 - uso de `IngestaoJSON.dry_run()`;
 - preservação do banco durante validação;
 - detecção de hash alterado;
+- detecção de arquivo extra não declarado;
+- rejeição de versão ou contrato de manifesto desconhecido;
 - reempacotamento dos sete exemplos documentais.
 
 Ainda fora do escopo:

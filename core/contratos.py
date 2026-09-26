@@ -686,6 +686,12 @@ TIPOS_FONTE_CADASTRO = (
     "legado",
     "sistema",
 )
+TIPOS_LIGACAO_SENTIDO_CONCEITO = (
+    "principal",
+    "relacionado",
+    "equivalente",
+    "instanciacao",
+)
 
 
 def _chaves_mapa(
@@ -858,6 +864,7 @@ class RelacaoCadastro:
     estado: str = "proposta"
     confianca: float = 0.5
     evidencia_ids: tuple[str, ...] = ()
+    tipo_ligacao: Optional[str] = None
 
     def __post_init__(self) -> None:
         _texto_obrigatorio(self.tipo, "tipo")
@@ -868,6 +875,16 @@ class RelacaoCadastro:
         _opcao(self.estado, ESTADOS_CADASTRO, "estado")
         _confianca(self.confianca)
         _ids_texto_unicos(self.evidencia_ids, "evidencia_ids")
+        if self.tipo == "sentido_conceito":
+            _opcao(
+                self.tipo_ligacao,
+                TIPOS_LIGACAO_SENTIDO_CONCEITO,
+                "tipo_ligacao",
+            )
+        elif self.tipo_ligacao is not None:
+            raise ValueError(
+                "tipo_ligacao só pode ser usada em sentido_conceito"
+            )
 
     @classmethod
     def from_dict(cls, valor: Mapping[str, Any]) -> "RelacaoCadastro":
@@ -880,7 +897,7 @@ class RelacaoCadastro:
                 "destino_tipo",
                 "destino_chave",
             ),
-            ("ordem", "estado", "confianca", "evidencia_ids"),
+            ("ordem", "estado", "confianca", "evidencia_ids", "tipo_ligacao"),
         )
         return cls(
             tipo=valor["tipo"],
@@ -891,10 +908,11 @@ class RelacaoCadastro:
             estado=valor.get("estado", "proposta"),
             confianca=valor.get("confianca", 0.5),
             evidencia_ids=tuple(valor.get("evidencia_ids", ())),
+            tipo_ligacao=valor.get("tipo_ligacao"),
         )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        resultado = {
             "tipo": self.tipo,
             "origem_objeto_id": self.origem_objeto_id,
             "destino_tipo": self.destino_tipo,
@@ -904,6 +922,9 @@ class RelacaoCadastro:
             "confianca": self.confianca,
             "evidencia_ids": list(self.evidencia_ids),
         }
+        if self.tipo_ligacao is not None:
+            resultado["tipo_ligacao"] = self.tipo_ligacao
+        return resultado
 
 
 @dataclass(frozen=True)

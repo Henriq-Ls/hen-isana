@@ -127,11 +127,12 @@ Resultados da implementação original e da revalidação da cópia transferida:
 - hashes dos seis bancos: inalterados antes/depois da validação nesta cópia
   transferida.
 
-Os testes de lotes em `testes/test_lotes_json_fase_3_7.py` executaram 9 casos
+Os testes de lotes em `testes/test_lotes_json_fase_3_7.py` executaram 12 casos
 aprovados, cobrindo inventário de fontes, determinismo, manifesto, contagens,
 idempotência, conflito de sobrescrita, rejeição segura, `dry_run`, hash
-divergente e os sete exemplos documentais. Os testes usam diretórios
-temporários; nenhum lote foi criado no repositório.
+divergente, arquivos extras, versão/contrato desconhecidos e os sete exemplos
+documentais. Os testes usam diretórios temporários; nenhum lote foi criado no
+repositório.
 
 ## 7. FORA DESTA ETAPA
 

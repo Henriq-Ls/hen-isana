@@ -487,6 +487,10 @@ class LotesJSONConhecimento:
             raise ValueError("manifesto precisa ser um objeto")
         if manifesto.get("formato") != FORMATO_LOTE:
             raise ValueError("formato de lote desconhecido")
+        if manifesto.get("formato_versao") != VERSAO_FORMATO_LOTE:
+            raise ValueError("versão de formato de lote desconhecida")
+        if manifesto.get("contrato") != "ContratoCadastro":
+            raise ValueError("contrato de lote desconhecido")
         lote = manifesto.get("lote")
         if not isinstance(lote, Mapping):
             raise ValueError("manifesto não contém identificação do lote")
@@ -497,6 +501,21 @@ class LotesJSONConhecimento:
         declarados = _arquivos_manifesto(manifesto)
         entradas: list[EntradaLote] = []
         motivos_manifesto: list[str] = []
+        caminhos_declarados = [str(item["arquivo"]) for item in declarados]
+        if len(set(caminhos_declarados)) != len(caminhos_declarados):
+            motivos_manifesto.append("manifesto contém arquivo declarado mais de uma vez")
+        arquivos_existentes = {
+            caminho.relative_to(diretorio).as_posix()
+            for caminho in diretorio.rglob("*")
+            if caminho.is_file() and caminho != manifesto_path
+        }
+        arquivos_nao_declarados = sorted(
+            arquivos_existentes - set(caminhos_declarados)
+        )
+        motivos_manifesto.extend(
+            f"arquivo não declarado: {caminho}"
+            for caminho in arquivos_nao_declarados
+        )
         for declarado in declarados:
             relativo = declarado["arquivo"]
             arquivo = Path(relativo).name
